@@ -51,13 +51,19 @@ assignees: ''
 - [ ] **영속화**:
   - 사용자 변경 즉시 — UI 반영 + localStorage 저장
   - 500ms debounce 후 — `updateUserPreferences({ color_mode: 'DARK' })` (FW-AUTH-005)
-- [ ] **다크 모드 디자인 토큰** — Tailwind 의 `dark:` 변형으로 모든 색상 정의:
-  ```jsx
-  <div className="bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100">
-  ```
+- [ ] **디자인 토큰 (맑고 투명한 해변 테마)** — Tailwind 의 `dark:` 변형으로 모든 색상 정의.
+  - **Light Mode (한낮의 맑은 해변)**
+    - Background: 하얀 모래사장 느낌의 오프화이트 (`#FAFAFA` 또는 Tailwind `slate-50`)
+    - Primary (포인트): 투명한 에메랄드빛 바다색 (`#06B6D4` - Tailwind `cyan-500`)
+    - Surface (카드 배경): 물결이 찰랑이는 아주 연한 민트블루 (`#ECFEFF` - Tailwind `cyan-50`)
+    - Text: 젖은 모래처럼 선명하고 차분한 다크 네이비 (`#0F172A` - Tailwind `slate-900`)
+  - **Dark Mode (달빛 비치는 밤바다)** - 심해의 무서운 느낌 배제
+    - Background: 맑은 밤하늘과 이어지는 딥 네이비 (`#082F49` - Tailwind `sky-900`)
+    - Primary (포인트): 달빛 윤슬처럼 밝게 빛나는 시안 (`#22D3EE` - Tailwind `cyan-400`)
+    - Text: 맑고 깨끗한 화이트 (`#F8FAFC`)
 - [ ] **색 대비 4.5:1 검증 — 양 모드 모두**:
-  - Light 모드: 본문 #1F2937 on #FFFFFF (대비 14.6:1 ✓)
-  - Dark 모드: 본문 #F3F4F6 on #111827 (대비 14.4:1 ✓)
+  - Light 모드: 본문 slate-900 on slate-50 (대비 15.3:1 ✓)
+  - Dark 모드: 본문 F8FAFC on sky-900 (대비 12.6:1 ✓)
   - 모든 컴포넌트가 양 모드에서 axe-core 통과 강제
 - [ ] **FOUC 방지 inline script** (FR-LES-004 와 동일 패턴):
   ```html
