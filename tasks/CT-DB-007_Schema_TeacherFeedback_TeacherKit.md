@@ -1,18 +1,20 @@
-# [Feature] CT-DB-007: TeacherFeedback + TeacherKit 모델 — 재사용 의사 + PDF 캐시 메타
+# [DEPRECATED] [Feature] CT-DB-007: TeacherFeedback + TeacherKit 모델
+
+> **[DEPRECATED]**: 이 태스크는 '교사 후기 수집 및 노출 기능 전면 삭제' 정책에 따라 폐기되었습니다. TeacherKit(PDF 캐시) 등 다른 테이블에 필요한 부분은 별도 태스크로 분리하거나 삭제합니다.
 
 ```yaml
 ---
 name: Feature Task
-about: SRS 기반의 구체적인 개발 태스크 명세
-title: "[Feature] CT-DB-007: TeacherFeedback (will_reuse·used_in_class·comment) + TeacherKit (PDF 캐시 메타) 모델"
-labels: 'feature, backend, db, teacher, priority:high, mvp-in, private-beta'
+about: SRS 기반의 구체적인 개발 태스크 명세 (폐기됨)
+title: "[DEPRECATED] [Feature] CT-DB-007: TeacherFeedback 모델"
+labels: 'deprecated, backend, db, teacher'
 assignees: ''
 ---
 ```
 
 ## :dart: Summary
-- **기능명**: [CT-DB-007] TeacherFeedback (교사 피드백 — will_reuse·used_in_class·comment) + TeacherKit (PDF 캐시 메타 — revision_at_generated·storage_path) 2개 테이블 정의
-- **목적**: Story 3 (장은혜) 의 데이터 기반. FW-TF-001 (피드백 제출) + FR-PDF-001 (PDF 다운로드 캐시) 의 데이터 진입점. INV-07 (TeacherFeedback 은 TEACHER role 만 INSERT) 의 데이터 레이어 강제 + REQ-NF-046 (재사용 의사 ≥10명) 누적 측정 기반.
+- **기능명**: [CT-DB-007] TeacherFeedback (폐기됨)
+- **목적**: 기능 축소 원칙에 따라 교사 피드백 기능을 완전히 제거합니다.
 
 ## :link: References (Spec & Context)
 > :bulb: AI Agent & Dev Note: 작업 시작 전 아래 문서를 반드시 먼저 Read/Evaluate 할 것.

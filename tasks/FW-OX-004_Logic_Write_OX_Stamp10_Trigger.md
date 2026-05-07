@@ -1,18 +1,18 @@
-# [Feature] FW-OX-004: 스탬프 10개 도달 트리거 — Resend 체감 변화 설문 메일 자동 발송 (1회 멱등)
+# [Feature] FW-OX-004: 권별(25편) 완주 트리거 — 체감 변화 설문 발송
 
 ```yaml
 ---
 name: Feature Task
 about: SRS 기반의 구체적인 개발 태스크 명세
-title: "[Feature] FW-OX-004: stamp_count = 10 도달 시 Resend 메일 발송 — REQ-FUNC-003 트리거 + 1회 멱등 + EventLog 기반 누적 카운트"
+title: "[Feature] FW-OX-004: 권별 완주 (stamp_count % 25 === 0) 시 설문 메일 발송"
 labels: 'feature, backend, ox, stamp, survey, priority:critical, mvp-in, public-pilot'
 assignees: ''
 ---
 ```
 
 ## :dart: Summary
-- **기능명**: [FW-OX-004] 사용자가 10번째 stamp 를 획득하는 순간 (FW-OX-001 의 Stamp INSERT 직후) Resend 로 체감 변화 설문 메일 자동 발송 + 1회 멱등 (재발송 방지) + EventLog 기록
-- **목적**: REQ-FUNC-003 (스탬프 10자리 트리거 → 체감 변화 설문) 구현. PRD 의 "꾸준히 학습한 사용자에게 학습 효용 자기보고 유도" — 단순 다운로드 카운트가 아닌 **체감 변화** 측정 위한 진입점. CT-API-008 (submitSurvey DTO) + IF-RES-001 (Resend) 연결. **MVP-IN** — Public Pilot 진입 시점 활성, 실 운영 데이터 수집.
+- **기능명**: [FW-OX-004] 사용자가 한 권(25편)을 완주하는 순간 (FW-OX-001 의 Stamp INSERT 직후, `stampCount % 25 === 0`) 설문 메일 자동 발송
+- **목적**: REQ-FUNC-003 구현. 권 단위 학습 효용 측정.
 
 ## :link: References (Spec & Context)
 > :bulb: AI Agent & Dev Note: 작업 시작 전 아래 문서를 반드시 먼저 Read/Evaluate 할 것.
@@ -45,8 +45,8 @@ assignees: ''
       // 1. 현재 stamp_count 조회
       const stampCount = await prisma.stamp.count({ where: { userId } });
 
-      // 2. 10자리 도달 검증
-      if (stampCount !== 10) return;  // 정확히 10개일 때만 트리거 (11, 12 무시)
+      // 2. 권별(25개 단위) 도달 검증
+      if (stampCount === 0 || stampCount % 25 !== 0) return;  // 25, 50, 75, 100, 125 개 도달 시에만 트리거
 
       // 3. 멱등 검증 — 이미 발송했는지 EventLog 확인
       const alreadySent = await prisma.eventLog.findFirst({
@@ -105,7 +105,7 @@ assignees: ''
     return (
       <Html>
         <Body>
-          <Heading>{nickname}님, 10편 완주 축하드립니다.</Heading>
+          <Heading>{nickname}님, 한 권 완주 축하드립니다.</Heading>
           <Text>
             경제 판단력 교과서를 꾸준히 학습해 주셔서 감사합니다.
             지금까지의 학습이 일상의 경제 판단에 어떤 변화를 가져왔는지 잠깐 되돌아보는 시간을
@@ -156,15 +156,15 @@ assignees: ''
 
 ## :test_tube: Acceptance Criteria (BDD/GWT)
 
-### Scenario 1: 10번째 stamp 도달 → 발송
-- **Given**: 사용자 A 의 stamp 9개 + 10번째 OX 통과
+### Scenario 1: 권(25편) 완주 → 발송
+- **Given**: 사용자 A 의 stamp 24개 + 25번째 OX 통과
 - **When**: FW-OX-001 의 트랜잭션 직후 checkStampMilestone(A) 호출
 - **Then**: Resend 메일 1통 발송. EventLog `survey.milestone_email_sent` 1건 INSERT
 
-### Scenario 2: 11번째 stamp — 발송 0
-- **Given**: 사용자 A 가 11번째 stamp 획득
+### Scenario 2: 26번째 stamp — 발송 0
+- **Given**: 사용자 A 가 26번째 stamp 획득
 - **When**: 호출
-- **Then**: 메일 미발송. stamp_count !== 10 으로 return
+- **Then**: 메일 미발송. stamp_count % 25 !== 0 으로 return
 
 ### Scenario 3: 멱등 — 재호출 시 미발송
 - **Given**: 이미 메일 발송 완료 (EventLog 존재) + 가상의 시나리오 (DB 조작으로 stamp_count=10 재현)

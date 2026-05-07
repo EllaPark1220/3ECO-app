@@ -1,18 +1,18 @@
-# [Feature] CT-MOCK-001: Lesson 10편 시드 + Module 5종 + OxQuestion 50건 + 콘텐츠 무결성 검증
+# [Feature] CT-MOCK-001: Lesson 125편 시드 + 총 5권 구성 + OxQuestion 625건 + 콘텐츠 무결성 검증
 
 ```yaml
 ---
 name: Feature Task
 about: SRS 기반의 구체적인 개발 태스크 명세
-title: "[Feature] CT-MOCK-001: Lesson 10편 (L001~L010) + Module M1~M5 + OxQuestion 50건 (10×5) 시드 + 무결성 검증 스크립트"
+title: "[Feature] CT-MOCK-001: Lesson 125편 (L001~L125, 총 5권) + OxQuestion 625건 (125×5) 시드 + 무결성 검증 스크립트"
 labels: 'feature, backend, content, mock, priority:critical, mvp-in, alpha'
 assignees: ''
 ---
 ```
 
 ## :dart: Summary
-- **기능명**: [CT-MOCK-001] Alpha 단계 운영을 위한 Lesson 10편 + Module 5종 + OxQuestion 50건 시드 스크립트 + 콘텐츠 무결성 자동 검증
-- **목적**: 모든 E2E 테스트 (TS-E2E-001·002·003·004·007·009·010) + Alpha 실 운영의 데이터 기반. 단순 dummy 가 아닌 **REQ-FUNC-008 (한국 맥락 예시 1개 이상) + REQ-FUNC-014 (3매체 정합성) + REQ-FUNC-015 (개정 이력 자동 삽입) + REQ-FUNC-037 (CC BY-NC-SA 4.0 라이선스) 모두 충족하는 실제 운영 가능 콘텐츠**.
+- **기능명**: [CT-MOCK-001] Alpha 단계 운영을 위한 Lesson 125편(총 5권) + OxQuestion 625건 시드 스크립트 + 콘텐츠 무결성 자동 검증
+- **목적**: 모든 E2E 테스트 및 실 운영의 데이터 기반. 단순 dummy 가 아닌 실제 운영 가능 콘텐츠.
 
 ## :link: References (Spec & Context)
 > :bulb: AI Agent & Dev Note: 작업 시작 전 아래 문서를 반드시 먼저 Read/Evaluate 할 것.
@@ -28,9 +28,9 @@ assignees: ''
 
 ## :white_check_mark: Task Breakdown (실행 계획)
 - [ ] `prisma/seed/index.ts` 메인 시드 스크립트 + 분리:
-  - `prisma/seed/modules.ts` — M1~M5
-  - `prisma/seed/lessons.ts` — L001~L010
-  - `prisma/seed/ox-questions.ts` — 50건
+  - `prisma/seed/modules.ts` — Volume 1~5 (총 5권)
+  - `prisma/seed/lessons.ts` — L001~L125
+  - `prisma/seed/ox-questions.ts` — 625건
 - [ ] **Module 5종 시드 (M1~M5)**:
   ```ts
   const modules = [
@@ -64,8 +64,8 @@ assignees: ''
   async function verify() {
     const lessons = await prisma.lesson.findMany({ include: { oxQuestions: true } });
 
-    // 1. Lesson 10편
-    if (lessons.length !== 10) throw new Error(`Lesson 카운트 ${lessons.length} (기대 10)`);
+    // 1. Lesson 125편
+    if (lessons.length !== 125) throw new Error(`Lesson 카운트 ${lessons.length} (기대 125)`);
 
     // 2. lessonId 포맷
     for (const l of lessons) {
@@ -130,7 +130,7 @@ assignees: ''
 ### Scenario 1: 시드 정상 실행
 - **Given**: 클린 DB (마이그레이션만 적용)
 - **When**: `npm run db:seed`
-- **Then**: Module 5건 + Lesson 10건 + OxQuestion 50건 INSERT. 에러 0건
+- **Then**: Module 5건(권) + Lesson 125건 + OxQuestion 625건 INSERT. 에러 0건
 
 ### Scenario 2: 무결성 검증 통과
 - **Given**: 시드 완료

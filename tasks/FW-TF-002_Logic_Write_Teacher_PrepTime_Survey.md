@@ -1,18 +1,20 @@
-# [Feature] FW-TF-002: 교사 사전-사후 설문 — 평균 ≥60분 절감 검증 + REQ-NF-047 측정
+# [DEPRECATED] [Feature] FW-TF-002: 교사 사전-사후 설문
+
+> **[DEPRECATED]**: 이 태스크는 '교사 후기 수집 및 노출 기능 전면 삭제' 정책에 따라 폐기되었습니다.
 
 ```yaml
 ---
 name: Feature Task
-about: SRS 기반의 구체적인 개발 태스크 명세
-title: "[Feature] FW-TF-002: 교사 사전-사후 설문 폼 — preparation_time_before/after + 평균 절감 시간 ≥60분 검증 + 분기당 1회"
-labels: 'feature, backend, teacher, survey, priority:medium, mvp-soft, public-pilot'
+about: SRS 기반의 구체적인 개발 태스크 명세 (폐기됨)
+title: "[DEPRECATED] [Feature] FW-TF-002: 교사 사전-사후 설문 폼"
+labels: 'deprecated, backend, teacher, survey'
 assignees: ''
 ---
 ```
 
 ## :dart: Summary
-- **기능명**: [FW-TF-002] 교사 사전-사후 설문 — 본 사이트 콘텐츠 활용 **이전** vs **이후** 의 수업 준비 시간 (preparation_time_before, preparation_time_after) 입력 → 평균 절감 시간 집계 + REQ-NF-047 (≥60분 절감) 검증
-- **목적**: 단순 다운로드 카운트 (FR-KPI-006) 외 **교사가 실제로 시간을 절감했는지** 정량 측정. PRD 의 "교안 활용 시 수업 준비 효율 ≥60분 절감" 검증. **MVP-SOFT** — Public Pilot 진입 후 활성. CT-DB-007 (TeacherFeedback) 의 컬럼 확장.
+- **기능명**: [FW-TF-002] 교사 사전-사후 설문 (폐기됨)
+- **목적**: 기능 축소 원칙에 따라 제거되었습니다.
 
 ## :link: References (Spec & Context)
 > :bulb: AI Agent & Dev Note: 작업 시작 전 아래 문서를 반드시 먼저 Read/Evaluate 할 것.

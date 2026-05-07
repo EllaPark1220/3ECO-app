@@ -1,18 +1,20 @@
-# [Feature] FR-TF-001: 교사 will_reuse 누적 집계 — Stage 1 ≥10명 검증 + lesson 별 분포
+# [DEPRECATED] [Feature] FR-TF-001: 교사 will_reuse 누적 집계
+
+> **[DEPRECATED]**: 이 태스크는 '교사 후기 수집 및 노출 기능 전면 삭제' 정책에 따라 폐기되었습니다.
 
 ```yaml
 ---
 name: Feature Task
-about: SRS 기반의 구체적인 개발 태스크 명세
-title: "[Feature] FR-TF-001: GET /api/teacher-feedback/summary — DISTINCT teacher_id (will_reuse=true, 가장 최근) + REQ-NF-046 진척도 (TEACHER 본인용)"
-labels: 'feature, backend, teacher, query, priority:high, mvp-in, private-beta'
+about: SRS 기반의 구체적인 개발 태스크 명세 (폐기됨)
+title: "[DEPRECATED] [Feature] FR-TF-001: GET /api/teacher-feedback/summary"
+labels: 'deprecated, backend, teacher, query'
 assignees: ''
 ---
 ```
 
 ## :dart: Summary
-- **기능명**: [FR-TF-001] `GET /api/teacher-feedback/summary` — TEACHER 본인의 피드백 이력 조회 + 전체 누적 (운영 KPI 가 아닌 본인 활동 요약) + lesson 별 분포 + REQ-NF-046 운영 진척도 (선택 노출)
-- **목적**: TEACHER 사용자가 본인의 피드백 이력 + 전체 누적을 자가 확인할 수 있게 한다. **FR-KPI-007 (이미 발행 — ADMIN 전용 누적 KPI) 와 분리** — 본 태스크는 본인용 요약. 운영 진척도 (≥10명) 는 익명 카운트로만 노출 (TEACHER 도 자신 외 다른 교사 식별자 미노출).
+- **기능명**: [FR-TF-001] (폐기됨)
+- **목적**: 기능 축소 원칙에 따라 제거되었습니다.
 
 ## :link: References (Spec & Context)
 > :bulb: AI Agent & Dev Note: 작업 시작 전 아래 문서를 반드시 먼저 Read/Evaluate 할 것.

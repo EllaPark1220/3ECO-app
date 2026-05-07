@@ -1,18 +1,20 @@
-# [Feature] CT-API-007: submitTeacherFeedback() Server Action DTO + will_reuse·used_in_class·comment + RBAC TEACHER
+# [DEPRECATED] [Feature] CT-API-007: submitTeacherFeedback() Server Action DTO
+
+> **[DEPRECATED]**: 이 태스크는 '교사 후기 수집 및 노출 기능 전면 삭제' 정책에 따라 폐기되었습니다.
 
 ```yaml
 ---
 name: Feature Task
-about: SRS 기반의 구체적인 개발 태스크 명세
-title: "[Feature] CT-API-007: submitTeacherFeedback() Server Action DTO — {lesson_id, will_reuse, used_in_class, comment} + RBAC TEACHER 가드 + 재제출 허용"
-labels: 'feature, backend, api-spec, teacher, priority:critical, mvp-in, private-beta'
+about: SRS 기반의 구체적인 개발 태스크 명세 (폐기됨)
+title: "[DEPRECATED] [Feature] CT-API-007: submitTeacherFeedback() Server Action DTO"
+labels: 'deprecated, backend, api-spec, teacher'
 assignees: ''
 ---
 ```
 
 ## :dart: Summary
-- **기능명**: [CT-API-007] `submitTeacherFeedback()` Server Action 의 Contract — Zod 입력 (`lesson_id` + `will_reuse` + `used_in_class` + optional `comment`) + RBAC TEACHER 가드 명시 + 재제출 허용 (UNIQUE 제약 미적용) + comment 2000자 제한 + XSS 방어 정책
-- **목적**: FW-TF-001 (Logic Write 본체) 의 Contract SSOT. Story 3 (장은혜) 의 데이터 진입점 + Private Beta Exit Gate (REQ-NF-046 ≥10명) 의 SSOT. INV-07 (TEACHER 만 생성) 의 데이터 레이어 강제.
+- **기능명**: [CT-API-007] `submitTeacherFeedback()` (폐기됨)
+- **목적**: 기능 축소 원칙에 따라 제거되었습니다.
 
 ## :link: References (Spec & Context)
 > :bulb: AI Agent & Dev Note: 작업 시작 전 아래 문서를 반드시 먼저 Read/Evaluate 할 것.

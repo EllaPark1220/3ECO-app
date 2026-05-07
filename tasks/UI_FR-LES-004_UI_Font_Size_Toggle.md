@@ -40,7 +40,10 @@ assignees: ''
   html.font-medium { --font-size-base: 18px; }
   html.font-large  { --font-size-base: 20px; }
 
-  body, .lesson-content, .ox-question { font-size: var(--font-size-base); }
+  body, .lesson-content, .ox-question { 
+    font-size: var(--font-size-base); 
+    font-family: 'Pretendard', sans-serif;
+  }
   ```
 - [ ] **rem 단위 활용** — 본문·UI 의 모든 텍스트가 base 기준 상대 크기 (`text-base`, `text-lg` 등 Tailwind class 활용). 절대 px 금지
 - [ ] **선택 즉시 반영** — `useState` 로 클라이언트 상태 관리 → html 클래스 즉시 변경 → 영속화는 별도 (debounce 500ms)

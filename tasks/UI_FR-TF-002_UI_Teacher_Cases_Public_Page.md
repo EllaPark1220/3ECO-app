@@ -1,18 +1,20 @@
-# [Feature] FR-TF-002: 교사 실사용 사례 공개 페이지 — 본인 동의 사례만 + DOMPurify XSS 방어 + 익명 표시 옵션
+# [DEPRECATED] [Feature] FR-TF-002: 교사 실사용 사례 공개 페이지
+
+> **[DEPRECATED]**: 이 태스크는 '교사 후기 페이지 삭제' 정책에 따라 폐기되었습니다.
 
 ```yaml
 ---
 name: Feature Task
-about: SRS 기반의 구체적인 개발 태스크 명세
-title: "[Feature] FR-TF-002: GET /teachers/cases — 본인 동의한 used_in_class=true 피드백 공개 페이지 + DOMPurify sanitize + 익명/실명 옵션 + 페이지네이션"
-labels: 'feature, frontend, teacher, public, priority:medium, mvp-soft, public-pilot'
+about: SRS 기반의 구체적인 개발 태스크 명세 (폐기됨)
+title: "[DEPRECATED] [Feature] FR-TF-002: GET /teachers/cases"
+labels: 'deprecated, feature, frontend'
 assignees: ''
 ---
 ```
 
 ## :dart: Summary
-- **기능명**: [FR-TF-002] `/teachers/cases` 공개 페이지 — 본인 동의 (`isPublicConsent=true`) 한 TeacherFeedback 의 `used_in_class=true` 사례 + comment 본문 + 닉네임 또는 익명 표시 옵션 + DOMPurify XSS 방어 + 페이지네이션
-- **목적**: REQ-FUNC-016 (재사용 의사 누적) + 콘텐츠 신뢰도 강화. 다른 교사가 실제로 어떻게 활용했는지 사례 공개 → 신규 교사 outreach 효과. **본인 동의 (`isPublicConsent=true`) 만** 노출 — PII 보호 + 자발적 공개. CON-05 정합 — 사례는 차분한 톤으로 표시.
+- **기능명**: [FR-TF-002] `/teachers/cases` 공개 페이지 (폐기됨)
+- **목적**: 불필요한 기능 최소화 원칙에 따라 교사 후기 페이지 구현을 취소합니다.
 
 ## :link: References (Spec & Context)
 > :bulb: AI Agent & Dev Note: 작업 시작 전 아래 문서를 반드시 먼저 Read/Evaluate 할 것.

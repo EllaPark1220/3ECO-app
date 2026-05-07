@@ -1,18 +1,20 @@
-# [Feature] FW-TF-001: submitTeacherFeedback() Server Action — 재사용 의사 + RBAC TEACHER 가드
+# [DEPRECATED] [Feature] FW-TF-001: submitTeacherFeedback() Server Action
+
+> **[DEPRECATED]**: 이 태스크는 '교사 후기 수집 및 노출 기능 전면 삭제' 정책에 따라 폐기되었습니다.
 
 ```yaml
 ---
 name: Feature Task
-about: SRS 기반의 구체적인 개발 태스크 명세
-title: "[Feature] FW-TF-001: submitTeacherFeedback() Server Action — will_reuse + used_in_class + comment 저장 (RBAC TEACHER 가드)"
-labels: 'feature, backend, teacher, rbac, priority:high, mvp-in, private-beta'
+about: SRS 기반의 구체적인 개발 태스크 명세 (폐기됨)
+title: "[DEPRECATED] [Feature] FW-TF-001: submitTeacherFeedback() Server Action"
+labels: 'deprecated, backend, teacher, rbac'
 assignees: ''
 ---
 ```
 
 ## :dart: Summary
-- **기능명**: [FW-TF-001] `submitTeacherFeedback()` Server Action — 교사가 PDF 다운로드 후 `will_reuse`(재사용 의사)·`used_in_class`(수업 활용 여부)·`comment`(자유 의견) 을 제출하는 Write 로직
-- **목적**: Story 3 (장은혜) 의 종착점이며 Private Beta Exit 게이트 핵심 — "교사 재사용 의사 1건 이상" (REQ-NF-046 의 누적 ≥10명 으로 향하는 시발점). UC-08 (교사 피드백 제출) + REQ-FUNC-016 (재사용 의사 누적) + INV-07 (LEARNER 의 TeacherFeedback 생성 차단) 충족.
+- **기능명**: [FW-TF-001] `submitTeacherFeedback()` (폐기됨)
+- **목적**: 기능 축소 원칙에 따라 제거되었습니다.
 
 ## :link: References (Spec & Context)
 > :bulb: AI Agent & Dev Note: 작업 시작 전 아래 문서를 반드시 먼저 Read/Evaluate 할 것.

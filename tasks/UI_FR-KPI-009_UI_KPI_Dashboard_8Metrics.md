@@ -11,8 +11,8 @@ assignees: ''
 ```
 
 ## :dart: Summary
-- **기능명**: [FR-KPI-009] ADMIN 전용 8개 KPI 통합 대시보드 UI
-- **목적**: FR-KPI-001~007 의 개별 API 를 단일 대시보드 페이지로 통합하여 단일 제작자(CON-08) 가 서비스 상태를 한눈에 파악한다. REQ-NF-032 (KPI 대시보드 자동 집계 + 시각화) 를 충족. 8개 KPI 카드 + 시계열 차트 + 목표 대비 게이지를 제공하며, 추가로 캐시 HIT 비율 (IF-CACHE-002)·D-TIER 상태 (IF-VC-002)·Sentry 에러 카운트도 운영 지표로 포함.
+- **기능명**: [FR-KPI-009] ADMIN 전용 7개 KPI 통합 대시보드 UI
+- **목적**: 개별 API 를 단일 대시보드 페이지로 통합하여 단일 제작자(CON-08) 가 서비스 상태를 한눈에 파악한다. REQ-NF-032 (KPI 대시보드 자동 집계 + 시각화) 를 충족. 7개 KPI 카드 + 시계열 차트 + 목표 대비 게이지를 제공하며, 추가로 캐시 HIT 비율 (IF-CACHE-002)·D-TIER 상태 (IF-VC-002)·Sentry 에러 카운트도 운영 지표로 포함.
 
 ## :link: References (Spec & Context)
 > :bulb: AI Agent & Dev Note: 작업 시작 전 아래 문서를 반드시 먼저 Read/Evaluate 할 것.
@@ -28,8 +28,8 @@ assignees: ''
   import { requireRole } from '@/lib/auth/guards';
   export default async function KpiDashboard() {
     await requireRole('ADMIN');
-    // 8개 KPI API 병렬 fetch
-    const [signups, l4, oxAccuracy, mediaPref, dau, teacherKit, teacherReuse, cacheHit] =
+    // 7개 KPI API 병렬 fetch
+    const [signups, l4, oxAccuracy, mediaPref, dau, teacherKit, cacheHit] =
       await Promise.all([
         fetch('/api/kpi/signups'),
         fetch('/api/kpi/l4-completion'),
@@ -37,16 +37,15 @@ assignees: ''
         fetch('/api/kpi/media-preference'),
         fetch('/api/kpi/dau'),
         fetch('/api/kpi/teacher-kit'),
-        fetch('/api/kpi/teacher-reuse'),
         fetch('/api/kpi/cache-hit'),
       ].map(p => p.then(r => r.json())));
-    return <DashboardGrid data={{ signups, l4, oxAccuracy, mediaPref, dau, teacherKit, teacherReuse, cacheHit }} />;
+    return <DashboardGrid data={{ signups, l4, oxAccuracy, mediaPref, dau, teacherKit, cacheHit }} />;
   }
   ```
 - [ ] `app/admin/dashboard/components/DashboardGrid.tsx` — 8카드 그리드:
   - 2열 × 4행 반응형 그리드 (모바일 1열)
   - 각 카드: 제목 + 현재값 + 목표 + 달성률 게이지 + 미니 시계열 sparkline
-- [ ] **KPI 카드 8종**:
+- [ ] **KPI 카드 7종**:
 
   | # | 카드 | 데이터 소스 | 목표 |
   |---|---|---|---|
@@ -56,8 +55,7 @@ assignees: ''
   | 4 | 매체 선호 분포 | FR-KPI-004 | 3매체 고른 분포 |
   | 5 | DAU | FR-KPI-005 | ≥50 |
   | 6 | 교안 다운로드 | FR-KPI-006 | ≥100회/월 |
-  | 7 | 교사 재사용 | FR-KPI-007 | ≥70% |
-  | 8 | 캐시 HIT | IF-CACHE-002 | ≥95% |
+  | 7 | 캐시 HIT | IF-CACHE-002 | ≥95% |
 
 - [ ] **시계열 차트** — `recharts` 또는 `chart.js` 라이트 활용:
   ```tsx
