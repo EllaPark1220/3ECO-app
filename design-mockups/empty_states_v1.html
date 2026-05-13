@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light">
+<title>빈 상태 시안 — 고요의 경제나루</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+<style>
+  :root {
+    color-scheme: light;
+    --bg-light: #F8FCFC;
+    --water-light: #DCEAEE;
+    --water-card: #EBF5F5;
+    --accent-soft: #86D0D6;
+    --accent-main: #1A8E9C;
+    --accent-deep: #0D5F6D;
+    --text-main: #0E2B30;
+    --text-soft: #4A5A60;
+    --text-mute: #7A8A90;
+    --line-light: #DCE7E8;
+    --line-soft: #E8F0F0;
+
+    --hahmlet: "Hahmlet", serif;
+    --pretendard: "Pretendard Variable", -apple-system, sans-serif;
+    --mono: "JetBrains Mono", monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--pretendard);
+    background: var(--bg-light);
+    color: var(--text-main);
+    line-height: 1.78;
+    font-size: 16px;
+  }
+
+  a:focus-visible, button:focus-visible {
+    outline: 2px solid var(--accent-main);
+    outline-offset: 3px; border-radius: 4px;
+  }
+
+  /* NAV */
+  .nav {
+    padding: 18px 40px;
+    display: flex; justify-content: center; align-items: center;
+    border-bottom: 1px solid var(--line-soft);
+    background: rgba(248, 252, 252, 0.92);
+  }
+  .nav-logo {
+    font-family: var(--hahmlet); font-weight: 600; font-size: 16px;
+    color: var(--text-main); letter-spacing: -0.01em; text-decoration: none;
+  }
+
+  /* 페이지 헤더 (데모 안내) */
+  .demo-header {
+    max-width: 720px; margin: 0 auto; padding: 60px 40px 30px;
+    text-align: center;
+  }
+  .demo-eyebrow {
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.3em;
+    color: var(--accent-deep); font-weight: 600; margin-bottom: 14px;
+    text-transform: uppercase;
+  }
+  .demo-title {
+    font-family: var(--hahmlet); font-weight: 600;
+    font-size: 32px; line-height: 1.3;
+    color: var(--text-main); letter-spacing: -0.015em; margin-bottom: 12px;
+  }
+  .demo-lead {
+    font-family: var(--pretendard); font-size: 14.5px;
+    color: var(--text-soft); line-height: 1.8;
+  }
+
+  /* 시나리오 컨테이너 */
+  .scenarios { max-width: 980px; margin: 0 auto; padding: 30px 40px 80px; }
+
+  .scenario {
+    margin-bottom: 56px;
+  }
+
+  .scenario-label {
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: 0.15em; color: var(--accent-deep);
+    font-weight: 600; text-transform: uppercase;
+    margin-bottom: 12px;
+    padding-left: 4px;
+  }
+
+  .scenario-label .sep {
+    color: var(--text-mute); margin: 0 8px;
+    font-weight: 400;
+  }
+  .scenario-label .url {
+    color: var(--text-mute); font-weight: 400;
+    text-transform: none; letter-spacing: 0.02em;
+  }
+
+  /* 시안 박스 (실제 페이지처럼) */
+  .scenario-content {
+    background: #FFFFFF;
+    border: 1px solid var(--line-light);
+    border-radius: 20px;
+    padding: 80px 60px;
+    min-height: 420px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center;
+  }
+
+  /* 심볼 영역 */
+  .empty-symbol {
+    margin-bottom: 32px;
+    color: var(--accent-soft);
+  }
+
+  .empty-symbol-404 {
+    font-family: var(--hahmlet);
+    font-weight: 700;
+    font-size: clamp(72px, 12vw, 110px);
+    line-height: 1;
+    color: var(--water-light);
+    letter-spacing: -0.02em;
+    margin-bottom: 18px;
+  }
+
+  .empty-symbol-svg {
+    width: 64px; height: 64px;
+    stroke: var(--accent-soft);
+    stroke-width: 1.5;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* 빈 진주 (학습 시작 전) */
+  .empty-pearl {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    background: transparent;
+    border: 1.5px dashed rgba(134, 208, 214, 0.55);
+    margin-bottom: 24px;
+    position: relative;
+  }
+
+  /* 텍스트 */
+  .empty-title {
+    font-family: var(--hahmlet); font-weight: 600;
+    font-size: clamp(22px, 3vw, 28px); line-height: 1.4;
+    color: var(--text-main); letter-spacing: -0.015em;
+    margin-bottom: 14px;
+  }
+
+  .empty-desc {
+    font-family: var(--pretendard); font-size: 15px;
+    color: var(--text-soft); line-height: 1.85;
+    max-width: 440px;
+    margin-bottom: 32px;
+  }
+
+  /* CTA */
+  .empty-actions {
+    display: flex; gap: 10px; flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .btn-primary {
+    display: inline-flex; align-items: center;
+    padding: 13px 26px;
+    background: var(--accent-main);
+    color: #FFFFFF;
+    border: none;
+    border-radius: 11px;
+    font-family: var(--pretendard);
+    font-weight: 600;
+    font-size: 14.5px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+  .btn-primary:hover {
+    background: var(--accent-deep);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px -8px rgba(26, 142, 156, 0.5);
+  }
+
+  .btn-secondary {
+    display: inline-flex; align-items: center;
+    padding: 13px 22px;
+    background: transparent;
+    color: var(--text-main);
+    border: 1.5px solid var(--line-light);
+    border-radius: 11px;
+    font-family: var(--pretendard);
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+  .btn-secondary:hover {
+    border-color: var(--accent-soft);
+    background: var(--water-card);
+    color: var(--accent-deep);
+  }
+
+  .empty-link {
+    margin-top: 22px;
+    font-family: var(--pretendard);
+    font-size: 13px;
+    color: var(--text-soft);
+  }
+  .empty-link a {
+    color: var(--accent-deep);
+    text-decoration: underline;
+  }
+
+  /* Footer */
+  .demo-footer {
+    text-align: center;
+    padding: 40px 20px;
+    border-top: 1px solid var(--line-soft);
+    background: var(--water-card);
+  }
+  .demo-footer-text {
+    font-family: var(--pretendard);
+    font-size: 12px;
+    color: var(--text-soft);
+    line-height: 1.85;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .nav { padding: 14px 20px; }
+    .demo-header { padding: 40px 22px 24px; }
+    .demo-title { font-size: 24px; }
+    .scenarios { padding: 20px 18px 60px; }
+    .scenario-content { padding: 56px 28px; min-height: 360px; }
+  }
+</style>
+</head>
+<body>
+
+  <nav class="nav">
+    <a href="/" class="nav-logo">고요의 경제나루</a>
+  </nav>
+
+  <header class="demo-header">
+    <div class="demo-eyebrow">EMPTY STATES</div>
+    <h1 class="demo-title">빈 상태 · 오류 페이지 시안</h1>
+    <p class="demo-lead">학습자가 마주칠 수 있는 네 가지 빈 상태입니다. 실서비스에서는 각자 라우트로 분리되어 작동합니다.</p>
+  </header>
+
+  <div class="scenarios">
+
+    <!-- SCENARIO 01 : 404 -->
+    <section class="scenario">
+      <div class="scenario-label">
+        SCENARIO 01 <span class="sep">·</span> 404 페이지
+        <span class="sep">·</span> <span class="url">/any-invalid-url</span>
+      </div>
+      <div class="scenario-content">
+        <div class="empty-symbol-404">404</div>
+        <h2 class="empty-title">찾으시는 페이지가 없어요</h2>
+        <p class="empty-desc">주소를 다시 확인해 보시거나, 처음으로 돌아가 천천히 둘러보세요.</p>
+        <div class="empty-actions">
+          <a href="/" class="btn-primary">홈으로</a>
+          <a href="/curriculum/1" class="btn-secondary">1권 1편부터 시작</a>
+        </div>
+        <div class="empty-link">계속 같은 문제가 생기면 <a href="mailto:contact@example.com">알려주세요</a></div>
+      </div>
+    </section>
+
+    <!-- SCENARIO 02 : 학습 시작 전 -->
+    <section class="scenario">
+      <div class="scenario-label">
+        SCENARIO 02 <span class="sep">·</span> 학습 시작 전 · 신규 회원
+        <span class="sep">·</span> <span class="url">/stamp-map</span>
+      </div>
+      <div class="scenario-content">
+        <div class="empty-pearl" aria-hidden="true"></div>
+        <h2 class="empty-title">아직 켜진 진주가 없습니다</h2>
+        <p class="empty-desc">1권 1편부터 천천히 시작해 보세요. 한 편을 마칠 때마다 작은 진주가 하나씩 켜집니다.</p>
+        <div class="empty-actions">
+          <a href="/lesson/1-1" class="btn-primary">1권 1편 시작하기</a>
+          <a href="/curriculum/1" class="btn-secondary">전체 커리큘럼 보기</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCENARIO 03 : 로그인 필요 -->
+    <section class="scenario">
+      <div class="scenario-label">
+        SCENARIO 03 <span class="sep">·</span> 로그인 필요
+        <span class="sep">·</span> <span class="url">/stamp-map (비로그인)</span>
+      </div>
+      <div class="scenario-content">
+        <svg class="empty-symbol-svg" viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="5" y="11" width="14" height="10" rx="2"/>
+          <path d="M8 11V7a4 4 0 0 1 8 0v4"/>
+          <circle cx="12" cy="16" r="1.2" fill="currentColor"/>
+        </svg>
+        <h2 class="empty-title">로그인이 필요해요</h2>
+        <p class="empty-desc">학습 흔적과 진주 스탬프 맵을 이어가시려면 로그인해 주세요. 새로 시작하셔도 됩니다.</p>
+        <div class="empty-actions">
+          <a href="/login" class="btn-primary">로그인</a>
+          <a href="/signup" class="btn-secondary">계정 만들기</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCENARIO 04 : 검색 결과 없음 -->
+    <section class="scenario">
+      <div class="scenario-label">
+        SCENARIO 04 <span class="sep">·</span> 검색 결과 없음
+        <span class="sep">·</span> <span class="url">/dictionary?q=...</span>
+      </div>
+      <div class="scenario-content">
+        <svg class="empty-symbol-svg" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"/>
+          <path d="m21 21-4.3-4.3"/>
+        </svg>
+        <h2 class="empty-title">찾으시는 단어가 없습니다</h2>
+        <p class="empty-desc">다른 단어로 검색해 보시거나, 가나다 인덱스에서 천천히 둘러보세요.</p>
+        <div class="empty-actions">
+          <a href="/dictionary" class="btn-primary">가나다순으로 보기</a>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <footer class="demo-footer">
+    <div class="demo-footer-text">결제 정보를 받지 않습니다 · 광고 없음</div>
+    <div class="demo-footer-text">CC BY-NC-SA 4.0 라이선스로 배포됩니다</div>
+  </footer>
+
+</body>
+</html>

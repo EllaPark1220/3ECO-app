@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light">
+<title>로그인 · 회원가입 — 고요의 경제나루</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+<style>
+  :root {
+    color-scheme: light;
+    --bg-light: #F8FCFC;
+    --water-light: #DCEAEE;
+    --water-card: #EBF5F5;
+    --accent-soft: #86D0D6;
+    --accent-main: #1A8E9C;
+    --accent-deep: #0D5F6D;
+    --text-main: #0E2B30;
+    --text-soft: #4A5A60;
+    --text-mute: #7A8A90;
+    --line-light: #DCE7E8;
+    --line-soft: #E8F0F0;
+    --error: #B85540;
+
+    --hahmlet: "Hahmlet", serif;
+    --pretendard: "Pretendard Variable", -apple-system, sans-serif;
+    --mono: "JetBrains Mono", monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--pretendard);
+    background: var(--bg-light);
+    color: var(--text-main);
+    line-height: 1.7;
+    font-size: 16px;
+    background-image:
+      radial-gradient(circle at 15% 10%, rgba(26, 142, 156, 0.04) 0%, transparent 50%),
+      radial-gradient(circle at 85% 90%, rgba(134, 208, 214, 0.05) 0%, transparent 50%);
+    min-height: 100vh;
+  }
+
+  .skip-link {
+    position: absolute; top: -40px; left: 0;
+    background: var(--accent-deep); color: #FFFFFF;
+    padding: 8px 16px; text-decoration: none; font-size: 14px; z-index: 200;
+  }
+  .skip-link:focus { top: 0; }
+
+  a:focus-visible, button:focus-visible, input:focus-visible {
+    outline: 2px solid var(--accent-main);
+    outline-offset: 3px; border-radius: 4px;
+  }
+
+  /* ============== NAV (단순화) ============== */
+  .nav {
+    padding: 22px 40px;
+    display: flex; justify-content: center; align-items: center;
+  }
+  .nav-logo {
+    font-family: var(--hahmlet); font-weight: 600; font-size: 17px;
+    color: var(--text-main); letter-spacing: -0.01em; text-decoration: none;
+  }
+
+  /* ============== 페이지 ============== */
+  .auth-page {
+    min-height: calc(100vh - 80px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 20px 60px;
+  }
+
+  /* ============== 카드 ============== */
+  .auth-card {
+    width: 100%;
+    max-width: 440px;
+    background: #FFFFFF;
+    border-radius: 22px;
+    padding: 44px 40px 36px;
+    border: 1px solid var(--line-light);
+    box-shadow: 0 12px 40px -20px rgba(13, 95, 109, 0.18);
+  }
+
+  .auth-header { text-align: center; margin-bottom: 28px; }
+
+  .auth-title {
+    font-family: var(--hahmlet);
+    font-weight: 600;
+    font-size: 26px;
+    color: var(--text-main);
+    letter-spacing: -0.01em;
+    margin-bottom: 6px;
+  }
+
+  .auth-sub {
+    font-family: var(--pretendard);
+    font-size: 13.5px;
+    color: var(--text-soft);
+    line-height: 1.7;
+  }
+
+  /* ============== 모드 탭 ============== */
+  .auth-tabs {
+    display: flex;
+    background: var(--water-card);
+    border-radius: 12px;
+    padding: 4px;
+    margin-bottom: 28px;
+  }
+
+  .tab {
+    flex: 1;
+    padding: 10px;
+    background: transparent;
+    border: none;
+    border-radius: 9px;
+    font-family: var(--pretendard);
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--text-soft);
+    cursor: pointer;
+    transition: all 0.25s ease;
+  }
+
+  .tab:hover { color: var(--text-main); }
+
+  .tab.active {
+    background: #FFFFFF;
+    color: var(--text-main);
+    font-weight: 600;
+    box-shadow: 0 2px 8px -3px rgba(13, 95, 109, 0.2);
+  }
+
+  /* ============== 폼 ============== */
+  .field {
+    margin-bottom: 16px;
+  }
+
+  .field-label {
+    display: block;
+    font-family: var(--pretendard);
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--text-main);
+    margin-bottom: 6px;
+  }
+
+  .field-input {
+    width: 100%;
+    padding: 13px 16px;
+    border: 1.5px solid var(--line-light);
+    border-radius: 11px;
+    background: var(--bg-light);
+    font-family: var(--pretendard);
+    font-size: 15px;
+    color: var(--text-main);
+    transition: all 0.2s ease;
+  }
+
+  .field-input::placeholder { color: var(--text-mute); }
+
+  .field-input:focus {
+    outline: none;
+    border-color: var(--accent-main);
+    background: #FFFFFF;
+    box-shadow: 0 0 0 3px rgba(26, 142, 156, 0.15);
+  }
+
+  .field-input:invalid:not(:placeholder-shown):not(:focus) {
+    border-color: var(--error);
+  }
+
+  .field-help {
+    display: block;
+    margin-top: 5px;
+    font-size: 12px;
+    color: var(--text-mute);
+    line-height: 1.5;
+  }
+
+  .field-help.error { color: var(--error); }
+
+  /* ============== 모드별 표시 ============== */
+  .signup-only { display: none; }
+  body[data-mode="signup"] .signup-only { display: block; }
+  body[data-mode="signup"] .login-only { display: none; }
+
+  /* ============== 카카오 로그인 ============== */
+  .btn-kakao-auth {
+    width: 100%;
+    padding: 13px;
+    background: #FEE500;
+    color: #3C1E1E;
+    border: none;
+    border-radius: 11px;
+    font-family: var(--pretendard);
+    font-weight: 600;
+    font-size: 14.5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 18px;
+    transition: all 0.2s ease;
+  }
+
+  .btn-kakao-auth:hover {
+    background: #F5DC00;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px -6px rgba(254, 229, 0, 0.55);
+  }
+
+  .auth-divider {
+    text-align: center;
+    margin: 8px 0 22px;
+    position: relative;
+    height: 12px;
+  }
+
+  .auth-divider::before,
+  .auth-divider::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: calc(50% - 56px);
+    height: 1px;
+    background: var(--line-light);
+  }
+
+  .auth-divider::before { left: 0; }
+  .auth-divider::after { right: 0; }
+
+  .auth-divider span {
+    font-family: var(--pretendard);
+    font-size: 11.5px;
+    color: var(--text-mute);
+    letter-spacing: 0.02em;
+  }
+
+  /* ============== 약관 ============== */
+  .terms-box {
+    background: var(--water-card);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--pretendard);
+    font-size: 13px;
+    color: var(--text-soft);
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .checkbox input {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--accent-main);
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+
+  .checkbox-required {
+    color: var(--accent-main);
+    font-weight: 600;
+    margin-right: 2px;
+  }
+
+  .terms-link {
+    margin-left: auto;
+    font-family: var(--pretendard);
+    font-size: 12px;
+    color: var(--accent-deep);
+    text-decoration: underline;
+  }
+
+  /* 로그인 모드: 기억하기 + 비밀번호 찾기 */
+  .login-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 22px;
+    margin-top: -4px;
+  }
+
+  .login-options a {
+    font-family: var(--pretendard);
+    font-size: 13px;
+    color: var(--text-soft);
+    text-decoration: none;
+  }
+
+  .login-options a:hover { color: var(--accent-deep); text-decoration: underline; }
+
+  /* ============== 제출 버튼 ============== */
+  .submit-btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--accent-main);
+    color: #FFFFFF;
+    border: none;
+    border-radius: 11px;
+    font-family: var(--pretendard);
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: 0.01em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .submit-btn:hover:not(:disabled) {
+    background: var(--accent-deep);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px -8px rgba(26, 142, 156, 0.5);
+  }
+
+  .submit-btn:disabled {
+    background: var(--line-light);
+    color: var(--text-mute);
+    cursor: not-allowed;
+  }
+
+  /* ============== 카드 하단 안내 ============== */
+  .auth-notice {
+    margin-top: 28px;
+    padding-top: 22px;
+    border-top: 1px solid var(--line-soft);
+    text-align: center;
+  }
+
+  .auth-notice p {
+    font-family: var(--pretendard);
+    font-size: 11.5px;
+    color: var(--text-mute);
+    line-height: 1.85;
+  }
+
+  /* ============== 페이지 하단 푸터 ============== */
+  .page-footer {
+    text-align: center;
+    padding: 30px 20px;
+    margin-top: 40px;
+  }
+
+  .page-footer a {
+    font-family: var(--pretendard);
+    font-size: 12px;
+    color: var(--text-mute);
+    text-decoration: none;
+    margin: 0 10px;
+  }
+
+  .page-footer a:hover { color: var(--accent-deep); }
+
+  /* ============== 접근성 ============== */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+
+  /* ============== 반응형 ============== */
+  @media (max-width: 480px) {
+    .nav { padding: 18px 20px; }
+    .auth-page { padding: 16px 16px 40px; }
+    .auth-card { padding: 32px 26px 28px; border-radius: 18px; }
+    .auth-title { font-size: 22px; }
+  }
+</style>
+</head>
+<body data-mode="login">
+
+  <a href="#main" class="skip-link">본문으로 건너뛰기</a>
+
+  <nav class="nav">
+    <a href="/" class="nav-logo">고요의 경제나루</a>
+  </nav>
+
+  <main class="auth-page" id="main">
+
+    <div class="auth-card">
+
+      <div class="auth-header">
+        <h1 class="auth-title" id="auth-title">다시 오신 것을 환영합니다</h1>
+        <p class="auth-sub" id="auth-sub">학습 흔적을 이어 가시려면 로그인해 주세요.</p>
+      </div>
+
+      <div class="auth-tabs" role="tablist">
+        <button type="button" class="tab active" data-mode="login" role="tab" aria-selected="true">로그인</button>
+        <button type="button" class="tab" data-mode="signup" role="tab" aria-selected="false">회원가입</button>
+      </div>
+
+      <!-- 카카오 빠른 시작 -->
+      <button type="button" class="btn-kakao-auth" id="btn-kakao-auth">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M12 3C6.48 3 2 6.58 2 11c0 2.84 1.85 5.34 4.65 6.78l-1.18 4.31c-.1.37.3.66.62.46l5.18-3.4c.24.02.48.04.73.04 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/>
+        </svg>
+        <span class="login-only">카카오로 로그인</span>
+        <span class="signup-only">카카오로 시작하기</span>
+      </button>
+
+      <div class="auth-divider">
+        <span>또는 이메일로</span>
+      </div>
+
+      <form id="auth-form" novalidate>
+
+        <!-- 이메일 (공통) -->
+        <div class="field">
+          <label class="field-label" for="email">이메일</label>
+          <input type="email" id="email" class="field-input" placeholder="name@example.com" required autocomplete="email">
+        </div>
+
+        <!-- 닉네임 (회원가입만) -->
+        <div class="field signup-only">
+          <label class="field-label" for="nickname">닉네임</label>
+          <input type="text" id="nickname" class="field-input" placeholder="다른 학습자에게 보이는 이름" autocomplete="nickname">
+          <small class="field-help">실명이 아닌 닉네임을 적어 주세요.</small>
+        </div>
+
+        <!-- 비밀번호 (공통) -->
+        <div class="field">
+          <label class="field-label" for="password">비밀번호</label>
+          <input type="password" id="password" class="field-input" placeholder="8자 이상" required autocomplete="current-password">
+          <small class="field-help signup-only">영문과 숫자를 섞은 8자 이상이 안전합니다.</small>
+        </div>
+
+        <!-- 비밀번호 확인 (회원가입만) -->
+        <div class="field signup-only">
+          <label class="field-label" for="password2">비밀번호 확인</label>
+          <input type="password" id="password2" class="field-input" placeholder="비밀번호 한 번 더" autocomplete="new-password">
+          <small class="field-help" id="password2-help"></small>
+        </div>
+
+        <!-- 로그인 옵션 (로그인만) -->
+        <div class="login-options login-only">
+          <label class="checkbox">
+            <input type="checkbox" id="remember">
+            <span>로그인 유지</span>
+          </label>
+          <a href="/auth/reset">비밀번호를 잊으셨나요?</a>
+        </div>
+
+        <!-- 약관 (회원가입만) -->
+        <div class="terms-box signup-only">
+          <label class="checkbox">
+            <input type="checkbox" id="agree-terms">
+            <span><span class="checkbox-required">필수</span> 이용약관에 동의합니다</span>
+            <a href="/terms" class="terms-link" target="_blank">보기</a>
+          </label>
+          <label class="checkbox">
+            <input type="checkbox" id="agree-privacy">
+            <span><span class="checkbox-required">필수</span> 개인정보 처리방침에 동의합니다</span>
+            <a href="/privacy" class="terms-link" target="_blank">보기</a>
+          </label>
+        </div>
+
+        <!-- 제출 -->
+        <button type="submit" class="submit-btn" id="submit-btn" disabled>
+          <span class="login-only">로그인</span>
+          <span class="signup-only">계정 만들기</span>
+        </button>
+
+      </form>
+
+      <!-- 하단 안내 -->
+      <div class="auth-notice">
+        <p>결제 정보를 받지 않습니다 · 광고 없음</p>
+        <p>이메일과 닉네임 외에는 어떤 정보도 받지 않습니다</p>
+      </div>
+
+    </div>
+
+  </main>
+
+  <footer class="page-footer">
+    <a href="/about">고요의 경제나루 소개</a>
+    <a href="/terms">이용약관</a>
+    <a href="/privacy">개인정보 처리방침</a>
+  </footer>
+
+  <script>
+    // ============== 모드 토글 ==============
+    const tabs = document.querySelectorAll('.tab');
+    const body = document.body;
+    const title = document.getElementById('auth-title');
+    const sub = document.getElementById('auth-sub');
+    const form = document.getElementById('auth-form');
+    const submitBtn = document.getElementById('submit-btn');
+
+    const COPY = {
+      login: {
+        title: '다시 오신 것을 환영합니다',
+        sub: '학습 흔적을 이어 가시려면 로그인해 주세요.'
+      },
+      signup: {
+        title: '천천히 시작해 봅시다',
+        sub: '이메일과 닉네임만으로 계정을 만들 수 있습니다.'
+      }
+    };
+
+    function setMode(mode) {
+      body.dataset.mode = mode;
+      tabs.forEach(t => {
+        const isActive = t.dataset.mode === mode;
+        t.classList.toggle('active', isActive);
+        t.setAttribute('aria-selected', isActive);
+      });
+      title.textContent = COPY[mode].title;
+      sub.textContent = COPY[mode].sub;
+      form.reset();
+      clearHelpers();
+      validate();
+    }
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => setMode(tab.dataset.mode));
+    });
+
+    // ============== 검증 ==============
+    const emailIn = document.getElementById('email');
+    const nicknameIn = document.getElementById('nickname');
+    const passwordIn = document.getElementById('password');
+    const password2In = document.getElementById('password2');
+    const password2Help = document.getElementById('password2-help');
+    const agreeTerms = document.getElementById('agree-terms');
+    const agreePrivacy = document.getElementById('agree-privacy');
+
+    function isValidEmail(v) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+    }
+
+    function clearHelpers() {
+      password2Help.textContent = '';
+      password2Help.classList.remove('error');
+    }
+
+    function validate() {
+      const mode = body.dataset.mode;
+      const email = emailIn.value.trim();
+      const password = passwordIn.value;
+
+      let ok = isValidEmail(email) && password.length >= 1;
+
+      if (mode === 'signup') {
+        const nickname = nicknameIn.value.trim();
+        const password2 = password2In.value;
+        const terms = agreeTerms.checked;
+        const privacy = agreePrivacy.checked;
+
+        const passwordLongEnough = password.length >= 8;
+        const passwordsMatch = password === password2 && password2.length > 0;
+
+        if (password2.length > 0 && !passwordsMatch) {
+          password2Help.textContent = '비밀번호가 일치하지 않습니다.';
+          password2Help.classList.add('error');
+        } else {
+          clearHelpers();
+        }
+
+        ok = isValidEmail(email)
+          && nickname.length >= 1
+          && passwordLongEnough
+          && passwordsMatch
+          && terms
+          && privacy;
+      }
+
+      submitBtn.disabled = !ok;
+    }
+
+    form.addEventListener('input', validate);
+    form.addEventListener('change', validate);
+
+    // ============== 제출 (데모) ==============
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const mode = body.dataset.mode;
+      const label = mode === 'login' ? '로그인' : '회원가입';
+      alert(`${label} 데모입니다. 실제 구현 시 서버 호출로 처리됩니다.`);
+    });
+
+    // 초기 검증
+    validate();
+
+    // ============== 카카오 로그인 (데모) ==============
+    document.getElementById('btn-kakao-auth').addEventListener('click', () => {
+      const mode = body.dataset.mode;
+      const label = mode === 'login' ? '카카오 로그인' : '카카오 회원가입';
+      alert(`${label} 데모 — 실서비스에서는 Kakao OAuth로 이메일·닉네임만 받습니다.`);
+    });
+  </script>
+
+</body>
+</html>

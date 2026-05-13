@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light">
+<title>스탬프 맵 — 고요의 경제나루</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+<style>
+  :root {
+    color-scheme: light;
+    --bg-light: #F8FCFC;
+    --water-light: #DCEAEE;
+    --water-card: #EBF5F5;
+    --accent-soft: #86D0D6;
+    --accent-main: #1A8E9C;
+    --accent-deep: #0D5F6D;
+    --text-main: #0E2B30;
+    --text-soft: #4A5A60;
+    --text-mute: #7A8A90;
+    --line-light: #DCE7E8;
+    --line-soft: #E8F0F0;
+
+    --vol1-light: #F5FAFD;
+    --vol1-base: #DCEAF5;
+    --vol1-deep: #B8D2E5;
+
+    --vol2-light: #FEF7F9;
+    --vol2-base: #F9E0E7;
+    --vol2-deep: #ECC0CC;
+
+    --vol3-light: #FEFAEC;
+    --vol3-base: #FAEDD0;
+    --vol3-deep: #ECDDB0;
+
+    --vol4-light: #F5FAF3;
+    --vol4-base: #DEEDD9;
+    --vol4-deep: #BFD7BB;
+
+    --vol5-light: #FFFFFF;
+    --vol5-base: #F8F8F5;
+    --vol5-deep: #E0E0DA;
+
+    --hahmlet: "Hahmlet", serif;
+    --pretendard: "Pretendard Variable", -apple-system, sans-serif;
+    --mono: "JetBrains Mono", monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--pretendard);
+    background: var(--bg-light);
+    color: var(--text-main);
+    line-height: 1.78;
+    font-size: 16px;
+    background-image:
+      radial-gradient(circle at 10% 5%, rgba(26, 142, 156, 0.04) 0%, transparent 40%),
+      radial-gradient(circle at 90% 95%, rgba(241, 233, 219, 0.3) 0%, transparent 50%);
+  }
+
+  .skip-link {
+    position: absolute; top: -40px; left: 0;
+    background: var(--accent-deep); color: #FFFFFF;
+    padding: 8px 16px; text-decoration: none; font-size: 14px; z-index: 200;
+  }
+  .skip-link:focus { top: 0; }
+
+  a:focus-visible, button:focus-visible {
+    outline: 2px solid var(--accent-main);
+    outline-offset: 3px; border-radius: 4px;
+  }
+
+  .nav {
+    position: sticky; top: 0; z-index: 100;
+    padding: 18px 40px;
+    display: flex; justify-content: space-between; align-items: center;
+    backdrop-filter: blur(16px) saturate(140%);
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
+    background: rgba(248, 252, 252, 0.85);
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .nav-logo {
+    font-family: var(--hahmlet); font-weight: 600; font-size: 16px;
+    color: var(--text-main); letter-spacing: -0.01em; text-decoration: none;
+  }
+  .nav-links { display: flex; gap: 26px; align-items: center; }
+  .nav-links a {
+    font-size: 14px; color: var(--text-soft); text-decoration: none;
+    font-weight: 500; transition: color 0.2s ease;
+  }
+  .nav-links a:hover { color: var(--accent-deep); }
+  .nav-links a.active { color: var(--accent-deep); font-weight: 600; }
+
+  .page { max-width: 1100px; margin: 0 auto; padding: 60px 40px 100px; }
+
+  .page-header { text-align: center; margin-bottom: 70px; }
+  .page-eyebrow {
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.3em;
+    color: var(--accent-deep); font-weight: 600; margin-bottom: 16px;
+    text-transform: uppercase;
+  }
+  .page-title {
+    font-family: var(--hahmlet); font-weight: 600;
+    font-size: clamp(28px, 4.5vw, 44px); line-height: 1.3;
+    color: var(--text-main); letter-spacing: -0.015em; margin-bottom: 14px;
+  }
+  .page-lead {
+    font-family: var(--pretendard); font-size: clamp(14px, 1.4vw, 16px);
+    color: var(--text-soft); line-height: 1.85;
+    max-width: 520px; margin: 0 auto;
+  }
+
+  .overall {
+    display: inline-flex; align-items: center; gap: 12px;
+    padding: 14px 24px; background: var(--water-card);
+    border: 1px solid var(--line-light); border-radius: 100px;
+    margin-top: 24px;
+  }
+  .overall-num {
+    font-family: var(--hahmlet); font-weight: 700; font-size: 18px;
+    color: var(--accent-deep);
+  }
+  .overall-text {
+    font-family: var(--pretendard); font-size: 14px; color: var(--text-soft);
+  }
+
+  .legend-wrap { text-align: center; margin-bottom: 56px; }
+  .legend {
+    display: inline-flex; align-items: center; gap: 22px;
+    padding: 16px 24px;
+    background: #FFFFFF;
+    border: 1px solid var(--line-light);
+    border-radius: 14px;
+  }
+  .legend-item {
+    display: flex; align-items: center; gap: 8px;
+    font-family: var(--pretendard); font-size: 13px; color: var(--text-soft);
+  }
+  .legend-dot {
+    width: 16px; height: 16px; border-radius: 50%; flex-shrink: 0;
+  }
+  .legend-dot.done {
+    background:
+      radial-gradient(circle at 32% 28%, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 25%),
+      radial-gradient(circle at 55% 55%, rgba(184, 218, 235, 0.4) 30%, rgba(184, 218, 235, 0.12) 70%),
+      radial-gradient(circle at 38% 30%, #FFFFFF 0%, #FBF7F0 50%, #ECDFCC 95%);
+  }
+  .legend-dot.todo {
+    background: transparent;
+    border: 1.5px dashed rgba(184, 210, 229, 0.65);
+  }
+
+  .volume-section { margin-bottom: 64px; }
+
+  .volume-header {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 20px; padding-bottom: 18px; margin-bottom: 28px;
+    border-bottom: 1px solid var(--line-light);
+  }
+
+  .volume-header-left {
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  }
+
+  .volume-color-marker {
+    width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0;
+    align-self: center;
+  }
+  .volume-color-marker.vol-1 {
+    background:
+      radial-gradient(circle at 32% 28%, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 25%),
+      radial-gradient(circle at 55% 55%, rgba(184, 218, 235, 0.4) 30%, rgba(184, 218, 235, 0.12) 70%),
+      radial-gradient(circle at 38% 30%, #FFFFFF 0%, #FBF7F0 50%, #ECDFCC 95%);
+    box-shadow: 0 2px 4px -1px rgba(160, 145, 130, 0.4);
+  }
+  .volume-color-marker.vol-2 {
+    background:
+      radial-gradient(circle at 32% 28%, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 25%),
+      radial-gradient(circle at 55% 55%, rgba(240, 197, 208, 0.42) 30%, rgba(240, 197, 208, 0.14) 70%),
+      radial-gradient(circle at 38% 30%, #FFFFFF 0%, #FBF7F0 50%, #ECDFCC 95%);
+    box-shadow: 0 2px 4px -1px rgba(160, 145, 130, 0.4);
+  }
+  .volume-color-marker.vol-3 {
+    background:
+      radial-gradient(circle at 32% 28%, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 25%),
+      radial-gradient(circle at 55% 55%, rgba(245, 224, 181, 0.46) 30%, rgba(245, 224, 181, 0.15) 70%),
+      radial-gradient(circle at 38% 30%, #FFFFFF 0%, #FBF7F0 50%, #ECDFCC 95%);
+    box-shadow: 0 2px 4px -1px rgba(160, 145, 130, 0.4);
+  }
+  .volume-color-marker.vol-4 {
+    background:
+      radial-gradient(circle at 32% 28%, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 25%),
+      radial-gradient(circle at 55% 55%, rgba(200, 223, 196, 0.42) 30%, rgba(200, 223, 196, 0.14) 70%),
+      radial-gradient(circle at 38% 30%, #FFFFFF 0%, #FBF7F0 50%, #ECDFCC 95%);
+    box-shadow: 0 2px 4px -1px rgba(160, 145, 130, 0.4);
+  }
+  .volume-color-marker.vol-5 {
+    background:
+      radial-gradient(circle at 32% 28%, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0) 28%),
+      radial-gradient(circle at 50% 60%, rgba(220, 200, 230, 0.2) 30%, rgba(255, 230, 220, 0.16) 70%),
+      radial-gradient(circle at 38% 30%, #FFFFFF 0%, #FCFAF4 50%, #EDE5D8 95%);
+    box-shadow: 0 2px 4px -1px rgba(160, 145, 130, 0.4);
+  }
+
+  .volume-num-label {
+    font-family: var(--hahmlet); font-weight: 700; font-size: 22px;
+    color: var(--accent-deep); letter-spacing: -0.01em;
+  }
+  .volume-title-label {
+    font-family: var(--hahmlet); font-weight: 500; font-size: 20px;
+    color: var(--text-main); letter-spacing: -0.005em;
+  }
+  .volume-question {
+    font-family: var(--pretendard); font-size: 13.5px;
+    color: var(--text-mute); margin-left: 6px; font-style: italic;
+  }
+
+  .volume-progress {
+    font-family: var(--mono); font-size: 12px; color: var(--text-soft);
+    letter-spacing: 0.05em; white-space: nowrap;
+  }
+  .volume-progress strong {
+    color: var(--accent-deep); font-family: var(--pretendard); font-weight: 700;
+  }
+
+  .pearls {
+    display: flex; flex-wrap: wrap;
+    gap: 16px 14px; padding: 0 4px;
+  }
+
+  .pearl {
+    width: 32px; height: 32px; border-radius: 50%;
+    position: relative; display: inline-flex;
+    align-items: center; justify-content: center;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  .pearl-circle {
+    width: 100%; height: 100%; border-radius: 50%;
+    transition: all 0.3s ease;
+  }
+
+  .pearl-done.pearl-vol-1 .pearl-circle {
+    background:
+      radial-gradient(circle at 32% 28%, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 22%),
+      radial-gradient(circle at 55% 55%, rgba(184, 218, 235, 0.32) 30%, rgba(184, 218, 235, 0.1) 70%, rgba(255, 235, 235, 0.12) 100%),
+      radial-gradient(circle at 38% 30%, #FFFFFF 0%, #FBF7F0 45%, #ECDFCC 85%, #C8B8A4 100%);
+    box-shadow: 0 3px 10px -2px rgba(160, 145, 130, 0.4);
+  }
+  .pearl-done.pearl-vol-2 .pearl-circle {
+    background:
+      radial-gradient(circle at 32% 28%, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 22%),
+      radial-gradient(circle at 55% 55%, rgba(240, 197, 208, 0.34) 30%, rgba(240, 197, 208, 0.12) 70%, rgba(245, 230, 220, 0.12) 100%),
+      radial-gradient(circle at 38% 30%, #FFFFFF 0%, #FBF7F0 45%, #ECDFCC 85%, #C8B8A4 100%);
+    box-shadow: 0 3px 10px -2px rgba(160, 145, 130, 0.4);
+  }
+  .pearl-done.pearl-vol-3 .pearl-circle {
+    background:
+      radial-gradient(circle at 32% 28%, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 22%),
+      radial-gradient(circle at 55% 55%, rgba(245, 224, 181, 0.38) 30%, rgba(245, 224, 181, 0.14) 70%, rgba(250, 240, 220, 0.12) 100%),
+      radial-gradient(circle at 38% 30%, #FFFFFF 0%, #FBF7F0 45%, #ECDFCC 85%, #C8B8A4 100%);
+    box-shadow: 0 3px 10px -2px rgba(160, 145, 130, 0.4);
+  }
+  .pearl-done.pearl-vol-4 .pearl-circle {
+    background:
+      radial-gradient(circle at 32% 28%, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 22%),
+      radial-gradient(circle at 55% 55%, rgba(200, 223, 196, 0.34) 30%, rgba(200, 223, 196, 0.12) 70%, rgba(235, 245, 230, 0.12) 100%),
+      radial-gradient(circle at 38% 30%, #FFFFFF 0%, #FBF7F0 45%, #ECDFCC 85%, #C8B8A4 100%);
+    box-shadow: 0 3px 10px -2px rgba(160, 145, 130, 0.4);
+  }
+  .pearl-done.pearl-vol-5 .pearl-circle {
+    background:
+      radial-gradient(circle at 32% 28%, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0) 25%),
+      radial-gradient(circle at 50% 60%, rgba(220, 200, 230, 0.18) 30%, rgba(255, 230, 220, 0.14) 70%, rgba(220, 235, 240, 0.16) 100%),
+      radial-gradient(circle at 38% 30%, #FFFFFF 0%, #FCFAF4 45%, #EDE5D8 85%, #C8BBAA 100%);
+    box-shadow: 0 3px 10px -2px rgba(160, 145, 130, 0.4);
+  }
+
+  .pearl-todo.pearl-vol-1 .pearl-circle {
+    background: transparent;
+    border: 1.5px dashed rgba(184, 210, 229, 0.65);
+  }
+  .pearl-todo.pearl-vol-2 .pearl-circle {
+    background: transparent;
+    border: 1.5px dashed rgba(236, 192, 204, 0.65);
+  }
+  .pearl-todo.pearl-vol-3 .pearl-circle {
+    background: transparent;
+    border: 1.5px dashed rgba(236, 221, 176, 0.7);
+  }
+  .pearl-todo.pearl-vol-4 .pearl-circle {
+    background: transparent;
+    border: 1.5px dashed rgba(191, 215, 187, 0.65);
+  }
+  .pearl-todo.pearl-vol-5 .pearl-circle {
+    background: transparent;
+    border: 1.5px dashed rgba(200, 200, 195, 0.7);
+  }
+
+  .pearl:hover, .pearl:focus-visible {
+    transform: translateY(-4px) scale(1.08);
+    z-index: 20;
+  }
+
+  .pearl-done:hover .pearl-circle {
+    filter: brightness(1.06);
+    box-shadow: 0 8px 22px -4px rgba(150, 135, 120, 0.5);
+  }
+
+  .pearl-todo:hover .pearl-circle { background: transparent; border-style: solid; }
+
+  .pearl-tip {
+    position: absolute;
+    bottom: calc(100% + 12px);
+    left: 50%; transform: translateX(-50%);
+    background: #FFFFFF;
+    border: 1px solid var(--line-light);
+    border-radius: 10px;
+    padding: 10px 14px;
+    min-width: 180px;
+    text-align: left;
+    box-shadow: 0 8px 24px -8px rgba(13, 95, 109, 0.25);
+    opacity: 0; visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+    pointer-events: none;
+    z-index: 30;
+  }
+  .pearl-tip::after {
+    content: "";
+    position: absolute; top: 100%; left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: #FFFFFF;
+  }
+  .pearl:hover .pearl-tip,
+  .pearl:focus-visible .pearl-tip {
+    opacity: 1; visibility: visible;
+  }
+  .pearl-tip-meta {
+    font-family: var(--mono); font-size: 10px;
+    letter-spacing: 0.15em; color: var(--accent-deep);
+    font-weight: 600; margin-bottom: 4px; text-transform: uppercase;
+  }
+  .pearl-tip-title {
+    font-family: var(--hahmlet); font-weight: 500;
+    font-size: 13.5px; color: var(--text-main); line-height: 1.4;
+  }
+  .pearl-tip-status {
+    font-family: var(--pretendard); font-size: 11px;
+    color: var(--text-mute); margin-top: 4px;
+  }
+  .pearl-tip-status.done { color: var(--accent-main); }
+
+  .footer {
+    background: var(--water-light);
+    text-align: center;
+    padding: 50px 40px;
+    margin-top: 80px;
+  }
+  .footer-line {
+    font-family: var(--pretendard); font-size: 12.5px;
+    color: var(--text-soft); line-height: 1.95;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .nav { padding: 14px 20px; }
+    .nav-links { gap: 14px; }
+    .nav-links a { font-size: 13px; }
+    .page { padding: 40px 22px 60px; }
+    .volume-header { flex-direction: column; align-items: flex-start; gap: 6px; }
+    .pearls { gap: 13px 11px; }
+    .pearl { width: 28px; height: 28px; }
+    .legend { flex-wrap: wrap; gap: 14px; padding: 14px 18px; }
+    .pearl-tip { min-width: 160px; }
+  }
+</style>
+</head>
+<body>
+
+  <a href="#main" class="skip-link">본문으로 건너뛰기</a>
+
+  <nav class="nav">
+    <a href="/" class="nav-logo">고요의 경제나루</a>
+    <div class="nav-links">
+      <a href="/">HOME</a>
+      <a href="/dictionary">INDEX</a>
+      <a href="/stamp-map" class="active">STAMP MAP</a>
+      <a href="/login">로그인</a>
+    </div>
+  </nav>
+
+  <main class="page" id="main">
+
+    <header class="page-header">
+      <div class="page-eyebrow">STAMP MAP</div>
+      <h1 class="page-title">여기, 당신이 걸어온 길</h1>
+      <p class="page-lead">학습한 편마다 작은 진주가 켜집니다.<br>점수도, 등수도, 자극도 없이.</p>
+
+      <div class="overall" role="status">
+        <span class="overall-num" id="overall-done">4</span>
+        <span class="overall-text">/ 133편 학습 완료</span>
+      </div>
+    </header>
+
+    <div class="legend-wrap">
+      <div class="legend" aria-label="진주 상태 범례">
+        <div class="legend-item">
+          <span class="legend-dot done"></span>
+          <span>학습 완료</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-dot todo"></span>
+          <span>아직 보지 않음</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="volumes"></div>
+
+  </main>
+
+  <footer class="footer">
+    <div class="footer-line">결제 정보를 받지 않습니다 · 광고 없음</div>
+    <div class="footer-line">CC BY-NC-SA 4.0 라이선스로 배포됩니다</div>
+    <div class="footer-line">제작 · ELLA PARK</div>
+  </footer>
+
+  <script>
+    const volumes = [
+      {
+        num: 1, title: '돈의 언어',
+        question: '경제가 뭔지 말할 수 있나?', count: 27,
+        episodes: [
+          { n: 1, title: '다 가질 수 없다는 것 — 희소성과 선택' },
+          { n: 2, title: '고르지 못한 쪽의 가치 — 기회비용' },
+          { n: 3, title: '이미 쓴 돈은 잊어야 한다 — 매몰비용과 인센티브' },
+          { n: 4, title: '가격은 누가 정할까 — 가격의 정체' },
+          { n: 5, title: '가격을 움직이는 두 힘 — 수요와 공급' },
+          { n: 6, title: '사고팔 수 있는 곳이라면 어디든 — 시장의 정체' },
+          { n: 7, title: '종이 한 장이 가치를 갖는 이유 — 돈이란 무엇인가' },
+          { n: 8, title: '돈의 가치가 녹는다는 것 — 인플레이션' },
+          { n: 9, title: '안 사는 게 더 무서운 이유 — 디플레이션' },
+          { n: 10, title: '빌린 돈에 붙는 값 — 금리와 이자' },
+          { n: 11, title: '이자에 이자가 붙는다는 것 — 복리' },
+          { n: 12, title: '보이지 않는 이력서 — 신용과 대출' },
+          { n: 13, title: '영수증 맨 아래의 작은 숫자 — 부가가치세' },
+          { n: 14, title: '가격표 안에 무엇이 들어 있나 — 원가·마진과 할인의 정체' },
+          { n: 15, title: '받기로 한 돈과 통장에 들어온 돈 — 세전과 세후' },
+          { n: 16, title: '많이 벌수록 더 떼어가는 이유 — 소득세 구조' },
+          { n: 17, title: '월급에서 미리 빠지는 안전망 — 4대보험' },
+          { n: 18, title: '노동에도 가격이 있다 — 최저임금' },
+          { n: 19, title: '월급에서 출발해 어디로 흘러가나 — 명세서 한 장 통합 읽기' },
+          { n: 20, title: '가진 것과 갚을 것 — 자산과 부채' },
+          { n: 21, title: '모으고, 지키고, 나누는 도구들 — 예금·적금·보험·연금' },
+          { n: 22, title: '한 나라의 1년 성적표 — GDP' },
+          { n: 23, title: '돈의 외국 가격 — 환율' },
+          { n: 24, title: '경제에도 계절이 있다 — 경기와 호황·불황' },
+          { n: 25, title: '평균 너머의 한 단위를 보다 — 평균과 한계' },
+          { n: 26, title: '돈의 언어 — 1권 정리 ①' },
+          { n: 27, title: '돈의 언어 — 1권 정리 ②' }
+        ]
+      },
+      { num: 2, title: '돈의 흐름', question: '세상이 어떻게 돌아가나?', count: 25, episodes: [
+          { n: 1, title: 'GDP를 분해해서 다시 본다 — 네 개의 항목' },
+          { n: 2, title: '경기는 왜 순환하는가 — 호황과 불황의 사이클' },
+          { n: 3, title: '경기를 재는 신호들 — 선행·동행·후행' },
+          { n: 4, title: '중앙은행은 왜 존재하는가 — 한국은행의 정체' },
+          { n: 5, title: '기준금리가 모든 금리의 어머니인 이유' },
+          { n: 6, title: '금리를 올리고 내릴 때 무슨 일이 벌어지나' },
+          { n: 7, title: '통화정책 — 돈을 풀고 조이는 두 가지 방향' },
+          { n: 8, title: '물가는 왜 오르는가 — 인플레이션의 세 가지 원인' },
+          { n: 9, title: '디플레이션이 더 무서운 이유 — 1권 9편 심화' },
+          { n: 10, title: '스태그플레이션 — 불황과 인플레이션이 함께 올 때' },
+          { n: 11, title: '환율은 어떻게 정해지는가 — 외환 시장의 수요와 공급' },
+          { n: 12, title: '환율이 오르면 누가 웃고 누가 우는가' },
+          { n: 13, title: '외환위기란 무엇인가 — 1997년 한국 이야기' },
+          { n: 14, title: '채권 — 국가·회사에 돈을 빌려준다는 것' },
+          { n: 15, title: '금리와 채권 가격은 왜 시소인가' },
+          { n: 16, title: '주식 — 회사를 조각내 사고판다는 것' },
+          { n: 17, title: '부동산 가격은 왜 움직이는가 — 수요·공급·심리' },
+          { n: 18, title: '전세는 왜 한국에만 있는가 — 한국 주거의 특수성' },
+          { n: 19, title: '무역 — 왜 모든 걸 직접 만들지 않는가' },
+          { n: 20, title: '글로벌 공급망 — 지구 반대편이 멈추면 내 택배가 멈추는 이유' },
+          { n: 21, title: '미국 경제가 기침하면 한국이 감기 걸리는 이유' },
+          { n: 22, title: '버블이란 무엇인가 — 가격이 현실을 잃을 때' },
+          { n: 23, title: '양적완화 — 위기 때 중앙은행이 꺼내는 카드' },
+          { n: 24, title: '정부도 경제를 움직인다 — 재정정책의 이해' },
+          { n: 25, title: '2권 총정리 — 뉴스 한 꼭지를 시작부터 끝까지 따라가기' }
+        ] },
+      { num: 3, title: '돈의 구조', question: '회사와 시장을 읽을 수 있나?', count: 25, episodes: [
+          { n: 1, title: '회사는 왜 만들어졌나 — 주식회사의 등장' },
+          { n: 2, title: '매출과 이익은 같은 말이 아니다' },
+          { n: 3, title: '회사를 보는 세 개의 창 — 재무제표 입문' },
+          { n: 4, title: '손익계산서를 펼친다 — 위에서 아래로 읽는 법' },
+          { n: 5, title: '매출원가와 판매관리비 — 돈은 어디로 빠져나갔나' },
+          { n: 6, title: '영업이익과 당기순이익 — 본업과 전체의 차이' },
+          { n: 7, title: '매출은 늘었는데 이익이 줄어드는 회사' },
+          { n: 8, title: '재무상태표를 펼친다 — 자산 = 부채 + 자본' },
+          { n: 9, title: '자산 안을 들여다보기 — 유동자산과 비유동자산' },
+          { n: 10, title: '부채와 자본 — 누구 돈으로 회사가 굴러가나' },
+          { n: 11, title: '이익은 났는데 현금이 없다? 흑자 도산 이야기' },
+          { n: 12, title: '영업·투자·재무 활동 — 현금이 어디서 들어오고 나가나' },
+          { n: 13, title: '안정성 지표 — 부채비율과 유동비율' },
+          { n: 14, title: '수익성 지표 — 영업이익률과 ROE' },
+          { n: 15, title: '활동성 지표 — 회사가 자산을 얼마나 잘 굴리나' },
+          { n: 16, title: '성장성 지표 — 매출과 이익은 늘고 있나' },
+          { n: 17, title: '지표는 혼자 보면 거짓말한다 — 시계열·동종업종 비교' },
+          { n: 18, title: '주가는 무엇으로 정해지나 — 가격과 가치 (1권 4편 심화)' },
+          { n: 19, title: 'PER — 이 주가가 비싼지 싼지 묻는 첫 질문' },
+          { n: 20, title: 'PBR — 장부가치 대비 주가는 어떤가' },
+          { n: 21, title: '배당과 배당수익률 — 회사가 주주에게 돌려주는 몫' },
+          { n: 22, title: '좋은 회사와 좋은 주식은 다르다 — 가격이 핵심' },
+          { n: 23, title: '산업의 차이가 지표의 의미를 바꾼다' },
+          { n: 24, title: '사업보고서를 펼치는 법 — 어디를 먼저 봐야 하나' },
+          { n: 25, title: '3권 총정리 — 한 회사를 처음부터 끝까지 읽어보기' }
+        ] },
+      { num: 4, title: '돈의 결정', question: '내 재정을 스스로 설계할 수 있나?', count: 31, episodes: [
+          { n: 1, title: '결정이 어려운 이유 — 머릿속 함정의 정체' },
+          { n: 2, title: '손실회피 — 잃지 않으려다 더 잃는 이유' },
+          { n: 3, title: '군중심리와 심리적 회계 — 남 따라가다 길 잃기' },
+          { n: 4, title: '결정의 메타 도구 — 기준 세우기와 체크리스트' },
+          { n: 5, title: '사고 싶은 것과 사야 할 것의 분별' },
+          { n: 6, title: '통장 쪼개기 — 한 통장에 다 두지 않는 이유' },
+          { n: 7, title: '할인·할부·구독의 진짜 비용 (1권 14편 심화)' },
+          { n: 8, title: '왜 저축만으로는 부족한가 — 인플레이션을 이기기 위해' },
+          { n: 9, title: '비상금 — 3개월치라는 안전망' },
+          { n: 10, title: '예금·적금을 고르는 기준 (1권 21편 심화)' },
+          { n: 11, title: '좋은 빚과 나쁜 빚 — 빚의 두 얼굴' },
+          { n: 12, title: '고정금리와 변동금리 — 무엇으로 갈까' },
+          { n: 13, title: '신용점수를 관리한다는 것 (1권 12편 심화)' },
+          { n: 14, title: '보험은 어디까지 들어야 하나 — 위험과 비용 사이' },
+          { n: 15, title: '실손의료보험 — 가장 먼저 짚어야 할 보험' },
+          { n: 16, title: '보험 가입 전 점검 5가지' },
+          { n: 17, title: '연말정산 — 받는 돈이 아니라 돌려받는 내 돈' },
+          { n: 18, title: '프리랜서·1인 사업자의 세금 — 매년 2월과 5월의 정산' },
+          { n: 19, title: 'ISA·연금저축·IRP — 세금을 아끼는 그릇들' },
+          { n: 20, title: '세금을 합법적으로 줄이는 큰 그림' },
+          { n: 21, title: '저축에서 투자로 넘어가는 다리' },
+          { n: 22, title: '분산투자 — 달걀을 한 바구니에 담지 않는다는 것의 진짜 의미' },
+          { n: 23, title: '실질수익률과 복리의 시간 — 투자의 두 엔진' },
+          { n: 24, title: '인덱스 펀드와 ETF — 시장 전체를 사는 도구' },
+          { n: 25, title: '채권을 자산에 넣는다는 것 (2권 14편·3권 13편 연결)' },
+          { n: 26, title: '달러 자산 — 위기 때 무게중심' },
+          { n: 27, title: '내 기준으로 종목을 거르는 법 (3권 지표 적용)' },
+          { n: 28, title: '노후 자금 3층 — 국민연금·퇴직연금·개인연금' },
+          { n: 29, title: '은퇴 후 현금흐름 설계 — 4% 룰의 직관' },
+          { n: 30, title: '길어진 노후, 짧아진 일 — 시간의 재배치' },
+          { n: 31, title: '4권 총정리 — 한 사람의 재정 설계도 그려보기' }
+        ] },
+      { num: 5, title: '돈의 인생', question: '경제로 삶의 방향을 잡을 수 있나?', count: 25, episodes: [
+          { n: 1, title: '시장은 나보다 똑똑하다 — 인덱스가 액티브를 이긴다는 것' },
+          { n: 2, title: '운과 실력을 구분한다는 것 — 성공한 뒤 더 조심해야 하는 이유' },
+          { n: 3, title: '예측은 왜 자주 빗나가는가 — 전문가 예측의 한계' },
+          { n: 4, title: '모른다는 말의 무게 — 솔직한 무지가 자산이 되는 이유' },
+          { n: 5, title: '복리는 시간으로 만드는 자산 (1권 11편 심화)' },
+          { n: 6, title: '일찍 시작한 사람과 많이 넣은 사람 — 누가 이기는가' },
+          { n: 7, title: '인내가 자산이 되는 메커니즘' },
+          { n: 8, title: '시간이 줄여주는 것 — 변동성과 불확실성의 차이' },
+          { n: 9, title: '비교라는 함정 — SNS 시대의 소비' },
+          { n: 10, title: '충분함의 선을 긋는다는 것 — 내 기준의 무게' },
+          { n: 11, title: '소비와 자존감 — 물건이 나를 증명할 수 없는 이유' },
+          { n: 12, title: '인구가 줄어든다는 것 — 한국 경제의 큰 변수' },
+          { n: 13, title: '고령화 사회와 노후 — 길어진 노후의 의미' },
+          { n: 14, title: 'AI와 일의 미래 — 노동 가치의 재정의' },
+          { n: 15, title: '기후와 경제 — 새로운 게임 규칙' },
+          { n: 16, title: '자본주의는 무엇인가 — 우리가 사는 시스템의 본질' },
+          { n: 17, title: '빈부격차는 왜 생기는가 — 구조와 개인의 책임 사이' },
+          { n: 18, title: '복지국가 — 세금으로 안전망을 만드는 사회' },
+          { n: 19, title: '자본주의의 그림자와 빛 — 균형 잡힌 시선' },
+          { n: 20, title: '뉴스를 다루는 법 — 흔들리지 않는 시민의 거리' },
+          { n: 21, title: '가족과 돈 — 투명함이 만드는 신뢰' },
+          { n: 22, title: '위기가 왔을 때 — 지난 50년의 기록이 가르치는 것' },
+          { n: 23, title: '시스템으로 사는 법 — 의지에 기대지 않는 자동화' },
+          { n: 24, title: '책 읽기는 끝나도 공부는 끝나지 않는다 — 평생 학습자' },
+          { n: 25, title: '5권 총정리 — 자립인이 된다는 것' }
+        ] }
+    ];
+
+    const completed = new Set(['1-1', '1-2', '1-3', '1-4']);
+
+    const volumesContainer = document.getElementById('volumes');
+    let totalDone = 0;
+
+    volumes.forEach(vol => {
+      const section = document.createElement('section');
+      section.className = 'volume-section';
+      section.setAttribute('aria-labelledby', `vol-${vol.num}-label`);
+
+      let volDone = 0;
+      for (let n = 1; n <= vol.count; n++) {
+        if (completed.has(`${vol.num}-${n}`)) volDone++;
+      }
+      totalDone += volDone;
+
+      section.innerHTML = `
+        <div class="volume-header">
+          <div class="volume-header-left">
+            <span class="volume-color-marker vol-${vol.num}" aria-hidden="true"></span>
+            <span class="volume-num-label" id="vol-${vol.num}-label">${vol.num}권</span>
+            <span class="volume-title-label">${vol.title}</span>
+            <span class="volume-question">${vol.question}</span>
+          </div>
+          <div class="volume-progress"><strong>${volDone}</strong> / ${vol.count}편 완료</div>
+        </div>
+        <div class="pearls" id="pearls-${vol.num}"></div>
+      `;
+
+      volumesContainer.appendChild(section);
+
+      const pearlsEl = section.querySelector(`#pearls-${vol.num}`);
+      for (let n = 1; n <= vol.count; n++) {
+        const id = `${vol.num}-${n}`;
+        const isDone = completed.has(id);
+        const episode = vol.episodes ? vol.episodes.find(e => e.n === n) : null;
+        const epTitle = episode ? episode.title : '편 제목 준비 중';
+
+        const pearl = document.createElement('a');
+        pearl.href = `/lesson/${id}`;
+        pearl.className = `pearl pearl-vol-${vol.num} ${isDone ? 'pearl-done' : 'pearl-todo'}`;
+        pearl.setAttribute('aria-label', `${vol.num}권 ${n}편 ${isDone ? '학습 완료' : '아직 보지 않음'} — ${epTitle}`);
+        pearl.innerHTML = `
+          <span class="pearl-circle"></span>
+          <span class="pearl-tip" role="tooltip">
+            <span class="pearl-tip-meta">${vol.num}권 ${n}편</span>
+            <span class="pearl-tip-title">${epTitle}</span>
+            <span class="pearl-tip-status ${isDone ? 'done' : ''}">${isDone ? '학습 완료' : '아직 보지 않음'}</span>
+          </span>
+        `;
+        pearlsEl.appendChild(pearl);
+      }
+    });
+
+    document.getElementById('overall-done').textContent = totalDone;
+  </script>
+
+</body>
+</html>

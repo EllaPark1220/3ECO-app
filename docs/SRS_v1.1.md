@@ -1,12 +1,13 @@
 # Software Requirements Specification (SRS)
 Document ID: SRS-001
-Revision: 0.9 (MVP Implementation Edition)
+Revision: 1.1 (MVP Implementation Edition + 학습 영역 시안 정합화)
 Origin: Based on `SRS_경제판단력교과서_v1.4.md` + `MVP-개발목표-적절성-종합-검토(난이도_가능성_효율성)-보고서.md` Part VI 수정 지시 전수 반영
-Date: 2026-04-25
+Date: 2026-05-13 (v1.1)
 Standard: ISO/IEC/IEEE 29148:2018
 
 **Project**: 경제 판단력 교과서 · MVP (Stage 1 파일럿)
-**Source of Truth**: `PRD_경제판단력교과서_Final.md` (v0.5, 2026-04-24)
+**Source of Truth**: `PRD_v1.1.md` (2026-05-13)
+**Co-Source of Truth**: `PROJECT_DECISIONS_v1.md` (Tier 1, 본 문서와 함께 단일 출처)
 **Prepared by**: Senior Requirements Engineer
 
 ---
@@ -27,7 +28,7 @@ Standard: ISO/IEC/IEEE 29148:2018
 
 | 항목 | 설명 |
 |---|---|
-| 콘텐츠 범위 | 125편 커리큘럼 중 M1·M2 초입 **10~25편** |
+| 콘텐츠 범위 | 133편 커리큘럼 중 M1·M2 초입 **10~25편** |
 | 사용자 모드 | 학습자 모드 + 교사 모드 **동시 런칭** |
 | 매체 구성 | 영상(유튜브 임베디드) · 글(스크립트) · 교안 PDF **3매체 단일 원전** |
 | 핵심 기능 | 진주 스탬프 맵, OX 체크, 재개 위치 저장, 접근성 기본 세트(WCAG AA), 후킹 금지 린팅 |
@@ -39,7 +40,7 @@ Standard: ISO/IEC/IEEE 29148:2018
 
 | 항목 | 배제 사유 |
 |---|---|
-| 125편 전편 제작 | Stage 2~3 이후 범위 |
+| 133편 전편 제작 | Stage 2~3 이후 범위 |
 | 종이책 출간 | 완결 후 진행 |
 | 댓글·커뮤니티·포럼 | PRD Non-Goals |
 | 네이티브 모바일 앱 | 웹 반응형으로 대체 |
@@ -740,7 +741,7 @@ graph TB
 
 | ID | 요구사항 | Source | Priority | MVP 라벨 | Acceptance Criteria |
 |---|---|---|---|---|---|
-| **REQ-FUNC-033** | 레슨 ID는 `L001 ~ L125` 포맷의 고유·불변 식별자로 관리된다. | F1 · §6.2 · 원칙 5 | M | ✅ MVP-IN | DB UNIQUE 제약. 생성 후 변경 불가. 누락·중복 허용 0건. |
+| **REQ-FUNC-033** | 레슨 ID는 `L001 ~ L133` 포맷의 고유·불변 식별자로 관리된다. | F1 · §6.2 · 원칙 5 | M | ✅ MVP-IN | DB UNIQUE 제약. 생성 후 변경 불가. 누락·중복 허용 0건. |
 | **REQ-FUNC-034** | 1 레슨 = 1 영상(유튜브 임베디드) = 1 스크립트 = 1 교안 PDF의 3매체 단일 원전을 유지한다. | F4 · 원칙 4·5 | M | ✅ MVP-IN | `LESSON` 레코드는 `youtube_video_id`·`script`·`pdf_kit_url` 3필드 모두 NOT NULL 강제. |
 | **REQ-FUNC-035** | 영상은 유튜브 임베디드 플레이어로만 재생한다. | ADR-005 · §6.4 | M | ✅ MVP-IN | 자체 영상 CDN·백업 구현 금지. iframe 재생 외 경로 차단. |
 | **REQ-FUNC-036** | OX 오답 시 스크립트의 해당 문단 앵커로 자동 스크롤한다. | F3 · Story 1 | M | ✅ MVP-IN | `/api/ox/submit` 응답의 `scroll_to_section` 앵커 기반 클라이언트 스크롤. 앵커는 `script` 편집 시점에 자동 생성. |
@@ -860,7 +861,7 @@ graph TB
 
 | ID | 요구사항 | 임계치 | MVP 라벨 | 출처 |
 |---|---|---|---|---|
-| **REQ-NF-048** | 콘텐츠 확장 | 레슨 1~125편 확장 시 데이터 모델·API 변경 없이 수용 (`lesson_id` 체계 기반) | ✅ MVP-IN (스키마 기본) | F1 · ADR-004 |
+| **REQ-NF-048** | 콘텐츠 확장 | 레슨 1~133편 확장 시 데이터 모델·API 변경 없이 수용 (`lesson_id` 체계 기반) | ✅ MVP-IN (스키마 기본) | F1 · ADR-004 |
 | **REQ-NF-049** | PDF 생성 캐시 | 동일 `lesson_id + revision` 조합 재생성 요청 시 캐시 HIT ≥ 95% | ⏸️ MVP-DEFER (실측 판정은 Public Pilot) | 3.4.2 · AC6 |
 | **REQ-NF-050** | CI 자동화 | **`.github/workflows/quality.yml` 단일 파일**로 접근성(axe-core)·성능(Lighthouse)·후킹 린터(정규식 + Gemini via Vercel AI SDK)·E2E(Playwright)·부하(k6) 전부 배포 차단형 필수 게이트. Vercel Preview Deploy와 병렬 작동. (§1.5.1.2 D-CI) | ✅ MVP-IN (axe + Lighthouse 2종만 Alpha) / 🟡 MVP-SOFT (Playwright/k6/Gemini Closed Beta) | CON-08 · §1.5.1.2 D-CI |
 | **REQ-NF-051** | 단일 제작자 운영 적합성 | 신규 레슨 1편 추가 시 제작자 수작업 **≤ 30분** (템플릿·자동 삽입 기반) | ⏸️ MVP-DEFER (실측은 Closed Beta 후반) | CON-08 · KSF 4 |
@@ -1021,7 +1022,7 @@ erDiagram
 
 | 필드 | 타입 | 제약 | 설명 |
 |---|---|---|---|
-| lesson_id | VARCHAR(4) | PK, 포맷 `L001`~`L125` | 불변 (REQ-FUNC-033, REQ-NF-052) |
+| lesson_id | VARCHAR(4) | PK, 포맷 `L001`~`L133` | 불변 (REQ-FUNC-033, REQ-NF-052) |
 | module_id | VARCHAR(8) | FK → MODULE | |
 | order_in_module | INT | NOT NULL | 권장 순서 (강제 아님, ADR-003) |
 | title | VARCHAR(200) | NOT NULL | |
@@ -1176,7 +1177,7 @@ classDiagram
     }
 
     class Lesson {
-        +String lessonId L001~L125
+        +String lessonId L001~L133
         +String moduleId FK
         +Integer orderInModule
         +String title
@@ -1315,7 +1316,7 @@ classDiagram
 
 | 불변식 | 설명 | 연결 Requirement |
 |---|---|---|
-| INV-01 | `Lesson.lessonId` 는 생성 이후 **변경 불가** (`L001`~`L125` 포맷) | REQ-FUNC-033, REQ-NF-052 |
+| INV-01 | `Lesson.lessonId` 는 생성 이후 **변경 불가** (`L001`~`L133` 포맷) | REQ-FUNC-033, REQ-NF-052 |
 | INV-02 | 1 Lesson = **정확히 1 TeacherKit, 1 youtubeVideoId, 1 script, 1 pdfKitUrl** | REQ-FUNC-034 |
 | INV-03 | `Stamp` 는 `(userId, lessonId)` 조합당 **최대 1건** | REQ-FUNC-006 |
 | INV-04 | `LessonProgress.stampEarned=true` 는 `oxCompleted=true` 가 전제 | REQ-FUNC-002 |
@@ -1363,7 +1364,7 @@ classDiagram
 
 | 페이지 | 구성 요소 | 폰트 | 요건 |
 |---|---|---|---|
-| **p.1 머리글** | 레슨 ID (L001~L125) · 제목 · 모듈명 · **개정일 (`revision_last_updated`)** · CC BY-NC-SA 4.0 뱃지 | 나눔바른고딕 Bold 18pt (제목) / Regular 10pt (메타) | REQ-FUNC-015, REQ-FUNC-037 |
+| **p.1 머리글** | 레슨 ID (L001~L133) · 제목 · 모듈명 · **개정일 (`revision_last_updated`)** · CC BY-NC-SA 4.0 뱃지 | 나눔바른고딕 Bold 18pt (제목) / Regular 10pt (메타) | REQ-FUNC-015, REQ-FUNC-037 |
 | **p.1 학습 목표** | 테두리 박스 안 "이 차시 이해 목표" 2~3줄 | 나눔바른고딕 11pt | 원칙 1 (이해가 먼저) |
 | **p.1 영상 접근** | 유튜브 링크 + **QR 코드** + 예상 시청 시간 | 나눔바른고딕 10pt | REQ-FUNC-019 |
 | **p.2 본문** | 스크립트 주요 구절 발췌 · 개념 정의 1회 이상 · 한국 맥락 예시 1개 | **나눔명조 11pt** | 원칙 1, REQ-FUNC-008 |
@@ -1588,7 +1589,7 @@ sequenceDiagram
 - [ ] REQ-NF-034 색 대비 ≥4.5:1 (axe 통과)
 - [ ] REQ-NF-037 키보드 네비게이션 100%
 - [ ] REQ-NF-039 글로 읽기 대체 경로 100%
-- [ ] REQ-NF-048 레슨 1~125 확장 가능 스키마
+- [ ] REQ-NF-048 레슨 1~133 확장 가능 스키마
 - [ ] REQ-NF-050 axe + Lighthouse CI 게이트 2종
 - [ ] REQ-NF-052 lesson_id 불변
 
@@ -1613,10 +1614,11 @@ sequenceDiagram
 | **1.3** | 2026-04-25 | §1.5.1, §1.5.1.1(신설), §3.4.1, §3.6, §4.1.1 REQ-FUNC-006, §5 TC-006, §6.1, §6.2.3 | **ADR-004 Pending Decision 확정 — 멱등성 보장 메커니즘 Option B(DB UNIQUE + 자연 멱등 키) 선택.** `Stamp UNIQUE(user_id, lesson_id)` 제약을 자연 멱등 키로 활용, UNIQUE 충돌을 200 응답으로 변환. 영구 멱등으로 INV-05 충족. 인프라·비용 증분 0. Option A 이전 트리거(모니터링 기준 4종) 사전 등록. |
 | **1.4** | 2026-04-25 | §1.5.1, §1.5.1.2(신설), §1.5.2 CON-07, §3.1, §3.2, §3.3, §3.6, §4.2.3 REQ-NF-017, §4.2.4 REQ-NF-023, §4.2.5 REQ-NF-032, §4.2.8 REQ-NF-050, §6.1, §6.2.2, §6.2.4(신설), §6.6 R8·R9·R10 | **ADR-004 Technology Stack 확정 — Next.js App Router + Supabase + Vercel + Vercel AI SDK/Gemini 단일 풀스택.** C-TEC-001~007 + 파생 결정 D-CI(GitHub Actions)·D-AUTH(Supabase Auth)·D-TIER(Hobby+Free 출발) 수록. Teacher Kit PDF 양식 규격(나눔바른고딕·나눔명조, SIL OFL 1.1, A4 2~3p) §6.2.4 신설. Cold start·Supabase pause·PDF 폰트 3건 운영 리스크 R8~R10으로 등재하고 Vercel Cron 완화책 명시. MVP 핵심 사용자 경험 훼손 없음 판정은 별도 Plan 문서 §3에 수록. PRD v0.5 §5.4·§7.4와 일부 수치·결정 불일치는 PRD v0.6 승격 시 정합화 필요. |
 | **0.9** | 2026-04-25 | §1.1, §1.2.3(신설), §1.3, §1.4 REF-18(신설), §3.1, §4.1 서두·4.1.1~4.1.8 전체, §4.2.1~4.2.8 전체, §5.3, §6.4, §6.6, §6.7(신설 · Appendix E), 부록 Z | **MVP Implementation Edition — 구현 범위 라벨 병기 + 파일럿 4구간 재정의.** v1.4의 모든 요구사항 범위를 유지하면서 각 REQ 94개(FUNC 42 + NF 52)에 ✅ MVP-IN / 🟡 MVP-SOFT / ⏸️ MVP-DEFER 라벨 병기. 파일럿을 Alpha(4주)/Private Beta(6주)/Closed Beta(8주)/Public Pilot(34주) 4구간으로 세분화(§1.2.3 신설). External Systems(§3.1)에 "투입 시점" 컬럼 추가 — 외부 의존 10→5→6→7→9 단계적 증설. 리스크 등록부(§6.6)에 "위험 노출 시점" 컬럼 추가. Appendix E Alpha Exit 체크리스트(§6.7 MVP-IN 38건) 신설. 본 Revision은 3개월 개발 경험 + 3년차 IT 기획 + 완전 바이브코딩 기반 단일 제작자가 Alpha 4주 내에 실제 구현 가능한 범위를 명확히 한다. 라벨 분류 근거는 REF-18 (MVP 개발목표 적절성 종합 검토 보고서). PRD v0.5 §8.1과 파일럿 단계 수치 불일치는 PRD v0.6 승격 시 정합화 필요. Revision 번호 체계에서 0.9는 "MVP Implementation Edition" 으로, v1.4의 완성형 목표 사양에서 파생된 MVP 실행 전용 버전임을 명시한다. |
+| **1.1** | 2026-05-13 | §1.2, §4.1 REQ-FUNC-033, §4.2.8 REQ-NF-048, §6.1, §6.2.2, §6.2.3 INV-01, §6.7 | **편 수 정정 + 학습 영역 시안 결정 반영 — 길 A 최소 침습 변경 (Revision 0.9 → 1.1 승격).** 마스터 v4 기준 125 → **133** 일괄 정정 (`L001~L125` → `L001~L133`, INV-01 / REQ-FUNC-033 / REQ-NF-048 갱신, §6.2 Class Diagram 영향). PRD §3 카카오 OAuth 신규 명시 (대안 인증, 추가 PII X), §1 학습 흔적 모달 예외 조항 추가 (조건 4가지 충족 시 PRD 정합), §6 진주 권별 색 결정 (1권 하늘 / 2권 분홍 / 3권 노랑 / 4권 연두 / 5권 순백). 자세한 변경 근거는 `PROJECT_DECISIONS_v1.md` §2. **본문 REQ 갱신 (REQ-FUNC 신규 발행, External System 추가, Class Diagram 갱신 등)은 PRD v0.6 Major 승격 시 정합 예정.** |
 
 ### 관리 규정
 
-- 본 SRS는 **Revision 0.9 (MVP Implementation Edition) 기준**이며, 원본 계보는 v1.4 "완성형 목표 사양" 을 유지한다. PRD 개정(분기 단위) 또는 Stage 1 파일럿 실측 결과에 따라 후속 Revision 발행.
+- 본 SRS는 **Revision 1.1 (MVP Implementation Edition + 학습 영역 시안 정합화) 기준**이며, 원본 계보는 v1.4 "완성형 목표 사양" 을 유지한다. PRD 개정(분기 단위) 또는 Stage 1 파일럿 실측 결과에 따라 후속 Revision 발행.
 - Revision 변경 시 변경 이력을 본 부록에 `Date · Section · Summary` 형식으로 기록.
 - 원칙 1·2·3·4 및 Non-Goals 관련 요구사항(예: REQ-NF-015, REQ-FUNC-007, 후킹 린터)은 **변경 불가 항목**. 수정 시 PRD v0.6 승격 선행 필요.
 - **MVP 라벨 조정 규정**: ✅ MVP-IN / 🟡 MVP-SOFT / ⏸️ MVP-DEFER 라벨은 Stage 1 실측 또는 MVP-IN 38건 완료 실패 시 재분류 가능하다. 재분류 시 REF-18 보고서 업데이트 또는 신규 근거 문서 발행 필요.

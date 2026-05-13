@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light">
+<title>관리자 대시보드 — 고요의 경제나루</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+<style>
+  :root {
+    color-scheme: light;
+    --bg-light: #F8FCFC;
+    --water-light: #DCEAEE;
+    --water-card: #EBF5F5;
+    --accent-soft: #86D0D6;
+    --accent-main: #1A8E9C;
+    --accent-deep: #0D5F6D;
+    --accent-darkest: #052830;
+    --text-main: #0E2B30;
+    --text-soft: #4A5A60;
+    --text-mute: #7A8A90;
+    --line-light: #DCE7E8;
+    --line-soft: #E8F0F0;
+    --status-public: #2A9F6E;
+    --status-private: #9B8E6D;
+    --status-draft: #B85540;
+
+    --hahmlet: "Hahmlet", serif;
+    --pretendard: "Pretendard Variable", -apple-system, sans-serif;
+    --mono: "JetBrains Mono", monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--pretendard);
+    background: var(--bg-light);
+    color: var(--text-main);
+    line-height: 1.7;
+    font-size: 16px;
+  }
+
+  .skip-link {
+    position: absolute; top: -40px; left: 0;
+    background: var(--accent-deep); color: #FFFFFF;
+    padding: 8px 16px; text-decoration: none; font-size: 14px; z-index: 200;
+  }
+  .skip-link:focus { top: 0; }
+
+  a:focus-visible, button:focus-visible {
+    outline: 2px solid var(--accent-main);
+    outline-offset: 3px; border-radius: 4px;
+  }
+
+  /* NAV (관리자용) */
+  .admin-nav {
+    position: sticky; top: 0; z-index: 100;
+    padding: 14px 40px;
+    display: flex; justify-content: space-between; align-items: center;
+    background: var(--accent-darkest);
+    color: #FFFFFF;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .admin-nav-left { display: flex; align-items: center; gap: 16px; }
+  .admin-nav-logo {
+    font-family: var(--hahmlet); font-weight: 600; font-size: 15px;
+    color: #FFFFFF; letter-spacing: -0.01em; text-decoration: none;
+  }
+  .admin-badge {
+    display: inline-flex; align-items: center;
+    padding: 3px 10px;
+    background: rgba(134, 208, 214, 0.18);
+    border: 1px solid rgba(134, 208, 214, 0.35);
+    color: var(--accent-soft);
+    border-radius: 6px;
+    font-family: var(--mono); font-size: 10px;
+    letter-spacing: 0.18em; font-weight: 600;
+    text-transform: uppercase;
+  }
+  .admin-nav-links { display: flex; gap: 4px; }
+  .admin-nav-links a {
+    padding: 7px 12px;
+    font-size: 13.5px; color: rgba(255, 255, 255, 0.7);
+    text-decoration: none; font-weight: 500;
+    border-radius: 7px;
+    transition: all 0.2s ease;
+  }
+  .admin-nav-links a:hover {
+    color: #FFFFFF; background: rgba(255, 255, 255, 0.06);
+  }
+  .admin-nav-links a.active {
+    color: #FFFFFF; background: rgba(255, 255, 255, 0.1);
+    font-weight: 600;
+  }
+  .admin-nav-right {
+    display: flex; align-items: center; gap: 10px;
+    font-family: var(--pretendard); font-size: 13px;
+    color: rgba(255, 255, 255, 0.7);
+  }
+  .admin-nav-right strong {
+    color: #FFFFFF; font-weight: 600;
+  }
+
+  /* 본문 */
+  .page { max-width: 1280px; margin: 0 auto; padding: 36px 40px 80px; }
+
+  .page-header {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    gap: 20px; flex-wrap: wrap; margin-bottom: 36px;
+  }
+  .page-header-left { flex: 1; min-width: 240px; }
+  .page-eyebrow {
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.25em;
+    color: var(--accent-deep); font-weight: 600; margin-bottom: 8px;
+    text-transform: uppercase;
+  }
+  .page-title {
+    font-family: var(--hahmlet); font-weight: 600;
+    font-size: 30px; line-height: 1.3;
+    color: var(--text-main); letter-spacing: -0.015em;
+  }
+  .page-date {
+    font-family: var(--mono); font-size: 12px;
+    color: var(--text-mute); letter-spacing: 0.05em;
+  }
+
+  /* 요약 카드 4개 */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 56px;
+  }
+  .summary-card {
+    background: #FFFFFF;
+    border: 1px solid var(--line-light);
+    border-radius: 14px;
+    padding: 22px 22px 20px;
+  }
+  .summary-label {
+    font-family: var(--mono); font-size: 10.5px;
+    letter-spacing: 0.18em; color: var(--text-soft);
+    font-weight: 600; text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .summary-num {
+    font-family: var(--hahmlet); font-weight: 700;
+    font-size: 32px; line-height: 1.1;
+    color: var(--text-main); letter-spacing: -0.02em;
+    margin-bottom: 6px;
+  }
+  .summary-unit {
+    font-family: var(--pretendard); font-weight: 500;
+    font-size: 14px; color: var(--text-soft);
+    margin-left: 4px;
+  }
+  .summary-delta {
+    font-family: var(--mono); font-size: 11px;
+    color: var(--text-mute); letter-spacing: 0.03em;
+  }
+  .summary-delta strong {
+    font-family: var(--pretendard); font-weight: 600;
+    color: var(--status-public);
+  }
+
+  /* 2-column 레이아웃 */
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 32px;
+  }
+  .section-h2 {
+    font-family: var(--hahmlet); font-weight: 600;
+    font-size: 20px; color: var(--text-main);
+    letter-spacing: -0.01em; margin-bottom: 18px;
+    display: flex; justify-content: space-between; align-items: baseline;
+  }
+  .section-h2-action {
+    font-family: var(--pretendard); font-size: 13px;
+    font-weight: 500; color: var(--accent-deep);
+    text-decoration: none;
+  }
+  .section-h2-action:hover { text-decoration: underline; }
+
+  /* 콘텐츠 테이블 */
+  .content-table-wrap {
+    background: #FFFFFF;
+    border: 1px solid var(--line-light);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  .content-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--pretendard);
+    font-size: 14px;
+  }
+  .content-table thead {
+    background: var(--bg-light);
+    border-bottom: 1px solid var(--line-light);
+  }
+  .content-table th {
+    padding: 12px 16px;
+    text-align: left;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.15em;
+    color: var(--text-soft);
+    font-weight: 600;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .content-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--line-soft);
+    color: var(--text-main);
+    vertical-align: middle;
+  }
+  .content-table tbody tr:last-child td { border-bottom: none; }
+  .content-table tbody tr {
+    transition: background 0.2s ease;
+  }
+  .content-table tbody tr:hover {
+    background: var(--bg-light);
+  }
+  .col-vol {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent-deep);
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    width: 70px;
+  }
+  .col-title {
+    font-family: var(--hahmlet);
+    font-weight: 500;
+    font-size: 14.5px;
+    color: var(--text-main);
+    letter-spacing: -0.005em;
+  }
+  .col-date {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--text-mute);
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+    width: 100px;
+  }
+
+  /* 상태 칩 */
+  .status-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 9px;
+    border-radius: 100px;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+  .status-chip::before {
+    content: "";
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .status-chip.public {
+    background: rgba(42, 159, 110, 0.1);
+    color: var(--status-public);
+  }
+  .status-chip.public::before { background: var(--status-public); }
+  .status-chip.private {
+    background: rgba(155, 142, 109, 0.12);
+    color: var(--status-private);
+  }
+  .status-chip.private::before { background: var(--status-private); }
+  .status-chip.draft {
+    background: rgba(184, 85, 64, 0.1);
+    color: var(--status-draft);
+  }
+  .status-chip.draft::before { background: var(--status-draft); }
+
+  .col-actions {
+    text-align: right;
+    width: 80px;
+  }
+  .action-btn {
+    padding: 5px 10px;
+    background: transparent;
+    border: 1px solid var(--line-light);
+    border-radius: 7px;
+    font-family: var(--pretendard);
+    font-size: 12px;
+    color: var(--text-soft);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+  }
+  .action-btn:hover {
+    border-color: var(--accent-main);
+    color: var(--accent-deep);
+    background: var(--water-card);
+  }
+
+  .table-footer {
+    padding: 14px 16px;
+    background: var(--bg-light);
+    text-align: center;
+    border-top: 1px solid var(--line-light);
+  }
+  .table-footer a {
+    font-family: var(--pretendard);
+    font-size: 13px;
+    color: var(--accent-deep);
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .table-footer a:hover { text-decoration: underline; }
+
+  /* 최근 활동 로그 */
+  .activity-card {
+    background: #FFFFFF;
+    border: 1px solid var(--line-light);
+    border-radius: 14px;
+    padding: 6px 0;
+    max-height: 540px;
+    overflow-y: auto;
+  }
+  .activity-item {
+    display: flex;
+    gap: 14px;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--line-soft);
+    align-items: flex-start;
+  }
+  .activity-item:last-child { border-bottom: none; }
+  .activity-time {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    color: var(--text-mute);
+    letter-spacing: 0.03em;
+    padding-top: 1px;
+    flex-shrink: 0;
+    width: 44px;
+  }
+  .activity-body {
+    flex: 1;
+    font-family: var(--pretendard);
+    font-size: 13px;
+    color: var(--text-soft);
+    line-height: 1.55;
+  }
+  .activity-user {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--accent-deep);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  .activity-target {
+    color: var(--text-main);
+    font-weight: 500;
+  }
+  .activity-tag {
+    display: inline-block;
+    padding: 1px 7px;
+    background: var(--water-card);
+    border-radius: 5px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent-deep);
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    margin-right: 4px;
+    text-transform: uppercase;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+
+  @media (max-width: 1080px) {
+    .summary-grid { grid-template-columns: repeat(2, 1fr); }
+    .main-grid { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 720px) {
+    .admin-nav { padding: 12px 20px; flex-wrap: wrap; gap: 10px; }
+    .admin-nav-right { display: none; }
+    .admin-nav-links { gap: 2px; }
+    .admin-nav-links a { padding: 5px 9px; font-size: 12.5px; }
+    .page { padding: 28px 18px 60px; }
+    .summary-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .summary-card { padding: 16px 16px 14px; }
+    .summary-num { font-size: 24px; }
+    .col-actions, .col-date { display: none; }
+    .content-table td, .content-table th { padding: 12px 12px; }
+    .activity-item { padding: 12px 16px; gap: 10px; }
+  }
+</style>
+</head>
+<body>
+
+  <a href="#main" class="skip-link">본문으로 건너뛰기</a>
+
+  <nav class="admin-nav">
+    <div class="admin-nav-left">
+      <a href="/admin/dashboard" class="admin-nav-logo">고요의 경제나루</a>
+      <span class="admin-badge">Admin</span>
+    </div>
+    <div class="admin-nav-links">
+      <a href="/admin/dashboard" class="active">대시보드</a>
+      <a href="/admin/contents">콘텐츠</a>
+      <a href="/admin/members">회원</a>
+      <a href="/admin/settings">설정</a>
+    </div>
+    <div class="admin-nav-right">
+      <span>운영자 · <strong>ELLA</strong></span>
+    </div>
+  </nav>
+
+  <main class="page" id="main">
+
+    <header class="page-header">
+      <div class="page-header-left">
+        <div class="page-eyebrow">DASHBOARD</div>
+        <h1 class="page-title">고요한 운영, 차분한 학습</h1>
+      </div>
+      <div class="page-date">2026.05.13 (수) · 22:14 기준</div>
+    </header>
+
+    <section class="summary-grid" aria-label="주요 지표">
+      <div class="summary-card">
+        <div class="summary-label">등록 회원</div>
+        <div class="summary-num">1,247<span class="summary-unit">명</span></div>
+        <div class="summary-delta">최근 7일 <strong>+34</strong></div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">7일 활성 학습자</div>
+        <div class="summary-num">423<span class="summary-unit">명</span></div>
+        <div class="summary-delta">전주 대비 <strong>+18%</strong></div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">누적 학습 완료</div>
+        <div class="summary-num">8,612<span class="summary-unit">편</span></div>
+        <div class="summary-delta">오늘 <strong>+127</strong></div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">PDF 다운로드</div>
+        <div class="summary-num">3,481<span class="summary-unit">회</span></div>
+        <div class="summary-delta">최근 7일 <strong>+96</strong></div>
+      </div>
+    </section>
+
+    <div class="main-grid">
+
+      <section>
+        <h2 class="section-h2">
+          최근 편집된 콘텐츠
+          <a href="/admin/contents" class="section-h2-action">전체 보기 →</a>
+        </h2>
+
+        <div class="content-table-wrap">
+          <table class="content-table">
+            <thead>
+              <tr>
+                <th>편</th>
+                <th>제목</th>
+                <th>상태</th>
+                <th>마지막 수정</th>
+                <th class="col-actions">관리</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="col-vol">1권 27편</td>
+                <td class="col-title">돈의 언어 — 1권 정리 ②</td>
+                <td><span class="status-chip draft">DRAFT</span></td>
+                <td class="col-date">2026.05.13</td>
+                <td class="col-actions"><a href="/admin/contents/1-27" class="action-btn">편집</a></td>
+              </tr>
+              <tr>
+                <td class="col-vol">1권 26편</td>
+                <td class="col-title">돈의 언어 — 1권 정리 ①</td>
+                <td><span class="status-chip private">비공개</span></td>
+                <td class="col-date">2026.05.12</td>
+                <td class="col-actions"><a href="/admin/contents/1-26" class="action-btn">편집</a></td>
+              </tr>
+              <tr>
+                <td class="col-vol">1권 25편</td>
+                <td class="col-title">평균 너머의 한 단위를 보다 — 평균과 한계</td>
+                <td><span class="status-chip public">공개</span></td>
+                <td class="col-date">2026.05.10</td>
+                <td class="col-actions"><a href="/admin/contents/1-25" class="action-btn">편집</a></td>
+              </tr>
+              <tr>
+                <td class="col-vol">1권 24편</td>
+                <td class="col-title">경제에도 계절이 있다 — 경기와 호황·불황</td>
+                <td><span class="status-chip public">공개</span></td>
+                <td class="col-date">2026.05.08</td>
+                <td class="col-actions"><a href="/admin/contents/1-24" class="action-btn">편집</a></td>
+              </tr>
+              <tr>
+                <td class="col-vol">1권 17편</td>
+                <td class="col-title">월급에서 미리 빠지는 안전망 — 4대보험</td>
+                <td><span class="status-chip public">공개</span></td>
+                <td class="col-date">2026.05.05</td>
+                <td class="col-actions"><a href="/admin/contents/1-17" class="action-btn">편집</a></td>
+              </tr>
+              <tr>
+                <td class="col-vol">1권 1편</td>
+                <td class="col-title">다 가질 수 없다는 것 — 희소성과 선택</td>
+                <td><span class="status-chip public">공개</span></td>
+                <td class="col-date">2026.04.20</td>
+                <td class="col-actions"><a href="/admin/contents/1-1" class="action-btn">편집</a></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="table-footer">
+            <a href="/admin/contents">전체 133편 중 6편 표시 · 모두 보기 →</a>
+          </div>
+        </div>
+      </section>
+
+      <aside>
+        <h2 class="section-h2">최근 활동</h2>
+        <div class="activity-card">
+          <div class="activity-item">
+            <div class="activity-time">22:14</div>
+            <div class="activity-body">
+              <span class="activity-tag">JOIN</span>
+              <span class="activity-user">jih****</span>님이 가입했습니다
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-time">22:10</div>
+            <div class="activity-body">
+              <span class="activity-tag">DONE</span>
+              <span class="activity-user">eco****</span>님이
+              <span class="activity-target">1권 1편</span>을 마쳤습니다
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-time">21:58</div>
+            <div class="activity-body">
+              <span class="activity-tag">PDF</span>
+              <span class="activity-target">1권 17편 4대보험</span> 자료가 다운로드되었습니다
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-time">21:42</div>
+            <div class="activity-body">
+              <span class="activity-tag">DONE</span>
+              <span class="activity-user">ang****</span>님이
+              <span class="activity-target">1권 3편</span>을 마쳤습니다
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-time">21:35</div>
+            <div class="activity-body">
+              <span class="activity-tag">DONE</span>
+              <span class="activity-user">min****</span>님이
+              <span class="activity-target">1권 8편</span>을 마쳤습니다
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-time">21:18</div>
+            <div class="activity-body">
+              <span class="activity-tag">JOIN</span>
+              <span class="activity-user">soo****</span>님이 가입했습니다 <span style="color: var(--text-mute); font-size: 11px;">· 카카오</span>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-time">20:53</div>
+            <div class="activity-body">
+              <span class="activity-tag">PDF</span>
+              <span class="activity-target">1권 1편 희소성</span> 자료가 다운로드되었습니다
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-time">20:41</div>
+            <div class="activity-body">
+              <span class="activity-tag">DONE</span>
+              <span class="activity-user">han****</span>님이
+              <span class="activity-target">1권 12편</span>을 마쳤습니다
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-time">20:28</div>
+            <div class="activity-body">
+              <span class="activity-tag">DONE</span>
+              <span class="activity-user">par****</span>님이
+              <span class="activity-target">1권 2편</span>을 마쳤습니다
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-time">20:14</div>
+            <div class="activity-body">
+              <span class="activity-tag">JOIN</span>
+              <span class="activity-user">lee****</span>님이 가입했습니다
+            </div>
+          </div>
+        </div>
+      </aside>
+
+    </div>
+
+  </main>
+
+</body>
+</html>
