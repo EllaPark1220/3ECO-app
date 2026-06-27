@@ -1,5 +1,7 @@
 # Visual Design Spec v3.1
 
+> **[PlayBoard SoT 고지]** 이 문서는 디자인 *근거*로 동결한다. 디자인 토큰의 **런타임 단일 진실 공급원은 `app/globals.css`** (VDS `:root` 변수 + `@theme`)이다. 값이 충돌하면 **`app/globals.css`가 우선**한다. 토큰 변경은 이 문서가 아니라 `app/globals.css`에 반영하고, 같은 PR에서 본 문서를 함께 갱신한다(양방향 싱크).
+
 **경제 판단력 교과서 (고요의 경제나루)**
 
 | 항목 | 값 |

@@ -1,15 +1,405 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
+@custom-variant dark (&:is(.dark *));
+
+/* ============================
+   VDS v3.1 — 디자인 시스템 토큰
+   런타임 SoT. 근거 문서는 docs/VDS_v3.md (충돌 시 이 파일이 우선).
+   ============================ */
 :root {
-  --font-size-base: 18px; /* FR-LES-004 기본값 S(18px) */
+  color-scheme: light;
+
+  /* 배경·면 */
+  --bg-light: #F8FCFC;
+  --water-light: #DCEAEE;
+  --water-card: #EBF5F5;
+  --water-mid: #B5DBE0;
+
+  /* 액센트 */
+  --accent-soft: #86D0D6;
+  --accent-main: #1A8E9C;
+  --accent-deep: #0D5F6D;
+  --accent-darkest: #052830;
+
+  /* 텍스트 (순검정 #000 금지, 순백 #FFF 금지) */
+  --text-main: #0E2B30;
+  --text-soft: #4A5A60;
+  --text-mute: #7A8A90;
+
+  /* 선·구분 */
+  --line-light: #DCE7E8;
+  --line-soft: #E8F0F0;
+
+  /* 관리자 상태 */
+  --status-public: #2A9F6E;
+  --status-private: #9B8E6D;
+  --status-draft: #B85540;
+
+  /* 카카오 */
+  --kakao-yellow: #FEE500;
+  --kakao-yellow-hover: #F5DC00;
+  --kakao-text: #3C1E1E;
+
+  /* 곡률 */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 20px;
+
+  /* 폰트 */
+  --hahmlet: "Hahmlet", serif;
+  --pretendard: "Pretendard Variable", -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", monospace;
+
+  /* 글자 크기 베이스 — FR-LES-004 기본값 S(18px) / CLAUDE.md 규칙 4 */
+  --font-size-base: 18px;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --radius: 0.625rem;
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
 }
+
+/* 접근성 글자 크기 토글 — 14/18/22/28px 4단계 (NF-A11Y-003 / CLAUDE.md 규칙 4)
+   28px + 브라우저 200% 확대에서 가로 스크롤 0 (TS-E2E-006) */
 html.font-xs { --font-size-base: 14px; }
 html.font-s  { --font-size-base: 18px; }
 html.font-l  { --font-size-base: 22px; }
 html.font-xl { --font-size-base: 28px; }
 
+/* Tailwind 테마 인라인 */
+@theme inline {
+  --color-bg-light: var(--bg-light);
+  --color-water-light: var(--water-light);
+  --color-water-card: var(--water-card);
+  --color-water-mid: var(--water-mid);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-main: var(--accent-main);
+  --color-accent-deep: var(--accent-deep);
+  --color-accent-darkest: var(--accent-darkest);
+  --color-text-main: var(--text-main);
+  --color-text-soft: var(--text-soft);
+  --color-text-mute: var(--text-mute);
+  --color-line-light: var(--line-light);
+  --color-line-soft: var(--line-soft);
+  --color-status-public: var(--status-public);
+  --color-status-private: var(--status-private);
+  --color-status-draft: var(--status-draft);
+  --color-kakao: var(--kakao-yellow);
+  --font-sans: var(--font-sans);
+  --font-serif: var(--hahmlet);
+  --font-mono: var(--mono);
+  --font-heading: var(--font-sans);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/* 접근성 글자 크기 유틸 — text-a11y-* (FR-LES-004 / NF-A11Y-003) */
+@theme {
+  --text-a11y-xs: 14px;
+  --text-a11y-s: 18px;
+  --text-a11y-l: 22px;
+  --text-a11y-xl: 28px;
+}
+
+/* 기본 요소 */
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
 body {
+  font-family: var(--pretendard);
   font-size: var(--font-size-base);
+  line-height: 1.85;
+  color: var(--text-main);
+  background: var(--bg-light);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 헤딩 폰트 */
+h1, h2, h3 {
+  font-family: var(--hahmlet);
+  letter-spacing: -0.01em;
+}
+
+/* 포커스 링 (접근성 — outline:none 금지) */
+:focus-visible {
+  outline: 3px solid var(--accent-main);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ============================
+   모션 정책 — 접근성 (VDS §5.4)
+   ============================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* ============================
+   랜딩 전용 애니메이션 (학습 영역에는 적용 금지)
+   ============================ */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes kenBurnsClose {
+  0% { transform: scale(1.02) translate(0, 0); }
+  100% { transform: scale(1.07) translate(-1.2%, -1.5%); }
+}
+
+@keyframes deepTwinkle {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.8; }
+}
+
+@keyframes gentleBob {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(8px); }
+}
+
+/* ============================
+   진주 스탬프 (VDS §13.1 + Stamp Map v3)
+   ============================ */
+.pearls {
+  display: flex; flex-wrap: wrap;
+  gap: 16px 14px; padding: 0 4px;
+}
+
+.pearl {
+  width: 32px; height: 32px; border-radius: 50%;
+  position: relative; display: inline-flex;
+  align-items: center; justify-content: center;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.pearl-circle {
+  width: 100%; height: 100%; border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+/* 완료 진주 광택 */
+.pearl-done.pearl-vol-1 .pearl-circle {
+  background:
+    radial-gradient(circle at 32% 28%, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 22%),
+    radial-gradient(circle at 55% 55%, rgba(184, 218, 235, 0.32) 30%, rgba(184, 218, 235, 0.1) 70%, rgba(255, 235, 235, 0.12) 100%),
+    radial-gradient(circle at 38% 30%, #FFFFFF 0%, #FBF7F0 45%, #ECDFCC 85%, #C8B8A4 100%);
+  box-shadow: 0 3px 10px -2px rgba(160, 145, 130, 0.4);
+}
+.pearl-done.pearl-vol-2 .pearl-circle {
+  background:
+    radial-gradient(circle at 32% 28%, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 22%),
+    radial-gradient(circle at 55% 55%, rgba(240, 197, 208, 0.34) 30%, rgba(240, 197, 208, 0.12) 70%, rgba(245, 230, 220, 0.12) 100%),
+    radial-gradient(circle at 38% 30%, #FFFFFF 0%, #FBF7F0 45%, #ECDFCC 85%, #C8B8A4 100%);
+  box-shadow: 0 3px 10px -2px rgba(160, 145, 130, 0.4);
+}
+.pearl-done.pearl-vol-3 .pearl-circle {
+  background:
+    radial-gradient(circle at 32% 28%, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 22%),
+    radial-gradient(circle at 55% 55%, rgba(245, 224, 181, 0.38) 30%, rgba(245, 224, 181, 0.14) 70%, rgba(250, 240, 220, 0.12) 100%),
+    radial-gradient(circle at 38% 30%, #FFFFFF 0%, #FBF7F0 45%, #ECDFCC 85%, #C8B8A4 100%);
+  box-shadow: 0 3px 10px -2px rgba(160, 145, 130, 0.4);
+}
+.pearl-done.pearl-vol-4 .pearl-circle {
+  background:
+    radial-gradient(circle at 32% 28%, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 22%),
+    radial-gradient(circle at 55% 55%, rgba(200, 223, 196, 0.34) 30%, rgba(200, 223, 196, 0.12) 70%, rgba(235, 245, 230, 0.12) 100%),
+    radial-gradient(circle at 38% 30%, #FFFFFF 0%, #FBF7F0 45%, #ECDFCC 85%, #C8B8A4 100%);
+  box-shadow: 0 3px 10px -2px rgba(160, 145, 130, 0.4);
+}
+.pearl-done.pearl-vol-5 .pearl-circle {
+  background:
+    radial-gradient(circle at 32% 28%, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0) 25%),
+    radial-gradient(circle at 50% 60%, rgba(220, 200, 230, 0.18) 30%, rgba(255, 230, 220, 0.14) 70%, rgba(220, 235, 240, 0.16) 100%),
+    radial-gradient(circle at 38% 30%, #FFFFFF 0%, #FCFAF4 45%, #EDE5D8 85%, #C8BBAA 100%);
+  box-shadow: 0 3px 10px -2px rgba(160, 145, 130, 0.4);
+}
+
+/* 미완 진주 */
+.pearl-todo.pearl-vol-1 .pearl-circle { background: transparent; border: 1.5px dashed rgba(184, 210, 229, 0.65); }
+.pearl-todo.pearl-vol-2 .pearl-circle { background: transparent; border: 1.5px dashed rgba(236, 192, 204, 0.65); }
+.pearl-todo.pearl-vol-3 .pearl-circle { background: transparent; border: 1.5px dashed rgba(236, 221, 176, 0.7); }
+.pearl-todo.pearl-vol-4 .pearl-circle { background: transparent; border: 1.5px dashed rgba(191, 215, 187, 0.65); }
+.pearl-todo.pearl-vol-5 .pearl-circle { background: transparent; border: 1.5px dashed rgba(200, 200, 195, 0.7); }
+
+.pearl:hover, .pearl:focus-visible {
+  transform: translateY(-4px) scale(1.08);
+  z-index: 20;
+}
+
+.pearl-done:hover .pearl-circle {
+  filter: brightness(1.06);
+  box-shadow: 0 8px 22px -4px rgba(150, 135, 120, 0.5);
+}
+.pearl-todo:hover .pearl-circle { background: transparent; border-style: solid; }
+
+/* 툴팁 */
+.pearl-tip {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  left: 50%; transform: translateX(-50%);
+  background: #FFFFFF;
+  border: 1px solid var(--line-light);
+  border-radius: 10px;
+  padding: 10px 14px;
+  min-width: 180px;
+  text-align: left;
+  box-shadow: 0 8px 24px -8px rgba(13, 95, 109, 0.25);
+  opacity: 0; visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+  pointer-events: none;
+  z-index: 30;
+}
+.pearl-tip::after {
+  content: "";
+  position: absolute; top: 100%; left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: #FFFFFF;
+}
+.group:hover .pearl-tip,
+.group:focus-visible .pearl-tip {
+  opacity: 1; visibility: visible;
+}
+.pearl-tip-meta {
+  font-family: var(--mono); font-size: 10px;
+  letter-spacing: 0.15em; color: var(--accent-deep);
+  font-weight: 600; margin-bottom: 4px; text-transform: uppercase;
+  display: block;
+}
+.pearl-tip-title {
+  font-family: var(--hahmlet); font-weight: 500;
+  font-size: 13.5px; color: var(--text-main); line-height: 1.4;
+  display: block;
+}
+.pearl-tip-status {
+  font-family: var(--pretendard); font-size: 11px;
+  color: var(--text-mute); margin-top: 4px;
+  display: block;
+}
+.pearl-tip-status.done { color: var(--accent-main); }
+
+@media (max-width: 720px) {
+  .pearls { gap: 13px 11px; }
+  .pearl { width: 28px; height: 28px; }
+  .pearl-tip { min-width: 160px; }
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
 }

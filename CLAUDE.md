@@ -21,3 +21,16 @@
 - 결정 변경 시 `docs/grill/GRILL_LEDGER.md`와 본 파일을 함께 갱신한다.
 - `tasks/*.md`는 GitHub Issue와 1:1 동기화(라벨 `Issue Automation`). 발행/갱신은 `gh` CLI.
 - `main` 직접 push 금지(브랜치 보호) — 브랜치 + PR.
+
+## PlayBoard SoT — 이중 고지
+
+이 repo는 `/playboard` 아래 **레지스트리 파생 단일 진실 공급원(PlayBoard)** 을 운영한다.
+전체 운영 규칙은 `AGENTS.md` 의 "PlayBoard — 기획·구현·운영 통합 SoT" 절을 따른다(이 파일과 이중 명시).
+
+핵심만:
+- 사실은 `playboard/registry/*.ts` 한 곳에만. 표면은 모두 파생(제1원칙). 하드코딩 목록 금지.
+- 요구사항·상태·정책·디자인 변경은 **같은 PR에서 레지스트리와 함께** 갱신.
+- **SoT 이중화 금지:** 세부 작업의 SoT 는 `tasks/*.md` ↔ GitHub 이슈. PlayBoard `work-items.ts`(EPIC)는 `externalRefs` 로 task 패밀리를 교차참조만 한다(복제 금지). 패밀리→EPIC 맵 = `playboard/registry/task-epics.ts`, "모든 task 가 1개 EPIC 에 매핑"을 무결성 테스트로 강제.
+- 디자인 토큰 런타임 SoT 는 `app/globals.css`(VDS). `docs/VDS_v3.md` 는 근거 동결(충돌 시 CSS 우선).
+- 머지 전 `npm test`(무결성 불변식) **green** 필수 + `playboard-integrity` GO.
+- PlayBoard 는 production 기본 비공개(노출 게이트). `PROTOTYPE_ENABLED=true` 는 preview 전용. 공유는 프리뷰 URL.
