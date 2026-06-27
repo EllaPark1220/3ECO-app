@@ -39,6 +39,11 @@ export const ERROR_CODES = {
   // Rate Limit (429)
   RATE_LIMIT_EXCEEDED: { http: 429, message: "요청이 너무 많습니다. 잠시 후 다시 시도하세요." },
 
+  // 스탬프맵 공유 (CT-API-011) — HTTP 매핑은 D6
+  SHARE_LIMIT_EXCEEDED: { http: 429, message: "활성 공유 링크가 너무 많습니다 (최대 5개)." },
+  SHARE_TOKEN_EXPIRED: { http: 410, message: "만료된 공유 링크입니다." },
+  SHARE_TOKEN_NOT_FOUND: { http: 404, message: "공유 링크를 찾을 수 없습니다." },
+
   // 서버 (5xx)
   INTERNAL_ERROR: { http: 500, message: "서버 오류가 발생했습니다." },
   PDF_GENERATION_FAILED: { http: 500, message: "PDF 생성에 실패했습니다." },

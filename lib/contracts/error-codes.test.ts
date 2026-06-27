@@ -4,8 +4,8 @@ import { ERROR_CODES, type ErrorCode } from "./error-codes";
 describe("ERROR_CODES", () => {
   const entries = Object.entries(ERROR_CODES) as [ErrorCode, { http: number; message: string }][];
 
-  it("정의된 코드 26종 (CT-API-001 22 + CT-API-008 설문 4)", () => {
-    expect(entries.length).toBe(26);
+  it("정의된 코드 29종 (CT-API-001 22 + 008 설문 4 + 011 공유 3)", () => {
+    expect(entries.length).toBe(29);
   });
 
   it("설문 에러코드 매핑 (CT-API-008)", () => {
