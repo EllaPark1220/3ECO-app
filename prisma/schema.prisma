@@ -1,0 +1,15 @@
+// CT-DB-001 — Prisma 초기화. 모든 후속 DB 모델(CT-DB-002~011)의 기반.
+// D7(CORE): Prisma 는 provider 를 정적 리터럴로만 허용(env() 불가). SRS C-TEC-003 의
+// "SQLite 로컬 ↔ PostgreSQL 배포 단일 스키마(env provider)" 는 Prisma 제약상 불가하므로,
+// 로컬·배포 모두 PostgreSQL(로컬은 Supabase local/Docker) 단일 provider 로 확정.
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL") // 마이그레이션 직접 연결 (Supabase PgBouncer 우회)
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// 모델은 CT-DB-002~011 에서 추가된다.

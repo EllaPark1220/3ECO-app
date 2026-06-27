@@ -4,7 +4,7 @@
 > 분류: CORE = 아키텍처·보안·외부의존·데이터모델·핵심 UX 계약 / MINOR = 네이밍·디렉터리·로그 포맷·UI 디테일
 > 종료: CORE 3 도달(CORE_BUDGET) · MINOR 10 도달(MINOR_BUDGET) · 미해소 이슈 0(NO_UNBLOCKED_ISSUES) · turn 50(TURN_CAP)
 
-CORE: 2
+CORE: 3
 MINOR: 4
 
 ---
@@ -16,3 +16,6 @@ MINOR: 4
 - [D4] MINOR | CT-API-001 | request_id 전파 = middleware UUID 발급 + 요청/응답 `X-Request-Id` 헤더(다운스트림은 헤더 read). AsyncLocalStorage 풀 전파는 후속 | 태스크 Scenario 8 request-scoped 요구를 MVP 경량(헤더)으로 충족. Upstash 라이브 검증·Sentry 연계는 IF-KV-001/NF-OBS-001 후속.
 - [D5] MINOR | CT-API-009 | 이메일 입력 정규화 = 검증 이전 trim+lowercase (transform→pipe(email)). task의 검증→변환 순서 대신 정규화 선행 | 실무 폼의 공백 패딩 이메일 허용(TDD가 실패 케이스로 포착). 견고성 향상, 계약 의미 동일.
 - [D6] MINOR | CT-API-011 | 공유 에러코드 HTTP 매핑 = SHARE_LIMIT_EXCEEDED 429 · SHARE_TOKEN_EXPIRED 410(Gone) · SHARE_TOKEN_NOT_FOUND 404 | task가 코드명만 명시하고 HTTP 미지정 → 의미에 맞는 표준 상태 선택.
+- [D7] CORE | CT-DB-001 | DB provider = **postgresql 정적 고정**(로컬도 Supabase local/Docker Postgres), Prisma **v6 고정**(v7 generator output 변경 회피) | Prisma 는 `provider`를 정적 리터럴로만 허용 → SRS C-TEC-003 의 "SQLite 로컬 ↔ PostgreSQL 배포 단일 스키마(env provider)"가 불가. 단일 provider 로 해소. **선행 스펙(C-TEC-003)과 상충하므로 인간 검토 필요.**
+
+STOP REASON: CORE_BUDGET
