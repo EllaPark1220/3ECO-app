@@ -6,3 +6,21 @@ publish_issues_result.csv
 # grill-it 반영 헬퍼 산출물
 fix_lesson_count.ps1
 sync_issues.ps1
+
+# Next.js / Node
+/node_modules
+/.next
+/out
+/build
+next-env.d.ts
+*.tsbuildinfo
+.vercel
+
+# env
+.env
+.env*.local
+
+# test
+/coverage
+/test-results
+/playwright-report

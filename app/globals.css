@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-size-base: 18px; /* FR-LES-004 기본값 S(18px) */
+}
+html.font-xs { --font-size-base: 14px; }
+html.font-s  { --font-size-base: 18px; }
+html.font-l  { --font-size-base: 22px; }
+html.font-xl { --font-size-base: 28px; }
+
+body {
+  font-size: var(--font-size-base);
+}
