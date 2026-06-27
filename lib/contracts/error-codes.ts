@@ -24,8 +24,14 @@ export const ERROR_CODES = {
   LESSON_NOT_FOUND: { http: 404, message: "레슨을 찾을 수 없습니다." },
   USER_NOT_FOUND: { http: 404, message: "사용자를 찾을 수 없습니다." },
 
+  // 설문 (CT-API-008)
+  INVALID_QUARTER: { http: 400, message: "분기 값이 올바르지 않습니다." },
+  INVALID_SCORE: { http: 400, message: "점수는 1~5 사이여야 합니다." },
+  FREE_RESPONSE_TOO_LONG: { http: 400, message: "자유 응답은 2000자 이하여야 합니다." },
+
   // 충돌 (409)
   EMAIL_ALREADY_EXISTS: { http: 409, message: "이미 사용 중인 이메일입니다." },
+  SURVEY_ALREADY_SUBMITTED: { http: 409, message: "이번 분기 설문에 이미 응답하셨습니다." },
 
   // 인증 (401 — 자격증명 불일치)
   INVALID_CREDENTIALS: { http: 401, message: "이메일 또는 비밀번호가 잘못되었습니다." },
