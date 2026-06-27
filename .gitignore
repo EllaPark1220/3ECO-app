@@ -1,0 +1,5 @@
+# Issue 자동 발행 헬퍼 산출물
+publish_issues.ps1
+gen_issue_list.ps1
+publish_issues.log
+publish_issues_result.csv
