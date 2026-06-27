@@ -192,7 +192,7 @@ PRD v0.5 §8.1의 Alpha 2주·Closed Beta 1~2개월·Public Pilot 잔여 3단계
 |---|---|
 | **C-TEC-001** | 모든 서비스는 **Next.js (App Router)** 기반의 단일 풀스택 프레임워크로 구현한다. 프론트엔드와 백엔드를 별도 분리하지 않는다. |
 | **C-TEC-002** | 서버 측 로직(DB 접근·API 호출·메일 발송·LLM 호출)은 Next.js의 **Server Actions** 또는 **Route Handlers** 로 구현한다. 별도의 백엔드 서버 없음. |
-| **C-TEC-003** | 데이터베이스는 **Prisma + 로컬 SQLite** 로 개발환경을 구성하고, 배포 시 **Supabase(PostgreSQL)** 를 사용한다. 인프라 설정 복잡도 최소화. |
+| **C-TEC-003** | 데이터베이스는 **Prisma + PostgreSQL 단일 provider**. 로컬 개발은 **Supabase local(또는 Docker Postgres)**, 배포는 **Supabase(PostgreSQL)**. (grill-it D7 정정 — Prisma 는 `provider` 에 `env()` 를 허용하지 않아 "로컬 SQLite ↔ 배포 PostgreSQL 단일 스키마"가 불가하므로 PostgreSQL 단일로 확정. Prisma v6 고정.) |
 | **C-TEC-004** | UI·스타일링은 **Tailwind CSS + shadcn/ui** 로 통일한다. 일관된 디자인 생성 강제. |
 | **C-TEC-005** | LLM 오케스트레이션은 별도 Python 서버 없이 **Vercel AI SDK** 로 Next.js 내부에서 구현한다. |
 | **C-TEC-006** | LLM 호출은 **Google Gemini API** 를 기본으로 하며, 환경 변수 설정만으로 모델 교체가 가능하도록 SDK 표준 인터페이스를 준수한다. |
@@ -1132,7 +1132,7 @@ erDiagram
 | `TIMESTAMP NOT NULL DEFAULT now()` | `DateTime @default(now())` | `createdAt`·`earnedAt`·`submittedAt` |
 | `append-only` | 애플리케이션 레벨 (RLS + Prisma Client 미제공 경로) | INV-08 `EventLog` |
 
-로컬 개발(SQLite)과 배포(Supabase PostgreSQL)는 동일 스키마로 작동하며, `DATABASE_URL` 환경 변수만 전환한다.
+로컬 개발(Supabase local/Docker Postgres)과 배포(Supabase PostgreSQL)는 **동일 provider(postgresql) 단일 스키마**로 작동하며, `DATABASE_URL`(+ 마이그레이션용 `DIRECT_URL`) 환경 변수만 전환한다. (grill-it D7 — Prisma `provider` env() 미지원으로 SQLite 로컬 폐기.)
 
 #### 6.2.3 Class Diagram (도메인 모델)
 
