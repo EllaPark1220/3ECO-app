@@ -71,7 +71,7 @@ assignees: ''
 ### 비용 모니터링
 - [ ] **월간 비용 추적** — Supabase 청구서 확인:
   - Pro 기본: $25/월 (~₩34,000)
-  - 추가 사용량: DB 8GB 초과 시 $0.125/GB, Storage 100GB 초과 시 $0.021/GB
+  - 추가 사용량: DB 8GB 초과 시 $0.133/GB, Storage 100GB 초과 시 $0.021/GB
   - 총 예상: MVP 단계 $25~30/월 (~₩34,000~₩41,000)
 - [ ] **NF-COST-001 과 정합**: 월 인프라 총비용 (Vercel + Supabase + Resend) ≤ ₩100,000 검증
 - [ ] **비용 알림** — Supabase Dashboard 의 Billing Alerts 설정 ($50 도달 시 알림)

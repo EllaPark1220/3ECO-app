@@ -61,7 +61,7 @@ assignees: ''
   - 9개 환경변수 매핑 (DATABASE_URL, DIRECT_URL, NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY 등)
 - [ ] **Free 한도 인지**:
   - DB 500MB (Lesson 10편 + 사용자 1000명 + EventLog 100K = 약 100MB 예상 — 한도 내)
-  - Storage 1GB (PDF 125편 × 2MB = 250MB — 한도 내)
+  - Storage 1GB (PDF 133편 × 2MB = 250MB — 한도 내)
   - Auth 50K MAU (Stage 1 KPI 1000명 — 한도 내)
   - Bandwidth 5GB/월
 - [ ] **R10 Supabase pause 대응**:

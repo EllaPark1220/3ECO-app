@@ -205,7 +205,7 @@ assignees: ''
 - **Then**: excerpt 가 ±50자 범위 (50~150 자) 출력
 
 ### Scenario 10: 응답 시간
-- **Given**: Lesson 125편 + 키워드 100개
+- **Given**: Lesson 133편 + 키워드 100개
 - **When**: 실행
 - **Then**: 실행 시간 ≤ 10초 (CI 부담 최소)
 
@@ -217,7 +217,7 @@ assignees: ''
 - **위반 발견 시 즉시 Fail (exit code 1)**: CI 차단 강제
 - **excerpt ±50자**: 발견 위치 컨텍스트 제공 (수정 가이드)
 - **allowlist 신중 활용**: false positive 만. PR 리뷰 의무
-- **응답 시간 ≤ 10초**: 125 lesson + 100 키워드 = O(n×m) 단순 매칭
+- **응답 시간 ≤ 10초**: 133 lesson + 100 키워드 = O(n×m) 단순 매칭
 - **SQLite + PostgreSQL 호환**: 단순 SELECT 만, 양 환경 동작
 - **운영 환경 EventLog (선택)**: 위반 발견 시 운영자 알림
 - **금지**:

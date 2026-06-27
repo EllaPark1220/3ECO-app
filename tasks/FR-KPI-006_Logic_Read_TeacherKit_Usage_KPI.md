@@ -13,6 +13,7 @@ assignees: ''
 ## :dart: Summary
 - **기능명**: [FR-KPI-006] 교안 PDF 다운로드 카운트 (lesson 별 + 전체) + TeacherFeedback 의 `used_in_class=true` 비율 + REQ-NF-045 (실사용 50% 목표) 진척도
 - **목적**: Story 3 (장은혜) 의 **실수업 활용** 추적. 단순 다운로드만으로는 효용 측정 불가 — used_in_class=true 비율이 진짜 가치 지표. 비율이 낮으면 PDF 디자인·콘텐츠 점검 트리거. REQ-NF-045 (교안 실사용률 ≥50%) + REQ-NF-028 (KPI 자동) 충족.
+- **⚠️ 범위 재검토 (T2)**: 교사 모드가 **경량(PDF + will_reuse + comment)** 으로 확정되어 `used_in_class` 필드는 수집하지 않는다. 따라서 본 KPI의 `used_in_class=true 비율` 산출은 **DEFER**한다. MVP에서는 **다운로드 카운트 + will_reuse 비율(FR-KPI-007)** 을 실사용 proxy로 사용하고, `used_in_class` 기반 정밀 측정은 교사 피드백 확장 시 재도입한다.
 
 ## :link: References (Spec & Context)
 > :bulb: AI Agent & Dev Note: 작업 시작 전 아래 문서를 반드시 먼저 Read/Evaluate 할 것.

@@ -161,7 +161,7 @@ assignees: ''
 ### Scenario 8: nightly — 전체 검증
 - **Given**: 새벽 04:00 KST schedule
 - **When**: 실행
-- **Then**: 125편 모두 LLM 호출
+- **Then**: 133편 모두 LLM 호출
 
 ### Scenario 9: git diff 정확성 — base 갱신
 - **Given**: PR base 가 main 의 최신

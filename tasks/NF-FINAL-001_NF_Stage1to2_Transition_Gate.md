@@ -156,7 +156,7 @@ assignees: ''
   1. /admin/stage-gates/stage1to2 의 8 Criteria 검토
   2. 자동 검증 + 운영자 자가 평가 (직관·시장 환경)
   3. Stage 2 전환 결정 시
-     - 콘텐츠 확장 (125 → 300+ lesson)
+     - 콘텐츠 확장 (133 → 300+ lesson)
      - 외주 콘텐츠 검토자 모집
      - 마이그레이션 SOP 활성 (NF-RISK-004)
      - 비용 한도 상향 (10 → 50만원/월)

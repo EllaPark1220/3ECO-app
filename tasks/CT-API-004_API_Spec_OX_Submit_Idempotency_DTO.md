@@ -54,7 +54,7 @@ assignees: ''
 - **Then**: 응답은 **첫 응답과 동일한 페이로드** `{ passed: true, stamp_earned: true }` (HTTP 200). 클라이언트는 두 응답을 구분할 수 없어야 한다 (read-only short-circuit, §1.5.1.1 구현 규약 3)
 
 ### Scenario 4: lesson_id 포맷 위반
-- **Given**: `lesson_id: "INVALID"` (L001~L125 포맷 위반)
+- **Given**: `lesson_id: "INVALID"` (L001~L133 포맷 위반)
 - **When**: Zod 스키마 parse
 - **Then**: `ZodError` 발생. 서버에서는 400 Bad Request + `{ error_code: "INVALID_LESSON_ID", ... }`
 

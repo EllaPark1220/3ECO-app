@@ -303,6 +303,25 @@ Layer 1 (아래): 흰빛~크림 진주 광택 베이스
 
 ---
 
+## 4. grill-it 착수 전 결정 (2026-06-27)
+
+`docs/PRD_v1.1.md` + 발행 Issue 190건(`ISSUE_LIST.md`)을 참조 범위로 진행한 grill-it 세션에서 UX flow·기술스택·설계의 미확정/충돌 8개 토픽을 확정했다. 원장: `docs/grill/GRILL_LEDGER.md`. 하네스: `CLAUDE.md`(CORE 규칙 박제).
+
+| ID | 분류 | 결정 | 반영처 |
+|---|---|---|---|
+| T1 | CORE | 레슨 133편(권별 가변 27/25/25/31/25), `L001~L133`. 권 완주·설문 트리거 = **권별 실제 편수**("권당 25 고정"·`% 25` 금지) | PRD 변경이력, tasks(FW-OX-004·CT-MOCK-001·TS-UT-008 등 20+), 이슈 #160·#23·#68 |
+| T2 | CORE | 교사 모드 = PDF 다운로드 + **경량 will_reuse(+comment)**. `used_in_class`·무거운 피드백/사전사후 설문 배제 | SRS §6.3·REQ-NF-045 DEFER, tasks(신규 FW-TF-004·TS-E2E-007·FR-KPI-006), 이슈 #134·#40 |
+| T3 | CORE | **카카오 OAuth** MVP 포함(Supabase Kakao provider, 이메일/비번 병행). PII 이메일·닉네임만 | PRD 변경이력, 신규 task/이슈 FW-AUTH-006 |
+| T4 | CORE | OX 통과 = in-page 메시지 + **학습 흔적 모달(4조건)** | PRD 변경이력, 신규 task/이슈 UI_FR-OX-002, #173·#175 연계 |
+| T5 | CORE | 글자 크기 **14/18/22/28px 4단계**(16/18/20 폐기). `FontSize` enum = XS/S/L/XL(default S) | tasks(UI_FR-LES-004·CT-DB-002·FW-AUTH-005·FR-AUTH-005·CT-MOCK-002·TS-E2E-003), 이슈 #171 등 |
+| T6 | CORE | 웹 분석 = **Vercel Analytics + Plausible**, GA4 배제. 제품 KPI는 내부 event_log | PRD §6.4·Story2 AC4, SRS REQ-FUNC-010·TC-010 |
+| T7 | MINOR | 진주 권별 색(하늘/분홍/노랑/연두/순백) + 미완=권 색 점선 outline+투명 | tasks(UI_FR-STAMP-002), 이슈 #175 |
+| T8 | MINOR | 교안 PDF **A4 2~3p** 표준, `TEACHER_KIT.pages` 2~3 검증, 단일 PDF | tasks(UI_FW-PDF-002), 이슈 #177 |
+
+**핵심 관찰**: 기술스택 자체는 이슈 레이어에 이미 확정(Next.js App Router·Prisma·Supabase·Vercel·Resend·Gemini+AI SDK·@react-pdf/renderer·shadcn/Radix·Playwright·axe·k6·Sentry)되어 있었고, 미해소는 대부분 *PRD v1.1 최신 결정의 이슈 미반영* 또는 *PRD↔이슈 충돌* 지점이었다.
+
+---
+
 **문서 끝.**
 
 다음 응답에서 `VDS_v3.md` → `VDS_v3.1.md` 갱신 작업 진행 예정.

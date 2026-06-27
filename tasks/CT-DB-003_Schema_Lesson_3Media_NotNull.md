@@ -43,7 +43,7 @@ assignees: ''
   ```prisma
   model Lesson {
     id                    String          @id @default(uuid())
-    lessonId              String          @unique  // L001 ~ L125 포맷
+    lessonId              String          @unique  // L001 ~ L133 포맷
     title                 String          @db.VarChar(200)
 
     // 3매체 NOT NULL (REQ-FUNC-034)

@@ -1,17 +1,17 @@
-# [Feature] CT-MOCK-001: Lesson 125편 시드 + 총 5권 구성 + OxQuestion 625건 + 콘텐츠 무결성 검증
+# [Feature] CT-MOCK-001: Lesson 133편 시드 + 총 5권 구성 + OxQuestion 665건 + 콘텐츠 무결성 검증
 
 ```yaml
 ---
 name: Feature Task
 about: SRS 기반의 구체적인 개발 태스크 명세
-title: "[Feature] CT-MOCK-001: Lesson 125편 (L001~L125, 총 5권) + OxQuestion 625건 (125×5) 시드 + 무결성 검증 스크립트"
+title: "[Feature] CT-MOCK-001: Lesson 133편 (L001~L133, 총 5권) + OxQuestion 665건 (133×5) 시드 + 무결성 검증 스크립트"
 labels: 'feature, backend, content, mock, priority:critical, mvp-in, alpha'
 assignees: ''
 ---
 ```
 
 ## :dart: Summary
-- **기능명**: [CT-MOCK-001] Alpha 단계 운영을 위한 Lesson 125편(총 5권) + OxQuestion 625건 시드 스크립트 + 콘텐츠 무결성 자동 검증
+- **기능명**: [CT-MOCK-001] Alpha 단계 운영을 위한 Lesson 133편(총 5권) + OxQuestion 665건 시드 스크립트 + 콘텐츠 무결성 자동 검증
 - **목적**: 모든 E2E 테스트 및 실 운영의 데이터 기반. 단순 dummy 가 아닌 실제 운영 가능 콘텐츠.
 
 ## :link: References (Spec & Context)
@@ -29,8 +29,8 @@ assignees: ''
 ## :white_check_mark: Task Breakdown (실행 계획)
 - [ ] `prisma/seed/index.ts` 메인 시드 스크립트 + 분리:
   - `prisma/seed/modules.ts` — Volume 1~5 (총 5권)
-  - `prisma/seed/lessons.ts` — L001~L125
-  - `prisma/seed/ox-questions.ts` — 625건
+  - `prisma/seed/lessons.ts` — L001~L133
+  - `prisma/seed/ox-questions.ts` — 665건
 - [ ] **Module 5종 시드 (M1~M5)**:
   ```ts
   const modules = [
@@ -41,6 +41,7 @@ assignees: ''
     { moduleId: 'M5', name: '경제 정책 판단', orderIndex: 5, description: '재정·통화 정책의 영향 분석' },
   ];
   ```
+  > **권별 정원 (PRD v1.1 / T1)**: 1권 27 · 2권 25 · 3권 25 · 4권 31 · 5권 25 = **총 133편** (권별 가변). 권 완주·설문 트리거는 "권당 25 고정"이 아니라 **권별 실제 편수** 기준으로 계산한다. (확장 시드의 라운드로빈 분배는 테스트용 placeholder이며, 실제 콘텐츠는 권별 정원을 따른다.)
 - [ ] **Lesson 10편 분배**:
   - M1: L001 (화폐의 정의), L002 (가치 측정)
   - M2: L003 (수요와 공급), L004 (가격의 신호)
@@ -64,8 +65,8 @@ assignees: ''
   async function verify() {
     const lessons = await prisma.lesson.findMany({ include: { oxQuestions: true } });
 
-    // 1. Lesson 125편
-    if (lessons.length !== 125) throw new Error(`Lesson 카운트 ${lessons.length} (기대 125)`);
+    // 1. Lesson 133편
+    if (lessons.length !== 133) throw new Error(`Lesson 카운트 ${lessons.length} (기대 133)`);
 
     // 2. lessonId 포맷
     for (const l of lessons) {
@@ -130,7 +131,7 @@ assignees: ''
 ### Scenario 1: 시드 정상 실행
 - **Given**: 클린 DB (마이그레이션만 적용)
 - **When**: `npm run db:seed`
-- **Then**: Module 5건(권) + Lesson 125건 + OxQuestion 625건 INSERT. 에러 0건
+- **Then**: Module 5건(권) + Lesson 133건 + OxQuestion 665건 INSERT. 에러 0건
 
 ### Scenario 2: 무결성 검증 통과
 - **Given**: 시드 완료

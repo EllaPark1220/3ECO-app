@@ -45,9 +45,10 @@ assignees: ''
 - [ ] `FontSize` enum:
   ```prisma
   enum FontSize {
-    SMALL
-    MEDIUM
-    LARGE
+    XS   // 14px
+    S    // 18px (default)
+    L    // 22px
+    XL   // 28px
   }
   ```
 - [ ] `ColorMode` enum:
@@ -67,7 +68,7 @@ assignees: ''
     role               Role            @default(LEARNER)
     accessibilityMode  Boolean         @default(false)
     mediaPreference    MediaPreference @default(MIXED)
-    fontSize           FontSize        @default(MEDIUM)
+    fontSize           FontSize        @default(S)
     colorMode          ColorMode       @default(SYSTEM)
     createdAt          DateTime        @default(now())
     updatedAt          DateTime        @updatedAt
@@ -109,7 +110,7 @@ assignees: ''
 ### Scenario 1: User 정상 INSERT
 - **Given**: Prisma 마이그레이션 적용 완료
 - **When**: `prisma.user.create({ data: { email: 'test@example.com', nickname: 'Test' } })` 호출
-- **Then**: User 1건 INSERT. 기본값 — role='LEARNER', accessibilityMode=false, mediaPreference='MIXED', fontSize='MEDIUM', colorMode='SYSTEM'
+- **Then**: User 1건 INSERT. 기본값 — role='LEARNER', accessibilityMode=false, mediaPreference='MIXED', fontSize='S', colorMode='SYSTEM'
 
 ### Scenario 2: email UNIQUE 제약
 - **Given**: User(`alice@example.com`) 가 존재

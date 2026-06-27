@@ -25,7 +25,7 @@ assignees: ''
   - `/docs/SRS_V0_9.md#1.2.3` — 파일럿 4구간 (Private Beta Exit 조건)
   - `/docs/SRS_V0_9.md#6.6` — R2 (교사 신뢰 미확보 — Private Beta 노출)
 - 페르소나: SH-05 장은혜 (중학 사회 교사 36세 · P14·P13)
-- 선행 구현: FW-AUTH-003, FR-PDF-001, FW-PDF-002, FW-TF-001, CT-MOCK-002 (TEACHER 시드)
+- 선행 구현: FW-AUTH-003, FR-PDF-001, FW-PDF-002, FW-TF-004(경량 will_reuse), CT-MOCK-002 (TEACHER 시드)
 
 ## :white_check_mark: Task Breakdown (실행 계획)
 - [ ] `tests/e2e/story-3-eunhye.spec.ts` 신규 파일
@@ -54,10 +54,9 @@ assignees: ''
     - QR 디코드 결과가 유튜브 URL (`https://youtu.be/{id}` 또는 `https://www.youtube.com/watch?v={id}`) 와 일치
 - [ ] **Step 4 — 피드백 폼 진입**:
   - PDF 다운로드 후 피드백 폼으로 이동 (또는 모달 노출)
-  - 폼 필드 가시성 확인 — `will_reuse` (checkbox 또는 radio), `used_in_class` (checkbox), `comment` (textarea)
+  - 폼 필드 가시성 확인 — `will_reuse` (checkbox 또는 radio), `comment` (textarea). **경량 범위(T2)** — `used_in_class` 등 무거운 피드백 필드 없음
 - [ ] **Step 5 — 피드백 제출 (will_reuse=true)**:
   - `will_reuse=true` 선택
-  - `used_in_class=true` 선택
   - `comment` 입력 ("학생 반응 좋음. 추후 재사용 예정")
   - 제출 버튼 클릭 → `submitTeacherFeedback()` Server Action 호출
   - 응답 확인 — `{ ok: true, feedback_id: '...' }`
@@ -167,7 +166,7 @@ assignees: ''
   - FR-PDF-001 (PDF 다운로드 API)
   - FW-PDF-001 (Renderer + 폰트)
   - FW-PDF-002 (PDF 템플릿)
-  - FW-TF-001 (Teacher Feedback Server Action)
+  - FW-TF-004 (경량 will_reuse 피드백 Server Action)
   - CT-MOCK-002 (TEACHER 픽스처 시드)
   - IF-RES-001 (Resend Setup — 운영자 알림 mock)
 - **Blocks**:

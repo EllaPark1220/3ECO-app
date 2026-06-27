@@ -1,9 +1,9 @@
 ﻿# Issue 발행 목록
 
 > `tasks/*.md` 의 각 Task 를 GitHub Issue 로 자동 발행한 결과입니다.
-> 저장소: [EllaPark1220/3ECO-app](https://github.com/EllaPark1220/3ECO-app) · 라벨: `Issue Automation`
+> 저장소: [EllaPark1220/3ECO-app](https://github.com/EllaPark1220/3ECO-app) · 라벨: `Issue Automation` (grill-it 도출/정정 항목은 `grill-it` 라벨 추가)
 
-- 총 발행: **190 건**
+- 총 발행: **193 건** (초기 190 + grill-it 신규 3: 카카오 OAuth·학습 흔적 모달·교사 경량 will_reuse)
 - 개요 문서(`0. TASK_LIST.md`, `0. TASK_DEPENDENCY_GRAPH.md`)는 개별 Task 가 아니므로 제외
 
 | # | Issue | Task 파일 | 제목 |
@@ -30,7 +30,7 @@
 | 20 | [#20](https://github.com/EllaPark1220/3ECO-app/issues/20) | `CT-DB-009_Schema_EventLog_AppendOnly.md` | [Feature] CT-DB-009: EventLog 모델 — append-only + JSON payload + 90일 retention |
 | 21 | [#21](https://github.com/EllaPark1220/3ECO-app/issues/21) | `CT-DB-010_Schema_Migration_Seed_Setup.md` | [Feature] CT-DB-010: 초기 마이그레이션 + 시드 통합 스크립트 + Vercel build hook |
 | 22 | [#22](https://github.com/EllaPark1220/3ECO-app/issues/22) | `CT-DB-011_Schema_Supabase_RLS_Policies.md` | [Feature] CT-DB-011: Supabase RLS 정책 — defense-in-depth 의 데이터 레이어 마지막 방어선 |
-| 23 | [#23](https://github.com/EllaPark1220/3ECO-app/issues/23) | `CT-MOCK-001_Mock_Lesson_10_Seed.md` | [Feature] CT-MOCK-001: Lesson 125편 시드 + 총 5권 구성 + OxQuestion 625건 + 콘텐츠 무결성 검증 |
+| 23 | [#23](https://github.com/EllaPark1220/3ECO-app/issues/23) | `CT-MOCK-001_Mock_Lesson_10_Seed.md` | [Feature] CT-MOCK-001: Lesson 133편 시드 + 총 5권 구성 + OxQuestion 665건 + 콘텐츠 무결성 검증 |
 | 24 | [#24](https://github.com/EllaPark1220/3ECO-app/issues/24) | `CT-MOCK-002_Mock_User_3Roles_Persona_Seed.md` | [Feature] CT-MOCK-002: 학습자/교사/관리자 3역할 시드 + 가입 검증·접근성 토글 테스트 페르소나 |
 | 25 | [#25](https://github.com/EllaPark1220/3ECO-app/issues/25) | `CT-MOCK-003_Mock_Progress_Stamp_Seed.md` | [Feature] CT-MOCK-003: 진도·스탬프 시드 — 5개·10개 시나리오 사용자 2명 + INV-04 정합 검증 |
 | 26 | [#26](https://github.com/EllaPark1220/3ECO-app/issues/26) | `CT-MOCK-004_Mock_MSW_Handler_4Routes.md` | [Feature] CT-MOCK-004: MSW 핸들러 — 프론트엔드 개발용 4종 API mock |
@@ -75,7 +75,7 @@
 | 65 | [#65](https://github.com/EllaPark1220/3ECO-app/issues/65) | `FW-OX-001_Logic_Write_OX_Grading_Transaction.md` | [Feature] FW-OX-001: submitOx() Server Action 본체 — 정답 판정 + 트랜잭션 INSERT |
 | 66 | [#66](https://github.com/EllaPark1220/3ECO-app/issues/66) | `FW-OX-002_Logic_Write_OX_P2002_Idempotent_Convert.md` | [Feature] FW-OX-002: Prisma P2002 catch → 200 동일 페이로드 변환 (영구 멱등 핵심 로직) |
 | 67 | [#67](https://github.com/EllaPark1220/3ECO-app/issues/67) | `FW-OX-003_Logic_Write_OX_EventLog_Emit.md` | [Feature] FW-OX-003: EventLog 발행 분리 — stamp.earned + ox.duplicate_idempotent + lesson.completed |
-| 68 | [#68](https://github.com/EllaPark1220/3ECO-app/issues/68) | `FW-OX-004_Logic_Write_OX_Stamp10_Trigger.md` | [Feature] FW-OX-004: 권별(25편) 완주 트리거 — 체감 변화 설문 발송 |
+| 68 | [#68](https://github.com/EllaPark1220/3ECO-app/issues/68) | `FW-OX-004_Logic_Write_OX_Stamp10_Trigger.md` | [Feature] FW-OX-004: 권 완주(권별 실제 편수) 트리거 — 체감 변화 설문 발송 |
 | 69 | [#69](https://github.com/EllaPark1220/3ECO-app/issues/69) | `FW-PDF-001_Infra_PDF_Renderer_Korean_Fonts.md` | [Feature] FW-PDF-001: @react-pdf/renderer + 나눔바른고딕·나눔명조 폰트 등록 (Vercel 번들 한도 검증) |
 | 70 | [#70](https://github.com/EllaPark1220/3ECO-app/issues/70) | `FW-PDF-003_Logic_Write_PDF_Fallback_Cache.md` | [Feature] FW-PDF-003: PDF 생성 5xx 실패 시 최신 캐시 PDF 폴백 + 에러 로그 |
 | 71 | [#71](https://github.com/EllaPark1220/3ECO-app/issues/71) | `FW-PROG-001_Logic_Write_Progress_Save_Throttle_Upsert.md` | [Feature] FW-PROG-001: saveProgress() Server Action — 10초 간격 병합 + UPSERT |
@@ -102,7 +102,7 @@
 | 92 | [#92](https://github.com/EllaPark1220/3ECO-app/issues/92) | `IF-FONT-001_Infra_Google_Fonts_Korean_Subset.md` | [Infra] IF-FONT-001: next/font/google 한글 폰트 서브셋 + Vercel Functions 번들 검증 |
 | 93 | [#93](https://github.com/EllaPark1220/3ECO-app/issues/93) | `IF-GEM-001_Infra_Gemini_API_AI_SDK.md` | [Feature] IF-GEM-001: Gemini API 키 + Vercel AI SDK 통합 + 모델 교체 가능 인터페이스 |
 | 94 | [#94](https://github.com/EllaPark1220/3ECO-app/issues/94) | `IF-RES-001_Infra_Resend_Email_Setup.md` | [Infra] IF-RES-001: Resend Free 셋업 — 가입 확인 메일 + Teacher will_reuse 알림 |
-| 95 | [#95](https://github.com/EllaPark1220/3ECO-app/issues/95) | `IF-SCALE-001_Infra_Lesson_125_Expansion_Validation.md` | [Infra] IF-SCALE-001: Lesson 1→125편 확장 검증 — 데이터 모델·API 변경 0건 |
+| 95 | [#95](https://github.com/EllaPark1220/3ECO-app/issues/95) | `IF-SCALE-001_Infra_Lesson_125_Expansion_Validation.md` | [Infra] IF-SCALE-001: Lesson 1→133편 확장 검증 — 데이터 모델·API 변경 0건 |
 | 96 | [#96](https://github.com/EllaPark1220/3ECO-app/issues/96) | `IF-SCALE-002_Infra_Lesson_Add_30min_Template.md` | [Infra] IF-SCALE-002: 신규 레슨 1편 추가 30분 내 완료 검증 |
 | 97 | [#97](https://github.com/EllaPark1220/3ECO-app/issues/97) | `IF-SUP-001_Infra_Supabase_Free_Auth_Storage.md` | [Infra] IF-SUP-001: Supabase Free 프로젝트 + Auth 활성화 + Storage 버킷 + DB 연결 |
 | 98 | [#98](https://github.com/EllaPark1220/3ECO-app/issues/98) | `IF-SUP-002_Infra_Supabase_Pro_Upgrade.md` | [Infra] IF-SUP-002: Supabase Free → Pro 전환 + event_log 90일 + 감사 로그 |
@@ -167,7 +167,7 @@
 | 157 | [#157](https://github.com/EllaPark1220/3ECO-app/issues/157) | `TS-UT-005_Test_Unit_SaveProgress_Throttle.md` | [Feature] TS-UT-005: saveProgress 10초 간격 병합 단위 테스트 — 10초 내 3회 → 1회 UPSERT 검증 |
 | 158 | [#158](https://github.com/EllaPark1220/3ECO-app/issues/158) | `TS-UT-006_Test_Unit_LessonProgress_LWW.md` | [Feature] TS-UT-006: LessonProgress LWW 다기기 충돌 단위 테스트 — updatedAt 최신값 우선 |
 | 159 | [#159](https://github.com/EllaPark1220/3ECO-app/issues/159) | `TS-UT-007_Test_Unit_Stamp_Unique_Constraint.md` | [Feature] TS-UT-007: Stamp UNIQUE 제약 단위 테스트 — 직접 INSERT 시 P2002 + Option B 영구 멱등 |
-| 160 | [#160](https://github.com/EllaPark1220/3ECO-app/issues/160) | `TS-UT-008_Test_Unit_LessonId_Format_Immutable.md` | [Feature] TS-UT-008: lessonId 포맷 L001~L125 UNIQUE·불변 단위 테스트 |
+| 160 | [#160](https://github.com/EllaPark1220/3ECO-app/issues/160) | `TS-UT-008_Test_Unit_LessonId_Format_Immutable.md` | [Feature] TS-UT-008: lessonId 포맷 L001~L133 UNIQUE·불변 단위 테스트 |
 | 161 | [#161](https://github.com/EllaPark1220/3ECO-app/issues/161) | `TS-UT-009_Test_Unit_Lesson_3Media_NotNull.md` | [Feature] TS-UT-009: 3매체 NOT NULL 단위 테스트 — youtube + script + pdf_kit 누락 시 Fail |
 | 162 | [#162](https://github.com/EllaPark1220/3ECO-app/issues/162) | `TS-UT-010_Test_Unit_Survey_Quarterly_Unique.md` | [Feature] TS-UT-010: Survey 분기당 1회 제한 단위 테스트 — INV-09 + P2002 변환 |
 | 163 | [#163](https://github.com/EllaPark1220/3ECO-app/issues/163) | `TS-UT-011_Test_Unit_Hooking_Linter_Regex.md` | [Feature] TS-UT-011: Hooking Linter 정규식 단위 테스트 — 통과 100% / 위반 시 Fail GWT |
@@ -178,7 +178,7 @@
 | 168 | [#168](https://github.com/EllaPark1220/3ECO-app/issues/168) | `UI_FR-DICT-001_UI_Term_Index_Page.md` | [Feature] UI_FR-DICT-001: 용어 인덱스 (Term Index) 페이지 구현 |
 | 169 | [#169](https://github.com/EllaPark1220/3ECO-app/issues/169) | `UI_FR-KPI-009_UI_KPI_Dashboard_8Metrics.md` | [Feature] FR-KPI-009: 8개 KPI 통합 대시보드 — Supabase SQL + Vercel Analytics + Sentry |
 | 170 | [#170](https://github.com/EllaPark1220/3ECO-app/issues/170) | `UI_FR-LES-003_UI_Lesson_Watch_YouTube_Toggle.md` | [Feature] FR-LES-003: 레슨 시청 페이지 — YouTube iframe + 매체 전환 UI |
-| 171 | [#171](https://github.com/EllaPark1220/3ECO-app/issues/171) | `UI_FR-LES-004_UI_Font_Size_Toggle.md` | [Feature] FR-LES-004: 글자 크기 조절 토글 — 16px / 18px / 20px (저시력 대응) |
+| 171 | [#171](https://github.com/EllaPark1220/3ECO-app/issues/171) | `UI_FR-LES-004_UI_Font_Size_Toggle.md` | [Feature] FR-LES-004: 글자 크기 조절 토글 — 14 / 18 / 22 / 28px 4단계 (저시력 대응) |
 | 172 | [#172](https://github.com/EllaPark1220/3ECO-app/issues/172) | `UI_FR-LES-005_UI_Anchor_Scroll_Wrong_Answer.md` | [Feature] FR-LES-005: OX 오답 시 스크립트 앵커 자동 스크롤 |
 | 173 | [#173](https://github.com/EllaPark1220/3ECO-app/issues/173) | `UI_FR-OX-001_UI_OX_Quiz_RadioGroup_Submit.md` | [Feature] FR-OX-001: OX 문항 UI — RadioGroup + 제출 + 정답 노출 0건 |
 | 174 | [#174](https://github.com/EllaPark1220/3ECO-app/issues/174) | `UI_FR-PROG-001_UI_Lesson_Resume_5sec_Restore.md` | [Feature] FR-PROG-001: 재진입 시 last_position_sec 조회 → ≤5초 오차 복원 |
@@ -198,4 +198,7 @@
 | 188 | [#188](https://github.com/EllaPark1220/3ECO-app/issues/188) | `UI_TS-E2E-009_Test_E2E_Sumin_NoHooking_VisualRegression.md` | [Test] TS-E2E-009: 이수민 시나리오 E2E — 후킹 톤·게임화 부재 시각 회귀 (Story 2 폐쇄) |
 | 189 | [#189](https://github.com/EllaPark1220/3ECO-app/issues/189) | `UI_TS-E2E-010_Test_E2E_NoPayment_Fields_VisualRegression.md` | [Test] TS-E2E-010: 결제 폼 필드 부재 시각 회귀 — PRD 원칙 2 영구 회귀 방지 |
 | 190 | [#190](https://github.com/EllaPark1220/3ECO-app/issues/190) | `FR-SUR-001_Logic_Read_Survey_KPI.md` | [Feature] FR-SUR-001: 설문 응답 집계 — "덜 두렵다" ≥60% 검증 + 분기별 시계열 |
+| 191 | [#191](https://github.com/EllaPark1220/3ECO-app/issues/191) | `FW-AUTH-006_Infra_Auth_Kakao_OAuth.md` | [Feature] FW-AUTH-006: 카카오 OAuth 로그인 (Supabase Kakao provider) — 이메일/비번 병행 + PII 최소 |
+| 192 | [#192](https://github.com/EllaPark1220/3ECO-app/issues/192) | `UI_FR-OX-002_UI_Learning_Trace_Modal.md` | [Feature] UI_FR-OX-002: OX 통과 학습 흔적 모달 (4조건 게이미피케이션 예외) + in-page 메시지 |
+| 193 | [#193](https://github.com/EllaPark1220/3ECO-app/issues/193) | `FW-TF-004_Logic_Write_Teacher_WillReuse_Lite.md` | [Feature] FW-TF-004: 교사 will_reuse 경량 수집 — TeacherFeedback(will_reuse+comment) 최소 모델 + Server Action |
 

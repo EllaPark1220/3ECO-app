@@ -47,7 +47,7 @@ assignees: ''
   export interface UserPreferencesResponse {
     accessibility_mode: boolean;
     media_preference: 'VIDEO' | 'TEXT' | 'MIXED';
-    font_size: 'SMALL' | 'MEDIUM' | 'LARGE';
+    font_size: 'XS' | 'S' | 'L' | 'XL';
     color_mode: 'LIGHT' | 'DARK' | 'SYSTEM';
   }
   ```
@@ -72,9 +72,9 @@ assignees: ''
 ## :test_tube: Acceptance Criteria (BDD/GWT)
 
 ### Scenario 1: 정상 조회
-- **Given**: User(`u1`, accessibilityMode=true, fontSize='LARGE', ...)
+- **Given**: User(`u1`, accessibilityMode=true, fontSize='XL', ...)
 - **When**: `GET /api/auth/preferences`
-- **Then**: 200 + `{ accessibility_mode: true, font_size: 'LARGE', ... }`
+- **Then**: 200 + `{ accessibility_mode: true, font_size: 'XL', ... }`
 
 ### Scenario 2: 미인증 — 401
 - **Given**: 세션 없음
@@ -82,7 +82,7 @@ assignees: ''
 - **Then**: 401 + `UNAUTHORIZED`
 
 ### Scenario 3: PATCH 직후 변경 반영
-- **Given**: PATCH 로 fontSize='LARGE' 변경 직후
+- **Given**: PATCH 로 fontSize='XL' 변경 직후
 - **When**: SWR mutate 후 GET
 - **Then**: 새 fontSize 반영. cache 무효화 정상
 
@@ -109,7 +109,7 @@ assignees: ''
 ### Scenario 8: enum 값 정확
 - **Given**: 응답
 - **When**: 각 enum 값 검사
-- **Then**: media_preference 는 'VIDEO'/'TEXT'/'MIXED' 중 하나, font_size 는 'SMALL'/'MEDIUM'/'LARGE' 중 하나 등
+- **Then**: media_preference 는 'VIDEO'/'TEXT'/'MIXED' 중 하나, font_size 는 'XS'/'S'/'L'/'XL' 중 하나 등
 
 ### Scenario 9: SWR hook 통합
 - **Given**: `useUserPreferences()` hook 사용

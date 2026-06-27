@@ -11,7 +11,7 @@ assignees: ''
 ```
 
 ## :dart: Summary
-- **기능명**: [CT-MOCK-002] User 테이블 + Supabase Auth 의 시드 데이터 — LEARNER/TEACHER/ADMIN 3역할 각 1명 + 페르소나별 환경설정 (한정숙=fontSize='LARGE'·colorMode='DARK', 김성호=accessibilityMode=true 등) + idempotent 시드 스크립트
+- **기능명**: [CT-MOCK-002] User 테이블 + Supabase Auth 의 시드 데이터 — LEARNER/TEACHER/ADMIN 3역할 각 1명 + 페르소나별 환경설정 (한정숙=fontSize='XL'·colorMode='DARK', 김성호=accessibilityMode=true 등) + idempotent 시드 스크립트
 - **목적**: 모든 인증·RBAC 테스트의 데이터 기반. CT-MOCK-001 (Lesson 10편) 과 함께 Alpha 환경의 픽스처 완성. INV-07 (RBAC 강제) 검증 + Story 3 (TEACHER 픽스처) + Story 5 (접근성 픽스처) 의 진입점.
 
 ## :link: References (Spec & Context)
@@ -61,7 +61,7 @@ assignees: ''
       nickname: '한정숙',  // SH-04 저시력
       preferences: {
         accessibilityMode: true,
-        fontSize: 'LARGE',
+        fontSize: 'XL',
         colorMode: 'DARK',
         mediaPreference: 'TEXT',  // 글로 읽기 선호
       },
@@ -73,7 +73,7 @@ assignees: ''
       nickname: '김성호',  // SH-08 키보드·청각
       preferences: {
         accessibilityMode: true,
-        fontSize: 'MEDIUM',
+        fontSize: 'S',
         colorMode: 'SYSTEM',
         mediaPreference: 'VIDEO',  // 자막 기본 ON
       },
@@ -150,7 +150,7 @@ assignees: ''
     { email: 'learner@test.example.com', role: 'LEARNER', accessibilityMode: false },
     { email: 'teacher@test.example.com', role: 'TEACHER' },
     { email: 'admin@test.example.com', role: 'ADMIN' },
-    { email: 'jeongsook@test.example.com', accessibilityMode: true, fontSize: 'LARGE' },
+    { email: 'jeongsook@test.example.com', accessibilityMode: true, fontSize: 'XL' },
     { email: 'sungho@test.example.com', accessibilityMode: true },
   ];
   for (const exp of expected) {
@@ -177,7 +177,7 @@ assignees: ''
 ### Scenario 3: 페르소나별 환경설정 정합
 - **Given**: 시드 후
 - **When**: `prisma.user.findUnique({ where: { email: 'jeongsook@test.example.com' } })`
-- **Then**: accessibilityMode=true, fontSize='LARGE', colorMode='DARK', mediaPreference='TEXT'
+- **Then**: accessibilityMode=true, fontSize='XL', colorMode='DARK', mediaPreference='TEXT'
 
 ### Scenario 4: 3역할 모두 존재
 - **Given**: 시드 후

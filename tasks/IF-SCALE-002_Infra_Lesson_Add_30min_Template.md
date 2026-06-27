@@ -22,7 +22,7 @@ assignees: ''
   - `/docs/SRS_V0_9.md#6.2.3` — INV-01 (lessonId UNIQUE), INV-02 (3매체 NOT NULL), INV-08 (3매체 동시 발행)
   - `/docs/SRS_V0_9.md#4.1.6` — REQ-FUNC-037 (CC 라이선스 3곳 명시)
 - 선행: FW-LINT-004 (CC 라이선스 자동 검증)
-- 짝: IF-SCALE-001 (125편 확장 검증 — 확장된 환경에서 1편 추가 측정)
+- 짝: IF-SCALE-001 (133편 확장 검증 — 확장된 환경에서 1편 추가 측정)
 
 ## :white_check_mark: Task Breakdown (실행 계획)
 
@@ -215,7 +215,7 @@ assignees: ''
 ## :construction: Dependencies & Blockers
 - **Depends on**:
   - FW-LINT-004 (CC 라이선스 자동 검증 — CLI 스크립트 내 호출)
-  - IF-SCALE-001 (125편 환경 — 확장된 상태에서 추가 테스트)
+  - IF-SCALE-001 (133편 환경 — 확장된 상태에서 추가 테스트)
   - CT-DB-003 (Lesson 모델)
   - CT-DB-006 (OxQuestion 모델)
   - CT-DB-010 (마이그레이션 안정화)

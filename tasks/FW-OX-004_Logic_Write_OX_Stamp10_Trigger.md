@@ -1,18 +1,19 @@
-# [Feature] FW-OX-004: 권별(25편) 완주 트리거 — 체감 변화 설문 발송
+# [Feature] FW-OX-004: 권 완주(권별 실제 편수) 트리거 — 체감 변화 설문 발송
 
 ```yaml
 ---
 name: Feature Task
 about: SRS 기반의 구체적인 개발 태스크 명세
-title: "[Feature] FW-OX-004: 권별 완주 (stamp_count % 25 === 0) 시 설문 메일 발송"
+title: "[Feature] FW-OX-004: 권 완주 (권별 보유 스탬프 = 권 정원) 시 설문 메일 발송"
 labels: 'feature, backend, ox, stamp, survey, priority:critical, mvp-in, public-pilot'
 assignees: ''
 ---
 ```
 
 ## :dart: Summary
-- **기능명**: [FW-OX-004] 사용자가 한 권(25편)을 완주하는 순간 (FW-OX-001 의 Stamp INSERT 직후, `stampCount % 25 === 0`) 설문 메일 자동 발송
+- **기능명**: [FW-OX-004] 사용자가 한 권을 완주하는 순간 (FW-OX-001 의 Stamp INSERT 직후, **해당 권의 보유 스탬프 수 = 그 권의 정원**) 설문 메일 자동 발송
 - **목적**: REQ-FUNC-003 구현. 권 단위 학습 효용 측정.
+- **권 정원 (PRD v1.1 / T1)**: 1권 27 · 2권 25 · 3권 25 · 4권 31 · 5권 25 (총 133, 권별 가변). 누적 경계 = 27·52·77·108·133. **"권당 25 고정"(`% 25`) 금지** — 자유 순서(ADR-003) 허용이므로 raw stamp_count 나머지가 아니라 **권별 실제 완주 여부**로 판정.
 
 ## :link: References (Spec & Context)
 > :bulb: AI Agent & Dev Note: 작업 시작 전 아래 문서를 반드시 먼저 Read/Evaluate 할 것.
@@ -31,7 +32,7 @@ assignees: ''
   ```ts
   // FW-OX-001 의 트랜잭션 + EventLog 발행 후
   await emitEvent({ userId, event: 'stamp.earned', payload: { lesson_id } });
-  await checkStampMilestone(userId);  // ← 본 태스크의 트리거
+  await checkStampMilestone(userId, lesson_id);  // ← 본 태스크의 트리거 (권 식별을 위해 lesson_id 전달)
   ```
 - [ ] **체크 + 발송 함수**:
   ```ts
@@ -40,22 +41,33 @@ assignees: ''
   import { render } from '@react-email/render';
   import { StampMilestoneSurveyEmail } from '@/lib/email/templates/stampMilestoneSurvey';
 
-  export async function checkStampMilestone(userId: string): Promise<void> {
+  export async function checkStampMilestone(userId: string, lessonId: string): Promise<void> {
     try {
-      // 1. 현재 stamp_count 조회
-      const stampCount = await prisma.stamp.count({ where: { userId } });
+      // 1. 방금 완주한 레슨이 속한 권(module) 식별
+      const lesson = await prisma.lesson.findUnique({
+        where: { lessonId },
+        select: { moduleId: true },
+      });
+      if (!lesson) return;
+      const moduleId = lesson.moduleId;
 
-      // 2. 권별(25개 단위) 도달 검증
-      if (stampCount === 0 || stampCount % 25 !== 0) return;  // 25, 50, 75, 100, 125 개 도달 시에만 트리거
+      // 2. 권 완주 검증 — 권별 실제 편수 기준 (권당 고정 25 금지)
+      //    해당 권의 전체 레슨 수와, 사용자가 그 권에서 보유한 스탬프 수 비교
+      const [lessonsInVolume, stampsInVolume] = await Promise.all([
+        prisma.lesson.count({ where: { moduleId } }),
+        prisma.stamp.count({ where: { userId, lesson: { moduleId } } }),
+      ]);
+      if (stampsInVolume < lessonsInVolume) return;  // 아직 이 권 미완주
 
-      // 3. 멱등 검증 — 이미 발송했는지 EventLog 확인
+      // 3. 멱등 검증 — 이 권에 대해 이미 발송했는지 EventLog 확인 (권 단위 멱등)
       const alreadySent = await prisma.eventLog.findFirst({
         where: {
           userId,
           event: 'survey.milestone_email_sent',
+          payload: { path: ['module_id'], equals: moduleId },
         },
       });
-      if (alreadySent) return;  // 이미 발송함 → skip
+      if (alreadySent) return;  // 이 권은 이미 발송함 → skip
 
       // 4. 사용자 이메일 조회
       const user = await prisma.user.findUnique({
@@ -87,7 +99,7 @@ assignees: ''
         data: {
           userId,
           event: 'survey.milestone_email_sent',
-          payload: { stamp_count: stampCount, anonymous_token: anonymousToken },
+          payload: { module_id: moduleId, stamps_in_volume: stampsInVolume, anonymous_token: anonymousToken },
         },
       });
     } catch (error) {
@@ -140,7 +152,7 @@ assignees: ''
   - 토큰 자체에는 user_id 직접 저장 0 — Survey 응답 시 user_id NULL (익명성 보장)
 - [ ] **silent fail 정책**:
   - 메일 발송 실패가 OX 채점 본 흐름 영향 0
-  - 실패 시 Sentry 알림 + EventLog 미발행 → 다음 stamp 도달 시 재시도 (정확히 10개일 때만이라 불가능 — 별도 재발송 SOP 필요)
+  - 실패 시 Sentry 알림 + EventLog 미발행 → 같은 권을 다시 완주 상태로 트리거할 일이 없으므로 자동 재시도 불가 — 별도 재발송 SOP 필요
 - [ ] **재발송 SOP (별도 후속)**:
   - 운영자가 수동으로 재발송 트리거 가능 (admin Server Action)
   - 본 태스크는 자동 1회만
@@ -150,26 +162,26 @@ assignees: ''
 - [ ] **응답 시간 영향**:
   - 본 함수가 FW-OX-001 의 트랜잭션 외부에서 호출되어야 함
   - OX 응답 시간 영향 0 (비동기 fire-and-forget 또는 트랜잭션 분리)
-- [ ] **카운트 정책 — 정확히 10개일 때만**:
-  - 11, 12 stamp 도달 시 발송 0 (이미 멱등 검증 통과)
-  - 10 미만 → return early (정상 case)
+- [ ] **카운트 정책 — 권 완주 시 1회만**:
+  - 권 완주 후 그 권에서 추가 stamp 도달 시 발송 0 (권 단위 멱등 검증 통과)
+  - 권 미완주 (stampsInVolume < lessonsInVolume) → return early (정상 case)
 
 ## :test_tube: Acceptance Criteria (BDD/GWT)
 
-### Scenario 1: 권(25편) 완주 → 발송
-- **Given**: 사용자 A 의 stamp 24개 + 25번째 OX 통과
-- **When**: FW-OX-001 의 트랜잭션 직후 checkStampMilestone(A) 호출
-- **Then**: Resend 메일 1통 발송. EventLog `survey.milestone_email_sent` 1건 INSERT
+### Scenario 1: 권 완주(권별 정원 도달) → 발송
+- **Given**: 사용자 A 가 1권(정원 27편)에서 26개 스탬프 보유 + 그 권의 27번째 OX 통과
+- **When**: FW-OX-001 의 트랜잭션 직후 checkStampMilestone(A, lessonId) 호출
+- **Then**: Resend 메일 1통 발송. EventLog `survey.milestone_email_sent`(payload.module_id=M1) 1건 INSERT
 
-### Scenario 2: 26번째 stamp — 발송 0
-- **Given**: 사용자 A 가 26번째 stamp 획득
+### Scenario 2: 권 미완주 stamp — 발송 0
+- **Given**: 사용자 A 가 1권(정원 27편)에서 20개만 보유한 상태로 추가 stamp 획득
 - **When**: 호출
-- **Then**: 메일 미발송. stamp_count % 25 !== 0 으로 return
+- **Then**: 메일 미발송. stampsInVolume < lessonsInVolume 으로 return
 
-### Scenario 3: 멱등 — 재호출 시 미발송
-- **Given**: 이미 메일 발송 완료 (EventLog 존재) + 가상의 시나리오 (DB 조작으로 stamp_count=10 재현)
-- **When**: 재호출
-- **Then**: 멱등 검증으로 skip. 메일 0통 추가 발송
+### Scenario 3: 멱등 — 같은 권 재호출 시 미발송
+- **Given**: 이미 해당 권에 대해 메일 발송 완료 (EventLog payload.module_id 존재)
+- **When**: 같은 권 완주 상태로 재호출
+- **Then**: 권 단위 멱등 검증으로 skip. 메일 0통 추가 발송
 
 ### Scenario 4: 사용자 미존재 — silent
 - **Given**: 잘못된 user_id
@@ -194,23 +206,23 @@ assignees: ''
 ### Scenario 8: EventLog payload
 - **Given**: 발송 후
 - **When**: EventLog 조회
-- **Then**: `payload.stamp_count: 10` + `payload.anonymous_token` 포함
+- **Then**: `payload.module_id` + `payload.stamps_in_volume` + `payload.anonymous_token` 포함
 
 ### Scenario 9: OX 응답 시간 영향 0
 - **Given**: FW-OX-001 의 본 함수 호출
 - **When**: 응답 시간 측정
 - **Then**: 본 함수의 시간이 OX 응답 시간에 미포함 (fire-and-forget 패턴)
 
-### Scenario 10: 카운트 정확성 — 정확히 10
-- **Given**: stamp_count: 9 + INSERT 직후 10
+### Scenario 10: 권 경계 정확성 — 권별 정원 가변
+- **Given**: 4권(정원 31편)에서 30개 보유 + 31번째 stamp INSERT
 - **When**: 호출
-- **Then**: stamp_count === 10 일 때만 발송. 9·11 발송 0
+- **Then**: stampsInVolume(31) === lessonsInVolume(31) 일 때만 발송. 30개·미완 시 발송 0. (권별 정원 27/25/25/31/25 각각 정확히 판정)
 
 ## :gear: Technical & Non-Functional Constraints
 - **트리거 시점 — Stamp INSERT 직후**: FW-OX-001 의 트랜잭션 외부에서 호출 (응답 시간 영향 0)
 - **fire-and-forget 패턴**: `await` 미사용 또는 별도 비동기 처리. OX 응답 영향 0
 - **멱등 강제 — EventLog 기반**: `survey.milestone_email_sent` 조회로 1회만 발송
-- **카운트 정확성 — 정확히 10**: 11, 12 도달 시 발송 0 (멱등 검증 통과)
+- **카운트 정확성 — 권별 정원 기준**: 권 완주 후 추가 도달 시 발송 0 (권 단위 멱등 검증 통과)
 - **silent fail 정책**: 메일 발송 실패가 OX 본 흐름 영향 0. Sentry 알림 + 운영자 인지
 - **익명 토큰 정책**: UUID v4 + 30일 만료 + Survey 의 anonymous_token 활용
 - **CON-05 (후킹 금지) 정합**: 메일 본문 — 차분한 톤, 자극 표현 부재

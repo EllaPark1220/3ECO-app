@@ -137,7 +137,7 @@ assignees: ''
 - [ ] **timeout 15분**: 빠른 실패 + Gemini Free 한도 (분당 15 req) 고려한 여유
 - [ ] **응답 시간 목표**:
   - 전체 Job (PR) — ≤ 5분 (정규식 + 정의 + CC 빠름 + 변경 lesson 1~3편 LLM)
-  - nightly LLM (전체 125편) — ≤ 30분
+  - nightly LLM (전체 133편) — ≤ 30분
 
 ## :test_tube: Acceptance Criteria (BDD/GWT)
 
@@ -179,7 +179,7 @@ assignees: ''
 ### Scenario 8: nightly 전체 검증
 - **Given**: cron 19:00 UTC
 - **When**: 실행
-- **Then**: 125편 모두 LLM 검증 + ≤ 30분
+- **Then**: 133편 모두 LLM 검증 + ≤ 30분
 
 ### Scenario 9: GITHUB_STEP_SUMMARY 출력
 - **Given**: Job 종료

@@ -32,7 +32,7 @@ assignees: ''
   import { z } from 'zod';
 
   export const LessonIdParamSchema = z.object({
-    lessonId: z.string().regex(/^L\d{3}$/, 'lessonId 포맷이 올바르지 않습니다 (L001~L125)'),
+    lessonId: z.string().regex(/^L\d{3}$/, 'lessonId 포맷이 올바르지 않습니다 (L001~L133)'),
   });
   export type LessonIdParam = z.infer<typeof LessonIdParamSchema>;
   ```

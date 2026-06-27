@@ -132,7 +132,7 @@ assignees: ''
 - [ ] **allowlist 미적용 정책**:
   - 본 검증은 false positive 최소 (단순 키워드 매칭)
   - allowlist 없음 — 위반 발견 시 콘텐츠 수정 강제
-- [ ] **응답 시간**: lesson 125편 검증 ≤ 5초 (단순 문자열 매칭)
+- [ ] **응답 시간**: lesson 133편 검증 ≤ 5초 (단순 문자열 매칭)
 
 ## :test_tube: Acceptance Criteria (BDD/GWT)
 
@@ -171,8 +171,8 @@ assignees: ''
 - **When**: 실행
 - **Then**: 3건 위반 출력 + exit code 1
 
-### Scenario 8: 응답 시간 — 125편 ≤ 5초
-- **Given**: 125편 lesson + 사전 키워드 30개
+### Scenario 8: 응답 시간 — 133편 ≤ 5초
+- **Given**: 133편 lesson + 사전 키워드 30개
 - **When**: 실행
 - **Then**: ≤ 5초
 

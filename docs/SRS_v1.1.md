@@ -698,7 +698,7 @@ graph TB
 | **REQ-FUNC-007** | 배포 파이프라인에 후킹 금지어 린터를 두어 썸네일·제목·도입부의 자극어 출현을 0으로 유지한다. | Story 2 AC1 · F8 | M | ✅ MVP-IN (정규식 1차) / 🟡 MVP-SOFT (Gemini 2차는 Closed Beta) | 정규식 1차 + LLM 2차 검증 통과율 **100%**. 숫자 약속·수익 언급·자극어 0회. 실패 시 배포 **자동 차단**. |
 | **REQ-FUNC-008** | 영상 도입부 30초 내 개념 정의 1회 이상 · 한국 맥락 예시 1개 포함을 강제한다. | Story 2 AC2 | M | 🟡 MVP-SOFT (자막 키워드 매칭·편집 QA는 Closed Beta) | 편집 QA 체크리스트 항목. 미충족 시 배포 차단. 자동 검증(자막 텍스트 기반 키워드 매칭) + 수동 QA 병행. |
 | **REQ-FUNC-009** | 이수민 유형 세그먼트의 첫 영상 완시청률을 측정한다. | Story 2 AC3 | M | 🟡 MVP-SOFT (세그먼트 완시청률 측정은 Closed Beta) | 온보딩 설문 "최근 투자 손실 경험" 응답자 세그먼트 완시청률 **≥ 60%**. n≥200, 95% CI 하한 ≥ 55% (EXP-2). |
-| **REQ-FUNC-010** | S2(랜딩) → S3(첫 영상 완시청) 퍼널 전환율을 측정한다. | Story 2 AC4 | M | 🟡 MVP-SOFT (퍼널 리포트 도구 Closed Beta) | GA4 또는 오픈소스 분석기 퍼널 리포트 기준 **≥ 20%**. |
+| **REQ-FUNC-010** | S2(랜딩) → S3(첫 영상 완시청) 퍼널 전환율을 측정한다. | Story 2 AC4 | M | 🟡 MVP-SOFT (퍼널 리포트 도구 Closed Beta) | Vercel Analytics + Plausible 퍼널 리포트 기준 **≥ 20%** (GA4 미사용 — grill-it T6). |
 | **REQ-FUNC-011** | A/B 실험 시 이수민 유형 세그먼트는 후킹 변형 트래픽에서 배제된다. | Story 2 AC5 | M | ⏸️ MVP-DEFER (EXP 인프라 필요) | 페르소나 매칭 태그 기반 자동 필터링. 유입 시도 시 차단 로그 발생. 유입 실측 0건. |
 | **REQ-FUNC-012** | 린터 통과 후에도 사용자 리포트 기반의 톤 피드백을 수집·반영한다. | Story 2 AC6 | M | ⏸️ MVP-DEFER (자동 감지 + 알림 체계 필요) | "과장됨" 리포트 비율 **> 5%** 해당 편 → 게시 중단 + 린터 규칙 업데이트 트리거. |
 
@@ -890,7 +890,7 @@ PRD Story ↔ SRS Requirement ID ↔ Test Case ID. 테스트 케이스 ID는 `TC
 | TC-007 | — | REQ-FUNC-007 | 후킹 금지어 린터 통과율 | CI 게이트 |
 | TC-008 | — | REQ-FUNC-008 | 30초 개념 정의 + 한국 예시 검증 | 편집 QA 체크리스트 + 자막 기반 자동 |
 | TC-009 | — | REQ-FUNC-009 | 이수민 세그먼트 완시청률 (n≥200) | EXP-2 |
-| TC-010 | — | REQ-FUNC-010 | S2→S3 퍼널 전환율 | GA4/오픈소스 분석기 |
+| TC-010 | — | REQ-FUNC-010 | S2→S3 퍼널 전환율 | Vercel Analytics/Plausible |
 | TC-011 | — | REQ-FUNC-011 | 페르소나 태그 A/B 격리 | 유입 로그 감사 |
 | TC-012 | — | REQ-FUNC-012 | 과장 리포트 5% 초과 시 게시 중단 자동 알림 | Severity 연동 |
 | **Story 3** (P14·P13 교사) | 장은혜 (SH-05) | REQ-FUNC-013 ~ 019 | TC-013 ~ TC-019 | k6, CI, 설문 |
@@ -969,7 +969,7 @@ PRD Story ↔ SRS Requirement ID ↔ Test Case ID. 테스트 케이스 ID는 `TC
 | `submitOx()` | **Server Action** | POST | `{ lesson_id, answers[] }` | `{ passed: bool, stamp_earned: bool, scroll_to_section?: string }` | 필수 | **Prisma `@@unique([userId, lessonId])` 에서 `P2002` 에러 catch → 동일 페이로드 재반환** (§1.5.1.1 Option B · REQ-FUNC-006 · INV-05) · 오답 시 `scroll_to_section` 앵커 반환 (REQ-FUNC-036) |
 | `/api/stamp/map` | Route Handler | GET | `user_id` (세션) | `[{ lesson_id, earned_at }]` | 필수 | Next.js `revalidate: 60` (1분) |
 | `/api/teacher/kit/{id}` | Route Handler | GET | `lesson_id` (path), optional `?rev=` | `application/pdf` (스트리밍) | 교사/익명 허용 정책별 | `@react-pdf/renderer` 렌더링(§6.2.4). 구버전 301 리디렉트 (REQ-FUNC-017) |
-| `submitTeacherFeedback()` | **Server Action** | POST | `{ lesson_id, will_reuse, used_in_class, comment }` | `{ ok }` | 교사 인증 필수 | `will_reuse=true` 누적 KPI 연결 (REQ-NF-046) |
+| `submitTeacherFeedback()` | **Server Action** | POST | `{ lesson_id, will_reuse, comment }` (경량 — `used_in_class` 미수집, grill-it T2) | `{ ok }` | 교사 인증 필수 | `will_reuse=true` 누적 KPI 연결 (REQ-NF-046). FW-TF-004 구현 |
 | `submitSurvey()` | **Server Action** | POST | `{ survey_id, answers{} }` | `{ ok }` | 선택 | 분기 1회 제한 |
 | `/api/newsletter/subscribe` | Route Handler | POST | `{ email }` | `{ ok, confirm_sent }` | 불요 | Resend API 프록시. 더블 옵트인 (REQ-FUNC-039) |
 | `shareStampMap()` (Could) | **Server Action** | POST | `user_id` | `{ share_token, url }` | 필수 | 토큰 기반 (REQ-FUNC-041) |
@@ -1615,6 +1615,7 @@ sequenceDiagram
 | **1.4** | 2026-04-25 | §1.5.1, §1.5.1.2(신설), §1.5.2 CON-07, §3.1, §3.2, §3.3, §3.6, §4.2.3 REQ-NF-017, §4.2.4 REQ-NF-023, §4.2.5 REQ-NF-032, §4.2.8 REQ-NF-050, §6.1, §6.2.2, §6.2.4(신설), §6.6 R8·R9·R10 | **ADR-004 Technology Stack 확정 — Next.js App Router + Supabase + Vercel + Vercel AI SDK/Gemini 단일 풀스택.** C-TEC-001~007 + 파생 결정 D-CI(GitHub Actions)·D-AUTH(Supabase Auth)·D-TIER(Hobby+Free 출발) 수록. Teacher Kit PDF 양식 규격(나눔바른고딕·나눔명조, SIL OFL 1.1, A4 2~3p) §6.2.4 신설. Cold start·Supabase pause·PDF 폰트 3건 운영 리스크 R8~R10으로 등재하고 Vercel Cron 완화책 명시. MVP 핵심 사용자 경험 훼손 없음 판정은 별도 Plan 문서 §3에 수록. PRD v0.5 §5.4·§7.4와 일부 수치·결정 불일치는 PRD v0.6 승격 시 정합화 필요. |
 | **0.9** | 2026-04-25 | §1.1, §1.2.3(신설), §1.3, §1.4 REF-18(신설), §3.1, §4.1 서두·4.1.1~4.1.8 전체, §4.2.1~4.2.8 전체, §5.3, §6.4, §6.6, §6.7(신설 · Appendix E), 부록 Z | **MVP Implementation Edition — 구현 범위 라벨 병기 + 파일럿 4구간 재정의.** v1.4의 모든 요구사항 범위를 유지하면서 각 REQ 94개(FUNC 42 + NF 52)에 ✅ MVP-IN / 🟡 MVP-SOFT / ⏸️ MVP-DEFER 라벨 병기. 파일럿을 Alpha(4주)/Private Beta(6주)/Closed Beta(8주)/Public Pilot(34주) 4구간으로 세분화(§1.2.3 신설). External Systems(§3.1)에 "투입 시점" 컬럼 추가 — 외부 의존 10→5→6→7→9 단계적 증설. 리스크 등록부(§6.6)에 "위험 노출 시점" 컬럼 추가. Appendix E Alpha Exit 체크리스트(§6.7 MVP-IN 38건) 신설. 본 Revision은 3개월 개발 경험 + 3년차 IT 기획 + 완전 바이브코딩 기반 단일 제작자가 Alpha 4주 내에 실제 구현 가능한 범위를 명확히 한다. 라벨 분류 근거는 REF-18 (MVP 개발목표 적절성 종합 검토 보고서). PRD v0.5 §8.1과 파일럿 단계 수치 불일치는 PRD v0.6 승격 시 정합화 필요. Revision 번호 체계에서 0.9는 "MVP Implementation Edition" 으로, v1.4의 완성형 목표 사양에서 파생된 MVP 실행 전용 버전임을 명시한다. |
 | **1.1** | 2026-05-13 | §1.2, §4.1 REQ-FUNC-033, §4.2.8 REQ-NF-048, §6.1, §6.2.2, §6.2.3 INV-01, §6.7 | **편 수 정정 + 학습 영역 시안 결정 반영 — 길 A 최소 침습 변경 (Revision 0.9 → 1.1 승격).** 마스터 v4 기준 125 → **133** 일괄 정정 (`L001~L125` → `L001~L133`, INV-01 / REQ-FUNC-033 / REQ-NF-048 갱신, §6.2 Class Diagram 영향). PRD §3 카카오 OAuth 신규 명시 (대안 인증, 추가 PII X), §1 학습 흔적 모달 예외 조항 추가 (조건 4가지 충족 시 PRD 정합), §6 진주 권별 색 결정 (1권 하늘 / 2권 분홍 / 3권 노랑 / 4권 연두 / 5권 순백). 자세한 변경 근거는 `PROJECT_DECISIONS_v1.md` §2. **본문 REQ 갱신 (REQ-FUNC 신규 발행, External System 추가, Class Diagram 갱신 등)은 PRD v0.6 Major 승격 시 정합 예정.** |
+| **1.1.1** | 2026-06-27 | §4.1 REQ-FUNC-010, §5 TC-010, §6.3 submitTeacherFeedback, 개정 이력 | **grill-it 착수 전 모호함 해소 정합화 (8개 결정).** T6: 퍼널 분석 도구를 GA4 → **Vercel Analytics + Plausible** 확정(REQ-FUNC-010·TC-010), 제품 KPI는 내부 event_log. T2: `submitTeacherFeedback()` DTO 경량화(`used_in_class` 미수집 — REQ-NF-045 DEFER 유지, FW-TF-004 구현). T1: 권 완주 트리거는 권별 실제 편수 기준(`% 25` 금지). T3 카카오 OAuth·T4 학습 흔적 모달·T5 글자 14/18/22/28px·T7 진주 권별 색·T8 PDF A4 2~3p 확정. 원장 `docs/grill/GRILL_LEDGER.md`, 하네스 `CLAUDE.md`. |
 
 ### 관리 규정
 

@@ -116,7 +116,7 @@ PRD 원칙: "이해 우선, 후킹·자극 표현 금지, 수익 약속 금지, 
   ```
 - [ ] **비용 정책 — Gemini Free 한도 대응**:
   - Gemini 1.5 Flash Free — 분당 15 req, 일 1500 req
-  - Lesson 125편 검증 → 분당 15 권장. 약 8분 소요
+  - Lesson 133편 검증 → 분당 15 권장. 약 8분 소요
   - **CI 정책 — PR 마다 변경된 lesson 만 검증** (전체 검증은 nightly 또는 manual)
   - 변경 감지 — git diff 활용
 - [ ] **변경된 lesson 만 검증 (CI 비용 절감)**:
@@ -132,7 +132,7 @@ PRD 원칙: "이해 우선, 후킹·자극 표현 금지, 수익 약속 금지, 
   - 모델 변경 시 한 곳만 수정 (Gemini → Claude → GPT 등)
 - [ ] **응답 시간 정책**:
   - lesson 1편당 ≤ 5초 (Gemini Flash 응답 시간)
-  - 125편 nightly 검증 — 약 10분
+  - 133편 nightly 검증 — 약 10분
   - PR 변경 lesson (평균 1~3편) — ≤ 30초
 - [ ] **Sentry 알림 — LLM 호출 실패 시**:
   - 한 번 실패 — graceful (continue)

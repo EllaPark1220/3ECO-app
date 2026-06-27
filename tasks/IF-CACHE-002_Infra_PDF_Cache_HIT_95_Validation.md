@@ -157,7 +157,7 @@ assignees: ''
 ## :gear: Technical & Non-Functional Constraints
 - **HIT 비율 목표**: ≥ 95% (REQ-NF-049)
   - MISS 원인: 첫 요청 + revision 변경 + Edge 만료 (24시간) + 수동 무효화
-  - MVP 125편 × 평균 2 revision/년 = ~250 MISS 이벤트/년 → 총 트래픽 대비 극소
+  - MVP 133편 × 평균 2 revision/년 = ~250 MISS 이벤트/년 → 총 트래픽 대비 극소
 - **측정 방법**:
   - L1 (Edge): `x-vercel-cache` 헤더 또는 Vercel Analytics Dashboard
   - L2 (Storage): EventLog 의 `pdf.cache_status` 이벤트

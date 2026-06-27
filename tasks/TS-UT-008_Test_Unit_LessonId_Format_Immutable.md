@@ -1,4 +1,4 @@
-# [Feature] TS-UT-008: lessonId 포맷 L001~L125 UNIQUE·불변 단위 테스트
+# [Feature] TS-UT-008: lessonId 포맷 L001~L133 UNIQUE·불변 단위 테스트
 
 ```yaml
 ---
@@ -11,7 +11,7 @@ assignees: ''
 ```
 
 ## :dart: Summary
-- **기능명**: [TS-UT-008] Lesson 모델의 `lessonId` 필드 단위 테스트 — (1) 포맷 정규식 (`L\d{3}`, L001~L125) 검증 + (2) UNIQUE 제약 + (3) 생성 후 수정 시도 차단 (불변성)
+- **기능명**: [TS-UT-008] Lesson 모델의 `lessonId` 필드 단위 테스트 — (1) 포맷 정규식 (`L\d{3}`, L001~L133) 검증 + (2) UNIQUE 제약 + (3) 생성 후 수정 시도 차단 (불변성)
 - **목적**: REQ-FUNC-033 (lessonId 포맷·불변) 회귀 방지. lessonId 는 모든 PDF 파일명·URL·EventLog payload·외부 인덱싱 의 키 — 변경되면 cascade 영향 거대. **생성 시점 strict 검증 + 수정 차단** 으로 데이터 무결성 보장.
 
 ## :link: References (Spec & Context)
@@ -25,7 +25,7 @@ assignees: ''
 - [ ] **테스트 파일** — `__tests__/db/lesson-id.test.ts`
 - [ ] **시나리오 1 — 정상 포맷 INSERT 통과**:
   ```ts
-  it.each(['L001', 'L050', 'L125'])('정상 포맷 "%s" INSERT', async (id) => {
+  it.each(['L001', 'L050', 'L133'])('정상 포맷 "%s" INSERT', async (id) => {
     const lesson = await prismaTest.lesson.create({
       data: { lessonId: id, title: 'Test', /* ... */ },
     });
@@ -99,13 +99,13 @@ assignees: ''
 - [ ] **시나리오 7 — 범위 초과 (L126) 거부 (선택 정책)**:
   ```ts
   it('L126 이상 거부 (Stage 1 한도 정책)', async () => {
-    // Zod refine 또는 CHECK 으로 L001~L125 강제
+    // Zod refine 또는 CHECK 으로 L001~L133 강제
     await expect(
       prismaTest.lesson.create({ data: { lessonId: 'L126', /* ... */ } })
     ).rejects.toThrow();
   });
   ```
-  - 본 정책은 Stage 1 한도 (125편). Stage 2 확장 시 정책 변경 가능
+  - 본 정책은 Stage 1 한도 (133편). Stage 2 확장 시 정책 변경 가능
 - [ ] **시나리오 8 — Mock 시드의 lessonId 정합 검증**:
   ```ts
   it('CT-MOCK-001 시드의 모든 lessonId 가 포맷 정합', async () => {
@@ -136,7 +136,7 @@ assignees: ''
 
   it.each([
     ['L001', true],
-    ['L125', true],
+    ['L133', true],
     ['L126', false],  // 범위 외 (선택 정책)
     ['l001', false],
     ['M001', false],
@@ -149,7 +149,7 @@ assignees: ''
 ## :test_tube: Acceptance Criteria (BDD/GWT)
 
 ### Scenario 1: 정상 포맷 통과
-- **Given**: L001, L050, L125
+- **Given**: L001, L050, L133
 - **When**: INSERT
 - **Then**: 정상
 
@@ -199,7 +199,7 @@ assignees: ''
 - **Then**: 정상 패턴만 success
 
 ## :gear: Technical & Non-Functional Constraints
-- **포맷 정규식 — `^L\d{3}$`**: L001~L999 허용 (Stage 1 정책 — L125 한도)
+- **포맷 정규식 — `^L\d{3}$`**: L001~L999 허용 (Stage 1 정책 — L133 한도)
 - **UNIQUE 제약**: @unique
 - **불변성 — Service 레이어 차단 + (선택) DB trigger**: 다중 방어
 - **CASCADE 정책**: lesson 삭제 시 stamp/progress/eventLog 의 영향 명시 검증

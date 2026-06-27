@@ -185,7 +185,7 @@ assignees: ''
 - **Then**: cc-license-lint Job Fail + main 차단
 
 ### Scenario 10: 응답 시간 — 5초 이내
-- **Given**: 125편 lesson
+- **Given**: 133편 lesson
 - **When**: 실행
 - **Then**: ≤ 5초
 

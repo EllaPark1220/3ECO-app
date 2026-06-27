@@ -4,7 +4,7 @@
 ---
 name: Feature Task
 about: SRS 기반의 구체적인 개발 태스크 명세
-title: "[Test] TS-E2E-003: 한정숙 시나리오 E2E — 영상↔글 매체 전환 + 글자 크기 LARGE + 다음 로그인 영속화 검증"
+title: "[Test] TS-E2E-003: 한정숙 시나리오 E2E — 영상↔글 매체 전환 + 글자 크기 XL + 다음 로그인 영속화 검증"
 labels: 'test, e2e, playwright, story-5-a, accessibility, priority:critical, mvp-in, closed-beta'
 assignees: ''
 ---
@@ -31,17 +31,17 @@ assignees: ''
 - [ ] **Step 1 — 로그인 + 레슨 진입**:
   - `/auth/login` 로그인
   - `/lesson/L001` 진입
-  - 기본 상태 검증 — 영상 모드, MEDIUM 글자, 라이트(또는 SYSTEM) 색 모드
+  - 기본 상태 검증 — 영상 모드, S 글자, 라이트(또는 SYSTEM) 색 모드
 - [ ] **Step 2 — "글로 읽기" 토글**:
   - 매체 전환 토글 클릭 (영상 → 글)
   - YouTube iframe unmount 검증
   - `<article>` 요소 + 스크립트 콘텐츠 렌더 검증
   - 전환 시간 측정 — p95 ≤ 300ms (REQ-NF-005)
-- [ ] **Step 3 — 글자 크기 LARGE 변경**:
-  - FontSizeToggle 클릭 → LARGE 선택
-  - html 에 `font-large` 클래스 적용 검증
-  - 본문 텍스트 computed font-size 가 20px 검증 (`page.evaluate` + getComputedStyle)
-  - DB 검증 (debounce 500ms 후) — `prisma.user.findUnique({ where: { id: userId } }).fontSize === 'LARGE'`
+- [ ] **Step 3 — 글자 크기 XL 변경**:
+  - FontSizeToggle 클릭 → XL 선택
+  - html 에 `font-xl` 클래스 적용 검증
+  - 본문 텍스트 computed font-size 가 28px 검증 (`page.evaluate` + getComputedStyle)
+  - DB 검증 (debounce 500ms 후) — `prisma.user.findUnique({ where: { id: userId } }).fontSize === 'XL'`
 - [ ] **Step 4 — DARK 색 모드 변경 (선택 — 색 모드 활성화 단계에서)**:
   - ColorModeToggle 클릭 → DARK 선택
   - html 에 `dark` 클래스 적용 검증
@@ -51,11 +51,11 @@ assignees: ''
   - 로그아웃 (`signOut()` 호출 또는 쿠키 삭제)
   - 동일 또는 다른 브라우저 컨텍스트에서 재로그인
   - `/lesson/L001` 진입
-  - **글 모드 + LARGE 폰트 + DARK 모드 자동 적용 검증** (서버 SSOT 의존)
-  - **FOUC 부재 검증** — 첫 paint 부터 LARGE + DARK 적용 (라이트 깜빡임 0건)
+  - **글 모드 + XL 폰트 + DARK 모드 자동 적용 검증** (서버 SSOT 의존)
+  - **FOUC 부재 검증** — 첫 paint 부터 XL + DARK 적용 (라이트 깜빡임 0건)
 - [ ] **Step 6 — 200% 확대 호환 검증 (WCAG 1.4.4)**:
   - Playwright 의 `page.emulate({ viewport: { width: 320, height: 568 }, deviceScaleFactor: 2 })` 또는 CSS zoom 200% 시뮬레이션
-  - LARGE 폰트 + 200% 확대 = 이중 확대 상태
+  - XL 폰트 + 200% 확대 = 이중 확대 상태
   - 가로 스크롤 0건 검증
   - 콘텐츠 손실 0건 검증 (모든 텍스트 가시 영역 내)
 - [ ] **Step 7 — axe-core 양 모드 검사**:
@@ -72,7 +72,7 @@ assignees: ''
 ### Scenario 1: 매체 전환 + 글자 크기 + 영속화 (Happy Path)
 - **Given**: 클린 DB + Lesson L001 + 한정숙 픽스처
 - **When**: Step 1~5 순차 실행
-- **Then**: 각 단계 통과. 최종 DB 상태 — User 의 mediaPreference='TEXT', fontSize='LARGE', colorMode='DARK'. 다음 로그인 시 자동 복원
+- **Then**: 각 단계 통과. 최종 DB 상태 — User 의 mediaPreference='TEXT', fontSize='XL', colorMode='DARK'. 다음 로그인 시 자동 복원
 
 ### Scenario 2: 매체 전환 시간 (REQ-NF-005)
 - **Given**: 영상 모드 상태
@@ -80,17 +80,17 @@ assignees: ''
 - **Then**: 전환 시간 ≤ 300ms (Performance API 측정)
 
 ### Scenario 3: 글자 크기 즉시 반영 + debounce 영속화
-- **Given**: MEDIUM 상태
-- **When**: LARGE 선택
+- **Given**: S 상태
+- **When**: XL 선택
 - **Then**: html 클래스 즉시 변경 (UI 반영 ≤ 50ms). 500ms 후 DB UPDATE 발생 (네트워크 모니터링)
 
 ### Scenario 4: 영속화 — 다른 디바이스에서 자동 복원
-- **Given**: Device A 에서 LARGE 설정 후 로그아웃
+- **Given**: Device A 에서 XL 설정 후 로그아웃
 - **When**: Device B (다른 Browser Context) 에서 로그인
-- **Then**: 첫 페이지 진입 시 LARGE 자동 적용. FOUC 부재
+- **Then**: 첫 페이지 진입 시 XL 자동 적용. FOUC 부재
 
-### Scenario 5: WCAG 1.4.4 — 200% 확대 + LARGE 이중 확대
-- **Given**: 320px 모바일 뷰포트 + LARGE + 브라우저 200% 확대
+### Scenario 5: WCAG 1.4.4 — 200% 확대 + XL 이중 확대
+- **Given**: 320px 모바일 뷰포트 + XL + 브라우저 200% 확대
 - **When**: 페이지 렌더
 - **Then**: 가로 스크롤 0건. 콘텐츠 손실 0건. 모든 텍스트 자연 줄바꿈
 
@@ -100,13 +100,13 @@ assignees: ''
 - **Then**: violation 0건 양 모드
 
 ### Scenario 7: 매체 전환 후 OX 풀이 가능
-- **Given**: 글 모드 + LARGE
+- **Given**: 글 모드 + XL
 - **When**: 스크롤하여 OX 영역 진입 + 5문항 답변 + 제출
-- **Then**: OX UI 도 LARGE 폰트 적용. 제출 정상 작동 (FW-OX-001)
+- **Then**: OX UI 도 XL 폰트 적용. 제출 정상 작동 (FW-OX-001)
 
 ### Scenario 8: 미인증 사용자 — localStorage 만 사용
 - **Given**: 세션 없음
-- **When**: LARGE 선택
+- **When**: XL 선택
 - **Then**: UI 즉시 반영 + localStorage 저장. 서버 영속화 호출 0건
 
 ### Scenario 9: 시나리오 실행 시간
