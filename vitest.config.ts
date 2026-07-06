@@ -14,6 +14,10 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./", import.meta.url)),
+      // Next 전용 "server-only" 가드를 vitest 에서 no-op 으로 대체(서버 모듈 단위 테스트용)
+      "server-only": fileURLToPath(
+        new URL("./test/server-only-stub.ts", import.meta.url),
+      ),
     },
   },
 });
