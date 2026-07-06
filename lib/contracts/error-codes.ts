@@ -10,6 +10,7 @@ export const ERROR_CODES = {
 
   // 검증 (400)
   INVALID_LESSON_ID: { http: 400, message: "lesson_id 포맷이 올바르지 않습니다." },
+  INVALID_INPUT: { http: 400, message: "입력값이 올바르지 않습니다." },
   INVALID_EMAIL: { http: 400, message: "이메일 형식이 올바르지 않습니다." },
   INVALID_PASSWORD: { http: 400, message: "비밀번호가 보안 정책을 충족하지 않습니다." },
   INVALID_ANSWER_FORMAT: { http: 400, message: "OX 답안 형식이 올바르지 않습니다." },
