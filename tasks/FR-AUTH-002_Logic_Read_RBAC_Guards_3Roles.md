@@ -24,6 +24,13 @@ assignees: ''
   - `/docs/SRS_V0_9.md#5.3` — ADR-001 (개인사업자) → admin 역할 단일 운영자
 - 선행 결정: D-AUTH (Supabase Auth Role 통합)
 
+## :package: 구현 범위·판단 (이 슬라이스에서 적용)
+> **구현(PR)**: `lib/auth/guards.ts` — `requireUser`·`requireRole`·`requireRoleAny`·`requireSelfOrAdmin` + `withRoleGuard`(Route Handler 래퍼). Scenario 1·2·3·5·6·7·8 대응(핸들러 레이어).
+> - **애플리케이션 레이어 가드로 권한 검증**(입구 추측 차단 대신 각 기능 실행 지점에서 `getCurrentUser()`로 실제 role 재검증 — 서버 작업 재검증 원칙). `getCurrentUser`(React.cache)라 동일 요청 DB 1회(Scenario 7).
+> - **401(UNAUTHORIZED) vs 403(FORBIDDEN) 분리**. Scenario 4는 명세 확정대로 옵션 A(TEACHER도 학습 가능) — 학습 액션에 `requireRole('LEARNER')` 걸지 않음. INV-07 반대 방향(LEARNER→TeacherFeedback)만 `requireRole('TEACHER')`로 차단.
+>
+> **후속(미착수, 경계)**: 미들웨어 정적 role 매칭(`/teacher/**`·`/admin/**`, Scenario 3·8의 입구 차단) → role 이 JWT 아닌 public.User 에 있어 Edge 에서 DB 없이 못 함 → **JWT role 클레임 도입 시 보조로**. EventLog `auth.access_denied`(Scenario 3) → **CT-DB-009**(현재 `console.warn`). RLS 데이터레이어 → **CT-DB-011**(가드는 그 앞단 defense-in-depth).
+
 ## :white_check_mark: Task Breakdown (실행 계획)
 - [ ] `lib/auth/guards.ts` — 가드 함수 4종 정의:
   - `requireUser()` — 인증된 사용자만 (역할 무관). 미인증 시 401
