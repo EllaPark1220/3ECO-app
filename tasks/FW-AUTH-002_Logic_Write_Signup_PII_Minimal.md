@@ -31,29 +31,31 @@ assignees: ''
 - [ ] `app/auth/actions.ts` 에 `signUp()` Server Action 구현
 - [ ] FormData 입력을 Zod 스키마로 parse — 잘못된 형식이거나 추가 필드는 거부
 - [ ] Supabase Auth 의 `auth.signUp({ email, password })` 호출
-- [ ] `auth.users` 가 생성되면 webhook 또는 후속 INSERT 로 `public.User` 레코드 생성 (id, email, nickname, role='LEARNER', accessibilityMode=false, mediaPreference='MIXED')
+- [ ] `signUp()` 은 `nickname` 을 `options.data`(user_metadata)에 실어 전달. **`public.User` INSERT(id, email, nickname, role='LEARNER', accessibilityMode=false, mediaPreference='MIXED')는 이메일 확인 콜백(FW-AUTH-004)이 담당** — 확인된 계정만 등록(경계 명시, 판단②)
 - [ ] 가입 확인 메일은 Supabase 가 자동 발송 (Auth Settings · FW-AUTH-001 에서 ON 처리)
 - [ ] 응답 — `{ ok: true, requires_email_confirmation: true }`. user_id 는 메일 확인 전까지 노출 안함
-- [ ] 입력 페이로드 로깅 시 이메일·비밀번호 마스킹 처리 (`***@***`)
-- [ ] 중복 이메일 처리 — Supabase Auth 가 반환하는 에러를 사용자 친화 메시지로 변환
-- [ ] Rate Limit — IP 당 5회/분 가입 시도 제한 (CT-API-001 의 미들웨어 활용 + 추가 강화)
+- [ ] 입력 페이로드 로깅 시 이메일·비밀번호 마스킹 처리 (`a***@e***`)
+- [ ] **중복 이메일 처리 — 열거 방지 우선(판단①)**: 존재 여부 비노출. 신규와 동일 응답 반환(위 Scenario 3 개정). `EMAIL_ALREADY_EXISTS` 미사용
+- [ ] **Rate Limit — IF-KV-001(Upstash) 선행 필요로 보류(판단③)**: 코드에 `TODO(IF-KV-001)` 경계만 표시. 활성화 시 `auth` 버킷(분당 10) 재사용 또는 signup 전용 5/분 신설 결정
 
 ## :test_tube: Acceptance Criteria (BDD/GWT)
 
 ### Scenario 1: 정상 회원가입
 - **Given**: 유효한 이메일(`alice@example.com`) + 닉네임(`Alice`) + 비밀번호(`secure1234`)
 - **When**: `signUp({ email, nickname, password })` Server Action 호출
-- **Then**: `auth.users` 에 사용자 생성 + `public.User` 레코드 생성 (role='LEARNER', accessibilityMode=false). 응답 `{ ok: true, requires_email_confirmation: true }`. 가입 확인 메일이 큐에 등록됨
+- **Then**: `auth.users` 에 사용자 생성 + **nickname 을 `user_metadata` 에 보관**. 응답 `{ ok: true, requires_email_confirmation: true }`. 가입 확인 메일이 큐에 등록됨
+- **경계(구현 편차)**: `public.User` 레코드 생성(role='LEARNER', accessibilityMode=false)은 **이메일 확인 콜백(FW-AUTH-004)** 이 담당한다 — 확인된 계정만 등록하여 미확인 orphan 행을 방지. accessibilityMode=false 등 기본값 검증은 FW-AUTH-004/TS-UT-001 에서 수행.
 
 ### Scenario 2: 결제 필드 입력 시도 — 구조적 거부
 - **Given**: 폼에 `card_number: '1234-5678-...'` 또는 `account_number` 등의 추가 필드를 hidden input 으로 삽입한 악의적 요청
 - **When**: `signUp()` Server Action 호출
 - **Then**: Zod 스키마는 정의된 3필드 외를 무시 (passthrough 가 아닌 strict 모드). 추가 필드는 절대 DB 에 저장되지 않음. `User` 레코드에는 결제 관련 컬럼 자체가 존재하지 않음
 
-### Scenario 3: 중복 이메일 — 409 Conflict
+### Scenario 3: 중복 이메일 — 열거 공격 방지(균일 응답) *(개정)*
 - **Given**: `alice@example.com` 이 이미 가입된 상태
 - **When**: 동일 이메일로 가입 재시도
-- **Then**: 응답 `{ error_code: 'EMAIL_ALREADY_EXISTS', message: '이미 사용 중인 이메일입니다.', request_id: '...' }`. HTTP 409 또는 Server Action 에러로 반환
+- **Then**: **계정 존재 여부를 응답으로 드러내지 않는다.** 신규 가입과 **동일한** `{ ok: true, requires_email_confirmation: true }` 반환. (Supabase 는 "Confirm email ON" 시 기존 이메일에 obfuscated user(`identities: []`)를 에러 없이 반환하므로 구분 없이 균일 응답.)
+- **개정 사유**: 기존 `EMAIL_ALREADY_EXISTS` 반환은 계정 존재를 노출하는 **이메일 열거 취약점** → 폐기. `EMAIL_ALREADY_EXISTS` 코드 자체는 유지하되 **가입 경로에서는 사용하지 않는다**. 진짜 인프라 오류만 일반 `INTERNAL_ERROR` 로(존재 비노출).
 
 ### Scenario 4: 잘못된 이메일 형식 — 400 Bad Request
 - **Given**: `email: 'not-an-email'`
@@ -87,7 +89,7 @@ assignees: ''
 - **로깅 마스킹**: 가입 폼 페이로드 로깅 시 이메일은 `a***@e***.com`, 비밀번호는 `***` 로 마스킹. 평문 로그 0건
 - **세션 미발급**: 가입 즉시 자동 로그인 금지. 이메일 확인 후 별도 로그인 (FW-AUTH-003)
 - **Rate Limit**: IP당 5회/분 (가입은 일반 API 보다 엄격)
-- **에러 코드 체계**: `EMAIL_ALREADY_EXISTS`, `INVALID_EMAIL`, `PASSWORD_TOO_SHORT`, `EMAIL_NOT_CONFIRMED`, `RATE_LIMIT_EXCEEDED` 5종
+- **에러 코드 체계**: 가입 경로 사용분 — `INVALID_EMAIL`, `PASSWORD_TOO_SHORT`, `INVALID_INPUT`(닉네임·추가필드, 필드명 비노출), `INTERNAL_ERROR`(인프라 오류). `EMAIL_ALREADY_EXISTS`·`EMAIL_NOT_CONFIRMED`·`RATE_LIMIT_EXCEEDED` 는 각각 열거방지(판단①)·로그인(FW-AUTH-003)·IF-KV-001 로 이관되어 **본 가입 액션에서는 미사용**
 - **응답 시간**: p95 ≤ 500ms (Supabase Auth 호출 포함)
 - **금지**: 자체 비밀번호 해시 라이브러리(bcrypt-ts 등) 도입 금지. 자체 user 테이블에 password 컬럼 추가 금지
 
