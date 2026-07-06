@@ -26,6 +26,14 @@ assignees: ''
   - `https://supabase.com/docs/guides/auth/passwords#password-reset`
 - 선행: FW-AUTH-001 (Supabase SSR), FW-AUTH-002 (가입), IF-RES-001 (Resend), CT-API-001 (응답 포맷)
 
+## :package: 구현 범위 분할 (이 태스크는 2 슬라이스로 진행)
+> **슬라이스 A — 콜백(구현 완료, PR)**: `/auth/callback` 코드 교환 + 확인된 계정만 `public.User` 멱등 등록 + 오픈 리다이렉트 가드. Scenario 1~5 대응.
+> - **멱등**: 명세 예시의 `upsert` 대신 **`prisma.user.create` + P2002 catch(이미 있으면 스킵, 쓰기 0건, 경쟁 안전)**. 프로젝트 P2002 관용구(CT-API-004)와 정합.
+> - **오픈 리다이렉트 가드**: `lib/auth/redirect.ts`의 `safeInternalPath()` — 내부 경로만 허용(`//`·`/\`·절대URL·제어문자 거부), 위반 시 `/lessons`.
+> - **기본값**: accessibility·mediaPreference·fontSize 는 create 에서 생략 → CT-DB-002 DB 기본값. nickname 은 `user_metadata`, 없으면 email local part(40자 절단).
+>
+> **슬라이스 B — 후속(미착수)**: 비밀번호 재설정(`sendPasswordResetEmail`·`/auth/reset-password`, Scenario 6~8) / 이메일 한국어 템플릿(Scenario 9, Dashboard) / EventLog 3종(Scenario 10) — **CT-DB-009(EventLog) 선행 블록** / Rate limit(Scenario 8) — **IF-KV-001 선행 블록** / Sentry 알림(Scenario 5) — **NF-OBS-001 선행 블록**(현재는 graceful 리다이렉트+로그).
+
 ## :white_check_mark: Task Breakdown (실행 계획)
 - [ ] **`app/auth/callback/route.ts` Route Handler**:
   ```ts
