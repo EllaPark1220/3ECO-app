@@ -25,6 +25,14 @@ assignees: ''
 - 외부 문서: Supabase Auth `signInWithPassword` API
 - 선행 결정: D-AUTH (자체 bcrypt 관리 없음)
 
+## :package: 구현 범위·판단 (이 슬라이스에서 적용)
+> **구현 완료(PR)**: `signIn()` + `signOut()` Server Action + 세션 쿠키(Supabase SSR 기본값) + 열거 방지 균일 응답 + 오픈 리다이렉트 가드 재사용(`safeInternalPath`). Scenario 1~4·6·8 대응.
+> - **열거 방지(핵심)**: 틀린 비번·미가입 이메일·검증 실패 → **모두 `INVALID_CREDENTIALS`(코드·메시지 동일)**. DB 존재 조회 없이 Supabase 에러코드만 매핑.
+> - **`EMAIL_NOT_CONFIRMED` 예외 유지**: Supabase 는 **비밀번호가 맞을 때만** `email_not_confirmed` 반환(틀린 비번·미가입은 `invalid_credentials`). 즉 비번을 이미 아는 경우에만 노출 → 열거 위험 없음 + 미확인 사용자 안내 UX. **유지**(Scenario 3).
+> - **세션 쿠키**: Supabase SSR 이 `HttpOnly·Secure·SameSite=Lax·Path=/` 자동 설정. 수동 쿠키 조작 없음(Scenario 6).
+>
+> **후속(미착수, 선행 블록)**: 5회 실패 잠금(`ACCOUNT_LOCKED`, Scenario 5)·IP+email rate limit(Scenario 8 실동작) → **IF-KV-001**(상태 저장 필요) / EventLog `auth.signin_attempt`·`auth.account_locked`(Scenario 1·2·5) → **CT-DB-009** / 미들웨어 자동 갱신 실동작(Scenario 7)·평문 로깅 감사(Scenario 9)·`Remember Me` 금지 확인 → E2E·감사. Supabase 자체 429 는 `RATE_LIMIT_EXCEEDED` 로 매핑만.
+
 ## :white_check_mark: Task Breakdown (실행 계획)
 - [ ] `lib/contracts/auth.ts` 에 `SignInRequest` Zod 스키마 추가 — `{ email, password }` (FW-AUTH-002 와 동일 파일)
 - [ ] `app/auth/actions.ts` 에 `signIn()` Server Action 구현
