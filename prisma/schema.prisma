@@ -13,3 +13,46 @@ generator client {
 }
 
 // 모델은 CT-DB-002~011 에서 추가된다.
+
+// ── CT-DB-002 · User + 환경설정 enum ─────────────────────────────
+// PII 최소(REQ-NF-014): email·nickname 만 수집. 성명·연락처·주소·생년월일·
+// 결제·소득 컬럼은 영구 금지(CON-01/02). 근거: SRS §6.2.2 USER 엔터티
+// (accessibility_mode·media_preference) + T5 CORE 결정(FontSize enum).
+// colorMode 는 SRS 데이터 모델 근거 부재 + 다크모드 연기(PROJECT_DECISIONS §4.4)
+// 로 제외 — 다크모드 확정 시(FR-AUTH-003) 별도 마이그레이션으로 추가.
+// relation(lessonProgress/stamps/teacherFeedbacks/eventLogs)은 대상 모델
+// (CT-DB-004/005/007/009) 생성 시 back-reference 와 함께 추가.
+
+enum Role {
+  LEARNER
+  TEACHER
+  ADMIN
+}
+
+enum MediaPreference {
+  VIDEO
+  TEXT
+  MIXED
+}
+
+enum FontSize {
+  XS // 14px
+  S // 18px (default)
+  L // 22px
+  XL // 28px
+}
+
+model User {
+  id                String          @id @default(uuid()) // = Supabase auth.users.id
+  email             String          @unique
+  nickname          String          @db.VarChar(40)
+  role              Role            @default(LEARNER)
+  accessibilityMode Boolean         @default(false)
+  mediaPreference   MediaPreference @default(MIXED)
+  fontSize          FontSize        @default(S)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  @@index([role])
+  @@index([createdAt])
+}
