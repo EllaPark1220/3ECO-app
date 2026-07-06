@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { SignUpRequestSchema } from "./auth";
+import { SignUpRequestSchema, SignInRequestSchema } from "./auth";
 
 const valid = { email: "alice@example.com", nickname: "Alice", password: "secure1234" };
 
@@ -35,5 +35,30 @@ describe("SignUpRequestSchema (FW-AUTH-002)", () => {
     expect(SignUpRequestSchema.safeParse({ ...valid, nickname }).success).toBe(
       false,
     );
+  });
+});
+
+describe("SignInRequestSchema (FW-AUTH-003)", () => {
+  it("정상 parse", () => {
+    const r = SignInRequestSchema.parse({
+      email: "alice@example.com",
+      password: "x",
+    });
+    expect(r.email).toBe("alice@example.com");
+  });
+
+  it("잘못된 이메일 거부", () => {
+    expect(
+      SignInRequestSchema.safeParse({ email: "nope", password: "x" }).success,
+    ).toBe(false);
+  });
+
+  it("빈 비밀번호 거부", () => {
+    expect(
+      SignInRequestSchema.safeParse({
+        email: "alice@example.com",
+        password: "",
+      }).success,
+    ).toBe(false);
   });
 });
