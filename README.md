@@ -181,14 +181,21 @@ scripts/        capture.ts 등 운영 스크립트
 
 ## 현재 한계와 로드맵
 
-이 저장소는 **P0(디자인·프로토타입) 단계가 완료된** 상태입니다. 모든 학습자·운영자 화면(랜딩·강의·스탬프 맵·사전·로그인·교사 키트·관리자 대시보드)이 UI로 구현되어 있습니다. 반대로 **백엔드·영속화는 아직 착수 전**입니다.
+이 저장소는 **P0(디자인·프로토타입) 단계가 완료**되었고, **P1(백엔드·영속화)에 착수해 인증 백엔드 뼈대가 완성**된 상태입니다. 모든 학습자·운영자 화면(랜딩·강의·스탬프 맵·사전·로그인·교사 키트·관리자 대시보드)이 UI로 구현되어 있습니다.
 
-숨기지 않고 적자면, 현재 `prisma/schema.prisma`에는 datasource 설정만 있고 **모델이 아직 정의되어 있지 않습니다.** 즉 강의 시청·OX 채점·스탬프 적립·로그인 화면은 동작하지만, 그 상태는 아직 클라이언트 프로토타입 수준이며 DB에 영속되지 않습니다.
+**구현 완료 — 인증 백엔드(P1·W10 진행분).** `prisma/schema.prisma`에 `User` 모델(+`Role`/`MediaPreference`/`FontSize` enum)이 정의되어 마이그레이션이 적용되었고, 다음이 서버 로직·테스트와 함께 동작합니다.
+
+- **회원가입**(이메일·닉네임만, PII 최소·결제 필드 구조적 거부, 이메일 열거 방지) → **이메일 확인 콜백**(확인된 계정만 `public.User` 멱등 등록, 오픈 리다이렉트 차단) → **로그인/로그아웃**(Supabase 세션 쿠키, 열거 방지 균일 응답).
+- **세션 조회**(`getCurrentUser`, 서버에서 JWT 재검증·요청당 1회) + **RBAC 가드**(learner/teacher/admin, 401/403 분리)로 인증·권한 레이어를 갖췄습니다.
+
+아직 **UI 배선(프로토타입 로그인 화면 ↔ 실제 Server Action)** 과 **나머지 영속화(학습 진척·OX 채점·스탬프 적립·교안 PDF·콘텐츠)** 는 진행 예정입니다. 즉 강의 시청·OX·스탬프 화면은 현재까진 클라이언트 프로토타입 수준이며 DB에 영속되지 않습니다.
+
+> 이 README는 현재 초안 수준으로, 구현 진척에 맞춰 계속 갱신됩니다.
 
 앞으로의 작업은 PlayBoard EPIC(`playboard/registry/work-items.ts`)에 대응하며, GitHub에서는 **Phase 단위 마일스톤**으로 추적합니다. 세부 명세는 `tasks/*.md`에, 진행은 각 마일스톤의 이슈에 있습니다.
 
 **[P1 · 백엔드·영속화](https://github.com/EllaPark1220/3ECO-app/milestone/1)** (다음 단계 · 이슈 58건)
-- **인증 백엔드 (W10)** — Supabase SSR + 카카오 OAuth, 최소 PII 회원가입. → [#191 FW-AUTH-006](https://github.com/EllaPark1220/3ECO-app/issues/191), [#54 FW-AUTH-001](https://github.com/EllaPark1220/3ECO-app/issues/54)
+- **인증 백엔드 (W10)** — Supabase SSR + 최소 PII 회원가입·확인·로그인·세션·RBAC 가드 **구현 완료**. 남은 것: 카카오 OAuth([#191 FW-AUTH-006](https://github.com/EllaPark1220/3ECO-app/issues/191)), 환경설정 PATCH/GET(FW/FR-AUTH-005), rate limit·감사 로그·RLS(각 IF-KV-001/CT-DB-009/CT-DB-011 선행).
 - **학습 진척 영속화 (W11)** — 진척 저장(throttle·upsert), OX 멱등 채점, 스탬프 유니크 제약. → [#71 FW-PROG-001](https://github.com/EllaPark1220/3ECO-app/issues/71), [#15 CT-DB-004](https://github.com/EllaPark1220/3ECO-app/issues/15)
 - **관리자 인증·역할 게이트 (W12)** — 3역할 RBAC, learner 403 가드. → [#165 TS-UT-013](https://github.com/EllaPark1220/3ECO-app/issues/165)
 - **PDF 다운로드 백엔드 (W13)** — 한글 폰트 렌더러, 2단 캐시, 교사 피드백 저장. → [#69 FW-PDF-001](https://github.com/EllaPark1220/3ECO-app/issues/69), [#80 IF-CACHE-001](https://github.com/EllaPark1220/3ECO-app/issues/80)
