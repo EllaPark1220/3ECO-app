@@ -37,7 +37,7 @@ assignees: ''
   - Email 확인 필수 ON (가입 검증 메일)
   - JWT Expiry 1시간 (REQ-NF-019)
   - Password 최소 길이 8자
-  - 외부 OAuth 비활성 (PII 최소 — REQ-NF-014)
+  - 외부 OAuth 비활성 — **단, Kakao provider 는 예외로 활성**(grill-it T3 CORE 결정: 이메일/비번 + Kakao OAuth 병행, PII 는 이메일·닉네임만). Google/GitHub 등 그 외 provider 는 비활성 유지 (PII 최소 — REQ-NF-014)
 - [ ] 헬스체크 라우트 `/api/health/auth` 임시 추가 — 클라이언트 인스턴스 정상 생성 확인
 - [ ] 환경 변수 누락 시 빌드 시점 에러로 fail-fast 처리 (zod 환경 검증 또는 `lib/env.ts`)
 
@@ -77,7 +77,7 @@ assignees: ''
   - JWT 만료: 1시간
   - 리프레시 토큰: 30일
 - **PII 최소 (REQ-NF-014)**: Supabase Auth 의 metadata 컬럼에 PII 저장 금지. 이메일·닉네임만 허용
-- **금지**: OAuth 외부 제공자 (Google, GitHub 등) 활성화 금지 (CON-01 PII 최소 + 단순화)
+- **OAuth provider 정책 (grill-it T3 CORE)**: **Kakao provider 는 활성**(이메일/비번 + Kakao 병행, 수집 PII 는 이메일·닉네임만). 그 외 외부 제공자(Google, GitHub 등)는 **활성화 금지**(CON-01 PII 최소 + 단순화). 구현은 FW-AUTH-006 에서, 본 태스크는 기반 인프라만.
 - **로컬 개발**: SQLite 환경에서는 Supabase Auth 가 작동하지 않으므로, 로컬 개발 시 Supabase Free 인스턴스의 dev 프로젝트를 별도 사용
 
 ## :checkered_flag: Definition of Done (DoD)
