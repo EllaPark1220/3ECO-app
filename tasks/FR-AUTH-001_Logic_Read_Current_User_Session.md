@@ -25,6 +25,15 @@ assignees: ''
 - 선행: FW-AUTH-001 (Supabase Auth), CT-DB-002 (User 모델)
 - 짝: FR-AUTH-002 (RBAC 가드 — 본 헬퍼 활용)
 
+## :package: 구현 범위·판단 (이 슬라이스에서 적용)
+> **구현(PR)**: `lib/auth/session.ts`(`getCurrentUser`·`getCurrentUserOrThrow`·`AuthError`) + `/api/auth/me`. Scenario 1~3·6~8 대응.
+> - **`getUser()` 사용(명세 예시의 `getSession()` 대신)**: 서버에서 `getSession()`은 쿠키를 검증 없이 읽어 위조·만료 가능. 이 헬퍼가 RBAC(FR-AUTH-002)·모든 인증 접근의 관문이라 **JWT 를 Auth 서버로 검증하는 `getUser()`** 를 쓴다.
+> - **계약**: 미인증 → `null`(정상). **세션 있는데 public.User 없음 = sync 깨짐(무결성 사고) → `AuthError('INTERNAL_ERROR')` throw + 로그**(null 로 삼키지 않음).
+> - **`/api/auth/me` 반환에서 `colorMode` 제외**: User 모델에 colorMode 없음(CT-DB-002 편차). 반환은 id·email·nickname·role·accessibilityMode·mediaPreference·fontSize.
+> - **React.cache**: 요청당 1회 조회. vitest 에선 passthrough(테스트 확인). setup 에 더미 Supabase env 추가로 서버 모듈 단위 테스트 로드 가능.
+>
+> **후속(미착수/성격상 제외)**: Sentry 알림(Scenario 6) → **NF-OBS-001**(현재 throw+로그) / 클라이언트 `useCurrentUser()` 훅(Scenario) → SWR·React Query 미설치·UI 관심사 / React.cache 중복제거·응답시간 실측(Scenario 4·5·9·10) → React 런타임 동작·성능 측정(단위 테스트 아님).
+
 ## :white_check_mark: Task Breakdown (실행 계획)
 - [ ] `lib/auth/session.ts` 생성
 - [ ] **`getCurrentUser()` 함수 정의 — React.cache 활용**:
