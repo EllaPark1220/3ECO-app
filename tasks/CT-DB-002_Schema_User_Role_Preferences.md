@@ -4,14 +4,14 @@
 ---
 name: Feature Task
 about: SRS 기반의 구체적인 개발 태스크 명세
-title: "[Feature] CT-DB-002: User 모델 + Role enum (LEARNER/TEACHER/ADMIN) + accessibilityMode/mediaPreference/fontSize/colorMode 환경설정"
+title: "[Feature] CT-DB-002: User 모델 + Role enum (LEARNER/TEACHER/ADMIN) + accessibilityMode/mediaPreference/fontSize 환경설정"
 labels: 'feature, backend, db, auth, priority:critical, mvp-in, alpha'
 assignees: ''
 ---
 ```
 
 ## :dart: Summary
-- **기능명**: [CT-DB-002] User 테이블 정의 — Supabase Auth 의 `auth.users` 와 1:1 매핑되는 `public.User` 모델 + Role enum + 환경설정 컬럼 4종
+- **기능명**: [CT-DB-002] User 테이블 정의 — Supabase Auth 의 `auth.users` 와 1:1 매핑되는 `public.User` 모델 + Role enum + 환경설정 컬럼 3종(accessibilityMode·mediaPreference·fontSize; colorMode 는 FR-AUTH-003 으로 연기)
 - **목적**: 모든 인증·권한·접근성 기능의 데이터 기반. SRS §6.2.2 USER 테이블 정의의 코드 구현. PII 최소 정책 (REQ-NF-014) 강제 — 컬럼 정의 자체로 결제·성명·연락처 같은 PII 차단. INV-07 (역할 격리) 의 데이터 레이어 진입.
 
 ## :link: References (Spec & Context)
@@ -51,14 +51,7 @@ assignees: ''
     XL   // 28px
   }
   ```
-- [ ] `ColorMode` enum:
-  ```prisma
-  enum ColorMode {
-    LIGHT
-    DARK
-    SYSTEM
-  }
-  ```
+- [ ] ~~`ColorMode` enum~~ — **CT-DB-002 범위에서 제외(구현 편차, PR #218)**. 근거: SRS §6.2.2 USER 엔터티·클래스 다이어그램에 `colorMode` 컬럼 부재 + 다크 모드가 `PROJECT_DECISIONS_v1 §4.4`에서 "낮은 우선순위·launch 시점 결정·미완"으로 명시 연기. 다크 모드 확정 시 **FR-AUTH-003** 에서 `ColorMode` enum(LIGHT/DARK/SYSTEM) + `User.colorMode` 컬럼을 **별도 마이그레이션**으로 추가한다.
 - [ ] `User` 모델 정의:
   ```prisma
   model User {
@@ -69,7 +62,7 @@ assignees: ''
     accessibilityMode  Boolean         @default(false)
     mediaPreference    MediaPreference @default(MIXED)
     fontSize           FontSize        @default(S)
-    colorMode          ColorMode       @default(SYSTEM)
+    // colorMode 는 CT-DB-002 범위에서 제외(위 참조). FR-AUTH-003 에서 추가.
     createdAt          DateTime        @default(now())
     updatedAt          DateTime        @updatedAt
 
@@ -92,7 +85,7 @@ assignees: ''
   - 소득·재산 (income, asset_*)
 - [ ] **enum 단일 정의 출처 (Single Source of Truth)**:
   - Prisma schema 가 enum 의 소스
-  - TypeScript 타입은 `import type { Role, MediaPreference, FontSize, ColorMode } from '@prisma/client'`
+  - TypeScript 타입은 `import type { Role, MediaPreference, FontSize } from '@prisma/client'` (ColorMode 는 FR-AUTH-003 에서 추가)
   - Zod 스키마는 `z.nativeEnum(Role)` 활용
 - [ ] **Supabase auth.users 와 동기화 정책**:
   - `User.id = auth.users.id` (UUID 일치 보장)
@@ -110,7 +103,7 @@ assignees: ''
 ### Scenario 1: User 정상 INSERT
 - **Given**: Prisma 마이그레이션 적용 완료
 - **When**: `prisma.user.create({ data: { email: 'test@example.com', nickname: 'Test' } })` 호출
-- **Then**: User 1건 INSERT. 기본값 — role='LEARNER', accessibilityMode=false, mediaPreference='MIXED', fontSize='S', colorMode='SYSTEM'
+- **Then**: User 1건 INSERT. 기본값 — role='LEARNER', accessibilityMode=false, mediaPreference='MIXED', fontSize='S' (colorMode 는 범위 제외)
 
 ### Scenario 2: email UNIQUE 제약
 - **Given**: User(`alice@example.com`) 가 존재
@@ -172,7 +165,7 @@ assignees: ''
 
 ## :checkered_flag: Definition of Done (DoD)
 - [ ] 9개 GWT 시나리오 전부 통과
-- [ ] User 모델 + 4개 enum 정의 완료
+- [ ] User 모델 + 3개 enum(Role·MediaPreference·FontSize) 정의 완료 (ColorMode 는 FR-AUTH-003)
 - [ ] PII 컬럼 화이트리스트 + CI 정적 분석 통합
 - [ ] 마이그레이션 SQL 파일 커밋
 - [ ] `prisma generate` 후 TypeScript 타입 export 검증
@@ -195,7 +188,7 @@ assignees: ''
   - FW-AUTH-005 (사용자 환경설정 PATCH)
   - FR-AUTH-001 (현재 세션 조회)
   - FR-AUTH-002 (RBAC 가드 — role 필드 활용)
-  - FR-AUTH-003 (색 모드 — colorMode 컬럼)
+  - FR-AUTH-003 (색 모드 — **`ColorMode` enum + `User.colorMode` 컬럼을 여기서 별도 마이그레이션으로 추가**. CT-DB-002 범위 제외분)
   - FR-LES-004 (글자 크기 — fontSize 컬럼)
 - **Related**:
   - CT-DB-011 (Supabase RLS — User 테이블 정책)
