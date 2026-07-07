@@ -10,6 +10,9 @@ assignees: ''
 ---
 ```
 
+## :fire: W11 grill 확정 (GRILL_LEDGER W11-T2/T3)
+> W11 마이그레이션 범위 = **Lesson(최소 stub: lessonId unique + title) + LessonProgress** 2개만(Module·Stamp 제외). LessonProgress 는 본 스펙대로 전 컬럼+`(userId,lessonId)` UNIQUE+cascade+INV-04 CHECK 를 **한 번에** 생성하되, W11 코드(FW-PROG-001)는 `lastPositionSec` 만 씀. Lesson 미디어 컬럼은 CT-DB-003 에서 additive 후속.
+
 ## :dart: Summary
 - **기능명**: [CT-DB-004] LessonProgress 테이블 정의 — 사용자별·레슨별 학습 진도 (재생 위치 + OX 완료 + 스탬프 발급) 관리 + `(userId, lessonId)` 복합 UNIQUE 로 자연 멱등 키 강제
 - **목적**: Story 4 (오세은 · 재개 위치) + Story 1 (박지훈 · OX 통과) 의 데이터 기반. INV-04 (stampEarned 는 oxCompleted 전제) + INV-12 (LessonProgress 와 Stamp 정합) 데이터 레이어 강제. FW-PROG-001 (UPSERT) 의 멱등 키.

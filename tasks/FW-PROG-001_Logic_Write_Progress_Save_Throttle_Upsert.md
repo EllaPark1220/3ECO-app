@@ -10,6 +10,15 @@ assignees: ''
 ---
 ```
 
+## :fire: W11 grill 확정 (본문보다 우선 — GRILL_LEDGER W11-T1~T9)
+> 아래가 본문 중 상충 서술보다 **우선**한다.
+> - **응답**: `lib/contracts/progress.ts` 의 **리치 응답**(ok·lesson_id·saved_position_sec·saved_at·is_first_save) 사용 — 본문의 "{ ok: true }" 서술 **무효**.
+> - **throttle**: 서버 스로틀 없음 — **항상 upsert, `@updatedAt` 매번 갱신**(Scenario 3 의 "updatedAt 미갱신" **무효**). 10초 간격은 클라 훅(FW-PROG-002) 책임.
+> - **저장 경로**: `saveProgressCore(userId, input)` 공유 → **Server Action(`saveProgress`)** + **Route Handler(`POST /api/progress/sync`, sendBeacon)** 둘 다.
+> - **저장 범위**: `lastPositionSec` 만. `oxCompleted`/`stampEarned` 은 컬럼만 존재하고 OX 기능(FW-OX-001)이 소유(본 액션은 미변경).
+> - **가드**: `requireUser`(비로그인 401, 클라 큐잉은 후속 FW-PROG-003). 레슨 시청 자체는 비로그인 공개.
+> - **EventLog**: `progress.saved`/`progress.anomaly` 는 `TODO(CT-DB-009)` 스텁(미발행).
+
 ## :dart: Summary
 - **기능명**: [FW-PROG-001] `saveProgress()` Server Action — 비디오 재생 위치를 10초 간격으로 `LessonProgress.lastPositionSec` 에 UPSERT
 - **목적**: Story 4 (오세은) 의 핵심 — 재개 위치 저장으로 단편 세션 학습자(<8분) 의 완주율을 보장. UC-01 (레슨 시청) + UC-04 (재개 위치 복원) 의 데이터 진입점이며, REQ-FUNC-020 (10초 간격 저장) · REQ-NF-006 (저장 주기 ≤10s) 충족.
