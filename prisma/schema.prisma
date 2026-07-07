@@ -53,6 +53,43 @@ model User {
   createdAt         DateTime        @default(now())
   updatedAt         DateTime        @updatedAt
 
+  // back-relation (CT-DB-004). 나머지 relation(stamps/teacherFeedbacks/eventLogs)은 각 모델 착수 시 추가.
+  lessonProgresses LessonProgress[]
+
   @@index([role])
   @@index([createdAt])
+}
+
+// ── CT-DB-003 · Lesson (최소 stub) ───────────────────────────────
+// W11(학습 진척 영속화)에 필요한 최소 필드만. 본편·차시·권 메타(module/order/quarter 등)는
+// FR-LESSON 계열 착수 시 확장. lessonId 는 L001~L133 포맷·고유·불변(CLAUDE.md T1).
+model Lesson {
+  lessonId  String   @id // L001~L133
+  title     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  progresses LessonProgress[]
+}
+
+// ── CT-DB-004 · LessonProgress (재생 위치 영속화) ─────────────────
+// W11 핵심: lastPositionSec 저장/재개. oxCompleted·stampEarned 는 컬럼만 존재하고
+// 이 웨이브에서는 쓰지 않는다(OX/Stamp 채점은 별도 task). INV-04 무결성:
+// stampEarned=true 이면 oxCompleted=true 여야 함 → migration.sql 에 CHECK 제약 수기 추가.
+// IDOR: userId 는 세션에서만 채움(요청 입력 user_id 미사용). @@unique 로 (user,lesson) 1행.
+model LessonProgress {
+  id              String   @id @default(uuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lessonId        String
+  lesson          Lesson   @relation(fields: [lessonId], references: [lessonId], onDelete: Cascade)
+  lastPositionSec Int      @default(0)
+  oxCompleted     Boolean  @default(false)
+  stampEarned     Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([userId, lessonId])
+  @@index([userId])
+  @@index([lessonId])
 }
