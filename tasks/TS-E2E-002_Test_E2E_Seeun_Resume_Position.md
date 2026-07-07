@@ -29,7 +29,7 @@ assignees: ''
 - [ ] `tests/e2e/story-4-seeun.spec.ts` 신규 파일
 - [ ] beforeAll — 테스트용 사용자 시드 (이메일 확인 완료 상태)
 - [ ] **Step 1 — 로그인 + 레슨 진입**:
-  - `/auth/login` 로그인
+  - `/login` 로그인
   - `/lesson/L001` 진입
   - YouTube iframe 로드 확인
 - [ ] **Step 2 — 시청 시뮬레이션 (30초 위치 저장)**:

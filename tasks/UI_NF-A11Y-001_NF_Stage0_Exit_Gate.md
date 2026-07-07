@@ -48,7 +48,7 @@ assignees: ''
   - 운영자 SOP — 분기 1회 또는 Stage 0 Exit 시 1회
   - 검증 대상 페이지 (8):
     1. 랜딩 (`/`)
-    2. 로그인 (`/auth/login`)
+    2. 로그인 (`/login`)
     3. 홈 (`/home`)
     4. lesson 시청 (`/lessons/L001`)
     5. OX 제출 (lesson 시청 내)
