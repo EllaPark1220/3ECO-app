@@ -20,7 +20,17 @@ vi.mock("next/headers", () => ({
   headers: vi.fn(async () => ({ get: getReqIdMock })),
 }));
 
-import { signUp, signIn, signOut } from "./actions";
+const { requireUserMock, prismaUpdateMock, revalidateMock } = vi.hoisted(() => ({
+  requireUserMock: vi.fn(),
+  prismaUpdateMock: vi.fn(),
+  revalidateMock: vi.fn(),
+}));
+vi.mock("@/lib/auth/guards", () => ({ requireUser: requireUserMock }));
+vi.mock("@/lib/db", () => ({ prisma: { user: { update: prismaUpdateMock } } }));
+vi.mock("next/cache", () => ({ revalidatePath: revalidateMock }));
+
+import { signUp, signIn, signOut, updateUserPreferences } from "./actions";
+import { AuthError } from "@/lib/auth/session";
 import { ERROR_CODES } from "@/lib/contracts/error-codes";
 
 const valid = { email: "alice@example.com", nickname: "Alice", password: "secure1234" };
@@ -173,5 +183,83 @@ describe("signIn() / signOut() (FW-AUTH-003 / TS-UT-002)", () => {
     const res = await signOut();
     expect(signOutMock).toHaveBeenCalledOnce();
     expect(res).toEqual({ ok: true });
+  });
+});
+
+describe("updateUserPreferences() (FW-AUTH-005)", () => {
+  const u1 = { id: "u1" };
+  beforeEach(() => {
+    requireUserMock.mockReset().mockResolvedValue(u1);
+    prismaUpdateMock.mockReset().mockResolvedValue({ id: "u1" });
+    revalidateMock.mockReset();
+  });
+
+  it("Scenario 1: 3필드 동시 변경 → updated_fields 3종 + where=세션 userId", async () => {
+    const res = await updateUserPreferences({
+      accessibility_mode: true,
+      media_preference: "TEXT",
+      font_size: "XL",
+    });
+    expect(res).toEqual({
+      ok: true,
+      updated_fields: ["accessibility_mode", "media_preference", "font_size"],
+    });
+    expect(prismaUpdateMock).toHaveBeenCalledWith({
+      where: { id: "u1" },
+      data: { accessibilityMode: true, mediaPreference: "TEXT", fontSize: "XL" },
+    });
+  });
+
+  it("Scenario 2: Partial(font_size 만) → 그 필드만 UPDATE", async () => {
+    const res = await updateUserPreferences({ font_size: "XL" });
+    expect(res).toEqual({ ok: true, updated_fields: ["font_size"] });
+    expect(prismaUpdateMock).toHaveBeenCalledWith({
+      where: { id: "u1" },
+      data: { fontSize: "XL" },
+    });
+  });
+
+  it("Scenario 3: 빈 객체 → 400 EMPTY_UPDATE, UPDATE 미호출", async () => {
+    const res = await updateUserPreferences({});
+    expect(res).toMatchObject({ error_code: "EMPTY_UPDATE" });
+    expect(prismaUpdateMock).not.toHaveBeenCalled();
+  });
+
+  it("Scenario 4: 잘못된 media_preference → 400 INVALID_MEDIA_PREFERENCE, 미호출", async () => {
+    const res = await updateUserPreferences({ media_preference: "INVALID" });
+    expect(res).toMatchObject({ error_code: "INVALID_MEDIA_PREFERENCE" });
+    expect(prismaUpdateMock).not.toHaveBeenCalled();
+  });
+
+  it("Scenario 5: 미인증 → 401 UNAUTHORIZED, UPDATE 미호출", async () => {
+    requireUserMock.mockRejectedValueOnce(new AuthError("UNAUTHORIZED"));
+    const res = await updateUserPreferences({ font_size: "XL" });
+    expect(res).toMatchObject({ error_code: "UNAUTHORIZED" });
+    expect(prismaUpdateMock).not.toHaveBeenCalled();
+  });
+
+  it("Scenario 6: 위조 user_id → 400 INVALID_INPUT, u2/u1 변경 0건(strict 차단)", async () => {
+    const res = await updateUserPreferences({ user_id: "u2", font_size: "XL" });
+    expect(res).toMatchObject({ error_code: "INVALID_INPUT" });
+    expect(prismaUpdateMock).not.toHaveBeenCalled();
+  });
+
+  it("잘못된 font_size 값 → 400 INVALID_INPUT, 미호출", async () => {
+    const res = await updateUserPreferences({ font_size: "ZZ" });
+    expect(res).toMatchObject({ error_code: "INVALID_INPUT" });
+    expect(prismaUpdateMock).not.toHaveBeenCalled();
+  });
+
+  it("DB 오류 → 500 INTERNAL_ERROR", async () => {
+    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    prismaUpdateMock.mockRejectedValueOnce(new Error("db down"));
+    const res = await updateUserPreferences({ font_size: "XL" });
+    expect(res).toMatchObject({ error_code: "INTERNAL_ERROR" });
+    spy.mockRestore();
+  });
+
+  it("성공 시 RSC revalidate 호출(즉시 반영)", async () => {
+    await updateUserPreferences({ font_size: "XL" });
+    expect(revalidateMock).toHaveBeenCalled();
   });
 });
