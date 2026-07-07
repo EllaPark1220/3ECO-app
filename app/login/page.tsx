@@ -1,7 +1,18 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { signInWithKakao } from '@/app/auth/actions';
+
+function callbackErrorMessage(code: string): string {
+  switch (code) {
+    case 'oauth_canceled': return '카카오 로그인이 취소되었습니다. 다시 시도해 주세요.';
+    case 'sync_failed': return '로그인 처리 중 문제가 발생했어요. 잠시 후 다시 시도해 주세요.';
+    case 'confirm_failed': return '인증 링크가 만료되었거나 이미 사용되었습니다.';
+    case 'missing_code': return '로그인 정보를 확인하지 못했어요. 다시 시도해 주세요.';
+    default: return '로그인 중 문제가 발생했어요.';
+  }
+}
 
 export default function LoginPage() {
   const [mode, setMode] = useState<'login' | 'signup'>('login');
@@ -12,6 +23,33 @@ export default function LoginPage() {
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [agreePrivacy, setAgreePrivacy] = useState(false);
+  const [oauthError, setOauthError] = useState<string | null>(null);
+
+  // 콜백(/login?error=...)에서 돌아온 경우만 마운트 후 1회 URL 을 읽어 배너 노출.
+  // window 는 클라이언트 전용이라 렌더 중 읽으면 SSR/하이드레이션이 깨진다 → 서버는 항상
+  // null 을 렌더하고, 마운트 후 effect 에서 URL 을 state 로 동기화하는 것이 유일하게 안전한 위치.
+  useEffect(() => {
+    const err = new URLSearchParams(window.location.search).get('error');
+    if (err) {
+      // 규칙(set-state-in-effect)은 렌더-구동 setState 의 연쇄 리렌더를 경고하나, 여기는 deps=[]
+      // 로 마운트 시 딱 1회만 실행되는 외부 시스템(URL)→state 동기화라 연쇄가 없다. 렌더 중
+      // window 접근은 하이드레이션 불일치를 유발하므로 effect 가 정당한 유일 위치 → 국소 예외.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setOauthError(callbackErrorMessage(err));
+    }
+  }, []);
+
+  const handleKakao = async () => {
+    setOauthError(null);
+    // next 는 클릭 시점에 URL 에서 직접 읽음(상태 불필요). 서버 액션이 safeInternalPath 로 재검증.
+    const next =
+      new URLSearchParams(window.location.search).get('next') ?? undefined;
+    // 성공 시 서버가 카카오로 redirect → 아래 도달 안 함. 실패(ErrorResponse)만 반환.
+    const res = await signInWithKakao(next);
+    if (res?.error_code) {
+      setOauthError('카카오 로그인을 시작할 수 없어요. 잠시 후 다시 시도해 주세요.');
+    }
+  };
 
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const passwordsMatch = password === passwordConfirm && passwordConfirm.length > 0;
@@ -81,6 +119,15 @@ export default function LoginPage() {
             </p>
           </div>
 
+          {oauthError && (
+            <div
+              role="alert"
+              className="mb-5 rounded-xl border border-error/40 bg-error/5 p-[12px_14px] font-sans text-[13px] text-error leading-[1.6]"
+            >
+              {oauthError}
+            </div>
+          )}
+
           {/* Mode Tabs */}
           <div className="flex bg-water-card rounded-xl p-1 mb-7" role="tablist">
             <button
@@ -111,7 +158,8 @@ export default function LoginPage() {
           <button
             type="button"
             className="w-full p-[13px] bg-[#FEE500] text-[#3C1E1E] border-none rounded-[11px] font-sans font-semibold text-[14.5px] cursor-pointer flex items-center justify-center gap-2 mb-4.5 transition-all hover:bg-[#F5DC00] hover:-translate-y-[1px] hover:shadow-[0_6px_18px_-6px_rgba(254,229,0,0.55)]"
-            onClick={() => alert('카카오 로그인 데모 — 실서비스에서는 Kakao OAuth로 이메일·닉네임만 받습니다.')}
+            onClick={handleKakao}
+            aria-label="카카오 계정으로 로그인"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
               <path d="M12 3C6.48 3 2 6.58 2 11c0 2.84 1.85 5.34 4.65 6.78l-1.18 4.31c-.1.37.3.66.62.46l5.18-3.4c.24.02.48.04.73.04 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/>

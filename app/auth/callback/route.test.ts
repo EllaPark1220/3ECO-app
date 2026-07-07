@@ -42,14 +42,22 @@ describe("GET /auth/callback (FW-AUTH-004)", () => {
   it("code 없음 → missing_code, 교환 미호출", async () => {
     const res = await GET(req(""));
     expect(exchangeMock).not.toHaveBeenCalled();
-    expect(location(res)).toBe(`${ORIGIN}/auth/login?error=missing_code`);
+    expect(location(res)).toBe(`${ORIGIN}/login?error=missing_code`);
   });
 
   it("교환 에러(만료·재사용) → confirm_failed, sync 미호출", async () => {
     exchangeMock.mockResolvedValueOnce({ error: { message: "expired" } });
     const res = await GET(req("?code=stale"));
     expect(syncMock).not.toHaveBeenCalled();
-    expect(location(res)).toBe(`${ORIGIN}/auth/login?error=confirm_failed`);
+    expect(location(res)).toBe(`${ORIGIN}/login?error=confirm_failed`);
+  });
+
+  it("OAuth 거부(error 파라미터) → /login?error=oauth_canceled, 교환 미호출", async () => {
+    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const res = await GET(req("?error=access_denied&error_description=denied"));
+    expect(exchangeMock).not.toHaveBeenCalled();
+    expect(location(res)).toBe(`${ORIGIN}/login?error=oauth_canceled`);
+    spy.mockRestore();
   });
 
   it("오픈 리다이렉트 next=//evil.com → 내부 기본값으로 차단", async () => {
@@ -61,7 +69,7 @@ describe("GET /auth/callback (FW-AUTH-004)", () => {
     const spy = vi.spyOn(console, "error").mockImplementation(() => {});
     syncMock.mockRejectedValueOnce(new Error("db down"));
     const res = await GET(req("?code=abc"));
-    expect(location(res)).toBe(`${ORIGIN}/auth/login?error=sync_failed`);
+    expect(location(res)).toBe(`${ORIGIN}/login?error=sync_failed`);
     spy.mockRestore();
   });
 });

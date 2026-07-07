@@ -25,7 +25,7 @@ assignees: ''
 ## :white_check_mark: Task Breakdown (실행 계획)
 - [ ] 카카오 개발자 콘솔 — REST 앱 등록 + Redirect URI(`{SUPABASE_URL}/auth/v1/callback`) 등록 + 동의항목 **이메일·닉네임만** 설정
 - [ ] Supabase Dashboard — Auth > Providers > Kakao 활성화 + Client ID/Secret 등록
-- [ ] 환경변수 — `KAKAO_CLIENT_ID`, `KAKAO_CLIENT_SECRET` (Vercel 3환경) + `.env.example` 키 추가
+- [ ] 환경변수 — `KAKAO_CLIENT_ID`/`KAKAO_CLIENT_SECRET` 은 **Supabase Dashboard(Kakao provider)가 단독 보관**. **Next 앱 env·`.env.example` 에 추가하지 않음** — Supabase 가 서버 측에서 OAuth 코드 교환을 수행하므로 앱은 키가 불필요하고, 앱 번들/서버 env 에 Secret 을 두면 "Client Secret 은 서버 환경변수만, 클라 노출 금지" 원칙과 무관하게 노출면만 늘린다(백엔드 전용 = Supabase 경계 내). 앱은 `NEXT_PUBLIC_SUPABASE_URL`/`ANON_KEY`(기존)만 사용.
 - [ ] **로그인 버튼** — `supabase.auth.signInWithOAuth({ provider: 'kakao', options: { redirectTo, scopes: 'account_email profile_nickname' } })`
 - [ ] **콜백 처리** — FW-AUTH-004 의 `/auth/callback` 라우트에서 카카오 코드 교환 + 세션 쿠키 발급(SSR)
 - [ ] **User 매핑** — 최초 카카오 로그인 시 `User` 레코드 생성: `email`(카카오 이메일) + `nickname`(카카오 닉네임)만. 나머지 컬럼은 기본값(role=LEARNER, fontSize=S 등 [[CT-DB-002]])
