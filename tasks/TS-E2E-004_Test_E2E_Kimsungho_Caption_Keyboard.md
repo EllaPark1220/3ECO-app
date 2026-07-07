@@ -33,7 +33,7 @@ assignees: ''
 - [ ] `tests/e2e/story-5-b-sungho.spec.ts` 신규 파일
 - [ ] beforeAll — 테스트용 사용자 시드 (김성호 페르소나)
 - [ ] **Step 1 — 키보드만으로 로그인**:
-  - `/auth/login` 접근
+  - `/login` 접근
   - **마우스 0회 사용** — Playwright 의 `page.keyboard.press()` 만 사용
   - Tab 키로 이메일 input 진입 → 입력 → Tab → 비밀번호 input → 입력 → Tab → "로그인" 버튼 → Enter
   - 로그인 성공 + `/lessons` 또는 `/stamp-map` 으로 리다이렉트

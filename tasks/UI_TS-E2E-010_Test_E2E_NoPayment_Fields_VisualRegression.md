@@ -27,7 +27,7 @@ assignees: ''
 ## :white_check_mark: Task Breakdown (실행 계획)
 - [ ] `tests/e2e/no-payment-fields.spec.ts` 신규 파일
 - [ ] **검사 대상 페이지 6종** (TS-E2E-009 와 동일):
-  - `/`, `/lesson/L001`, `/stamp-map`, `/auth/signup`, `/auth/login`, `/teacher/kit/L001`
+  - `/`, `/lesson/L001`, `/stamp-map`, `/auth/signup`, `/login`, `/teacher/kit/L001`
 - [ ] **Step 1 — 결제 input 필드 selector 검사**:
   - 금지 input name·id·placeholder·autocomplete 속성:
     ```ts

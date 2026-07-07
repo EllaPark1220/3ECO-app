@@ -32,7 +32,7 @@ assignees: ''
   - `/lesson/L001` (레슨 시청)
   - `/stamp-map` (스탬프 맵)
   - `/auth/signup` (가입)
-  - `/auth/login` (로그인)
+  - `/login` (로그인)
   - `/teacher/kit/L001` (교사 PDF 페이지 — TEACHER 컨텍스트)
 - [ ] **Step 1 — 텍스트 콘텐츠 검사 (정적 키워드 보완)**:
   - 각 페이지에서 `page.evaluate(() => document.body.innerText)` 로 전체 텍스트 추출

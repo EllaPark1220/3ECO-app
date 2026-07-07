@@ -33,7 +33,7 @@ assignees: ''
   - `/auth/signup` 접근
   - 이메일·닉네임·비밀번호 입력
   - 가입 후 이메일 확인 (테스트 환경에서는 Supabase admin API 로 자동 confirm 또는 사전 시드 사용자 활용)
-  - `/auth/login` 에서 로그인
+  - `/login` 에서 로그인
   - `/lessons` 또는 `/stamp-map` 으로 리다이렉트 확인
 - [ ] **Step 2 — 레슨 시청 시작**:
   - 스탬프 맵에서 L001 카드 클릭
@@ -82,7 +82,7 @@ assignees: ''
 ### Scenario 4: 미로그인 시 리다이렉트
 - **Given**: 세션 없음
 - **When**: `/lesson/L001` 직접 접근
-- **Then**: `/auth/login?returnTo=/lesson/L001` 으로 리다이렉트
+- **Then**: `/login?returnTo=/lesson/L001` 으로 리다이렉트
 
 ### Scenario 5: 자율 선택 — L003 직접 클릭 (ADR-003)
 - **Given**: 신규 사용자 (스탬프 0건)

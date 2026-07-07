@@ -40,7 +40,7 @@ assignees: ''
 
   **Criteria 4 — Smoke 테스트 (핵심 5 페이지 200)**:
   - 핵심 5 페이지 production HTTP 200 + 응답 시간 < 3초
-  - 페이지: `/`, `/auth/login`, `/lessons/L001`, `/stamps`, `/teacher/feedback`
+  - 페이지: `/`, `/login`, `/lessons/L001`, `/stamps`, `/teacher/feedback`
   - 별도 cron 또는 Vercel Monitoring
 
   **Criteria 5 — 핵심 5플로우 자동 통과 (TS-E2E-001 의 회원가입·로그인·시청·OX·StampMap)**:
@@ -137,7 +137,7 @@ assignees: ''
 - [ ] **Smoke 테스트 — `runSmokeTest()`**:
   ```ts
   async function runSmokeTest(): Promise<{ allPassed: boolean; failedPages: string[] }> {
-    const pages = ['/', '/auth/login', '/lessons/L001', '/stamps', '/teacher/feedback'];
+    const pages = ['/', '/login', '/lessons/L001', '/stamps', '/teacher/feedback'];
     const failedPages: string[] = [];
 
     for (const path of pages) {

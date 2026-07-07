@@ -33,7 +33,7 @@ assignees: ''
   - `/lesson/L001` (레슨 시청 — Story 1·5)
   - `/stamp-map` (스탬프 맵)
   - `/auth/signup` (가입)
-  - `/auth/login` (로그인)
+  - `/login` (로그인)
 - [ ] **Vercel Preview Deploy URL 대기** — GitHub Actions 의 `vercel/wait-for-deployment-action` 또는 webhook
 - [ ] **axe-core 룰셋 설정**:
   - `wcag2a` + `wcag2aa` (WCAG 2.0 + 2.1 AA)

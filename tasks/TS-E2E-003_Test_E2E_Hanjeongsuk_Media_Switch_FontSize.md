@@ -29,7 +29,7 @@ assignees: ''
 - [ ] `tests/e2e/story-5-a-jeongsook.spec.ts` 신규 파일
 - [ ] beforeAll — 테스트용 사용자 시드 (이메일 확인 완료, 기본 환경설정)
 - [ ] **Step 1 — 로그인 + 레슨 진입**:
-  - `/auth/login` 로그인
+  - `/login` 로그인
   - `/lesson/L001` 진입
   - 기본 상태 검증 — 영상 모드, S 글자, 라이트(또는 SYSTEM) 색 모드
 - [ ] **Step 2 — "글로 읽기" 토글**:

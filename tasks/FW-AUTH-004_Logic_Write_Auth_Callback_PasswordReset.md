@@ -44,8 +44,6 @@ assignees: ''
     const { searchParams, origin } = new URL(req.url);
     const code = searchParams.get('code');
     const next = searchParams.get('next') ?? '/lessons';
-    // 주: 로그인 페이지 실제 경로는 `/login`(프로토타입). 다수 task 가 `/auth/login` 로
-    //     표기돼 있으나 구현/실존 라우트는 `/login` — 표준 경로 통일은 별도 결정.
 
     if (!code) {
       return NextResponse.redirect(`${origin}/login?error=missing_code`);

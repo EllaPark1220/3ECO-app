@@ -32,7 +32,7 @@ assignees: ''
 - [ ] beforeAll — TEACHER 역할 테스트 사용자 시드 (Supabase Auth admin API 로 이메일 확인 + role='TEACHER' 설정)
   - `tests/fixtures/story-3.ts` 에 TEACHER 픽스처 분리
 - [ ] **Step 1 — TEACHER 로그인**:
-  - `/auth/login` 진입 (또는 별도 교사 진입 페이지)
+  - `/login` 진입 (또는 별도 교사 진입 페이지)
   - 이메일·비밀번호 입력
   - 로그인 후 보호된 라우트 접근 가능 검증 (`/teacher/*` 또는 `/lessons`)
   - 세션 쿠키 발급 확인 (HttpOnly 검증)
