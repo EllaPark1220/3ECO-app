@@ -3,6 +3,7 @@
 // 경계: auth.users 생성 + nickname 을 user_metadata 에 보관까지. public.User INSERT 는
 //       이메일 확인 콜백(FW-AUTH-004)이 담당. 가입 즉시 세션 미발급(확인 후 로그인).
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import type { Prisma, User } from "@prisma/client";
 import { createClient } from "@/lib/supabase/server";
@@ -200,4 +201,29 @@ export async function updateUserPreferences(
   revalidatePath("/stamp-map");
 
   return { ok: true, updated_fields: updated };
+}
+
+// FW-AUTH-006 — 카카오 OAuth 진입. Supabase Kakao provider 로 인가 URL 생성 후 리다이렉트.
+// 콜백은 이메일 흐름과 공용(/auth/callback). 로그인 후 이동은 safeInternalPath(오픈 리다이렉트 차단).
+// scope 는 account_email·profile_nickname 2종만(PII 최소). Client Secret 은 Supabase 가 보관(앱 미노출).
+export async function signInWithKakao(next?: string): Promise<ErrorResponse> {
+  const requestId =
+    (await headers()).get("X-Request-Id") ?? crypto.randomUUID();
+  const safeNext = safeInternalPath(next);
+
+  const supabase = await createClient();
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: "kakao",
+    options: {
+      redirectTo: `${process.env.NEXT_PUBLIC_APP_URL ?? ""}/auth/callback?next=${encodeURIComponent(safeNext)}`,
+      scopes: "account_email profile_nickname",
+    },
+  });
+  if (error || !data?.url) {
+    console.error(
+      `[signInWithKakao] req=${requestId}: ${error?.message ?? "no url"}`,
+    );
+    return err("INTERNAL_ERROR", requestId);
+  }
+  redirect(data.url); // NEXT_REDIRECT — 브라우저를 카카오 인가 페이지로(이후 도달 불가)
 }

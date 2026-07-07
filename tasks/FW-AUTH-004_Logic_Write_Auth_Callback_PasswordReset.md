@@ -44,16 +44,18 @@ assignees: ''
     const { searchParams, origin } = new URL(req.url);
     const code = searchParams.get('code');
     const next = searchParams.get('next') ?? '/lessons';
+    // 주: 로그인 페이지 실제 경로는 `/login`(프로토타입). 다수 task 가 `/auth/login` 로
+    //     표기돼 있으나 구현/실존 라우트는 `/login` — 표준 경로 통일은 별도 결정.
 
     if (!code) {
-      return NextResponse.redirect(`${origin}/auth/login?error=missing_code`);
+      return NextResponse.redirect(`${origin}/login?error=missing_code`);
     }
 
     const supabase = await createClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (error) {
-      return NextResponse.redirect(`${origin}/auth/login?error=${encodeURIComponent(error.message)}`);
+      return NextResponse.redirect(`${origin}/login?error=${encodeURIComponent(error.message)}`);
     }
 
     // 인증 성공 → public.User 자동 sync 확인 (별도 trigger 또는 본 단계에서 upsert)
@@ -129,12 +131,12 @@ assignees: ''
 ### Scenario 2: code 누락
 - **Given**: `/auth/callback` 직접 접근 (code 없음)
 - **When**: 응답
-- **Then**: `/auth/login?error=missing_code` redirect
+- **Then**: `/login?error=missing_code` redirect
 
 ### Scenario 3: 만료된 code
 - **Given**: 만료된 인증 링크 클릭
 - **When**: `exchangeCodeForSession` 호출
-- **Then**: 에러 → `/auth/login?error=...` redirect. 사용자에게 "링크가 만료되었습니다" 표시
+- **Then**: 에러 → `/login?error=...` redirect. 사용자에게 "링크가 만료되었습니다" 표시
 
 ### Scenario 4: code 재사용
 - **Given**: 한 번 사용된 인증 링크 재클릭

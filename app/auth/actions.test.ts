@@ -1,24 +1,29 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 // 실제 server.ts(server-only)·next/headers 를 로드하지 않도록 모킹
-const { signUpMock, signInMock, signOutMock, getReqIdMock } = vi.hoisted(() => ({
-  signUpMock: vi.fn(),
-  signInMock: vi.fn(),
-  signOutMock: vi.fn(),
-  getReqIdMock: vi.fn(() => "req-test"),
-}));
+const { signUpMock, signInMock, signOutMock, oauthMock, getReqIdMock } =
+  vi.hoisted(() => ({
+    signUpMock: vi.fn(),
+    signInMock: vi.fn(),
+    signOutMock: vi.fn(),
+    oauthMock: vi.fn(),
+    getReqIdMock: vi.fn(() => "req-test"),
+  }));
 vi.mock("@/lib/supabase/server", () => ({
   createClient: vi.fn(async () => ({
     auth: {
       signUp: signUpMock,
       signInWithPassword: signInMock,
       signOut: signOutMock,
+      signInWithOAuth: oauthMock,
     },
   })),
 }));
 vi.mock("next/headers", () => ({
   headers: vi.fn(async () => ({ get: getReqIdMock })),
 }));
+const { redirectMock } = vi.hoisted(() => ({ redirectMock: vi.fn() }));
+vi.mock("next/navigation", () => ({ redirect: redirectMock }));
 
 const { requireUserMock, prismaUpdateMock, revalidateMock } = vi.hoisted(() => ({
   requireUserMock: vi.fn(),
@@ -29,7 +34,13 @@ vi.mock("@/lib/auth/guards", () => ({ requireUser: requireUserMock }));
 vi.mock("@/lib/db", () => ({ prisma: { user: { update: prismaUpdateMock } } }));
 vi.mock("next/cache", () => ({ revalidatePath: revalidateMock }));
 
-import { signUp, signIn, signOut, updateUserPreferences } from "./actions";
+import {
+  signUp,
+  signIn,
+  signOut,
+  updateUserPreferences,
+  signInWithKakao,
+} from "./actions";
 import { AuthError } from "@/lib/auth/session";
 import { ERROR_CODES } from "@/lib/contracts/error-codes";
 
@@ -261,5 +272,57 @@ describe("updateUserPreferences() (FW-AUTH-005)", () => {
   it("성공 시 RSC revalidate 호출(즉시 반영)", async () => {
     await updateUserPreferences({ font_size: "XL" });
     expect(revalidateMock).toHaveBeenCalled();
+  });
+});
+
+describe("signInWithKakao() (FW-AUTH-006)", () => {
+  beforeEach(() => {
+    oauthMock.mockReset().mockResolvedValue({
+      data: { url: "https://kauth.kakao.com/oauth/authorize?x=1" },
+      error: null,
+    });
+    redirectMock.mockReset();
+  });
+
+  it("정상 → kakao provider + scope 2종 + /auth/callback redirectTo, 인가 URL 로 redirect", async () => {
+    await signInWithKakao("/stamp-map");
+    expect(oauthMock).toHaveBeenCalledWith({
+      provider: "kakao",
+      options: {
+        redirectTo: expect.stringContaining("/auth/callback?next=%2Fstamp-map"),
+        scopes: "account_email profile_nickname",
+      },
+    });
+    expect(redirectMock).toHaveBeenCalledWith(
+      "https://kauth.kakao.com/oauth/authorize?x=1",
+    );
+  });
+
+  it("오픈 리다이렉트 next=//evil.com → 내부 기본값(/lessons)으로 차단", async () => {
+    await signInWithKakao("//evil.com");
+    expect(oauthMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        options: expect.objectContaining({
+          redirectTo: expect.stringContaining("next=%2Flessons"),
+        }),
+      }),
+    );
+  });
+
+  it("OAuth 오류 → INTERNAL_ERROR, redirect 미호출", async () => {
+    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    oauthMock.mockResolvedValueOnce({ data: {}, error: { message: "kakao down" } });
+    const res = await signInWithKakao();
+    expect(res).toMatchObject({ error_code: "INTERNAL_ERROR" });
+    expect(redirectMock).not.toHaveBeenCalled();
+    spy.mockRestore();
+  });
+
+  it("url 없음 → INTERNAL_ERROR", async () => {
+    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    oauthMock.mockResolvedValueOnce({ data: { url: null }, error: null });
+    const res = await signInWithKakao();
+    expect(res).toMatchObject({ error_code: "INTERNAL_ERROR" });
+    spy.mockRestore();
   });
 });
