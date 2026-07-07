@@ -4,15 +4,17 @@
 ---
 name: Feature Task
 about: SRS 기반의 구체적인 개발 태스크 명세
-title: "[Feature] FR-AUTH-005: GET /api/auth/preferences — accessibilityMode + mediaPreference + fontSize + colorMode 4종 조회 + private 캐시"
+title: "[Feature] FR-AUTH-005: GET /api/auth/preferences — accessibilityMode + mediaPreference + fontSize 3종 조회 + private 캐시"
 labels: 'feature, backend, auth, preferences, query, priority:high, mvp-in, alpha'
 assignees: ''
 ---
 ```
 
 ## :dart: Summary
-- **기능명**: [FR-AUTH-005] `GET /api/auth/preferences` Route Handler — 현재 사용자의 환경설정 4종 (accessibilityMode + mediaPreference + fontSize + colorMode) 반환
+- **기능명**: [FR-AUTH-005] `GET /api/auth/preferences` Route Handler — 현재 사용자의 환경설정 3종 (accessibilityMode + mediaPreference + fontSize) 반환
 - **목적**: FW-AUTH-005 (PATCH) 의 Read 짝. 클라이언트 hook (FR-LES-004 의 글자 크기 토글, FR-AUTH-003 의 색 모드) 가 본 API 로 초기 상태 조회. localStorage 보조 캐시 + 서버 SSOT 우선 정책의 데이터 진입점.
+
+> colorMode 는 모델 제외분(다크모드 연기, PROJECT_DECISIONS §4.4). 다크모드 확정(FR-AUTH-003) 시 마이그레이션과 함께 4번째 필드로 확장.
 
 ## :link: References (Spec & Context)
 > :bulb: AI Agent & Dev Note: 작업 시작 전 아래 문서를 반드시 먼저 Read/Evaluate 할 것.
@@ -34,7 +36,6 @@ assignees: ''
       accessibility_mode: user.accessibilityMode,
       media_preference: user.mediaPreference,
       font_size: user.fontSize,
-      color_mode: user.colorMode,
     }, {
       headers: {
         'Cache-Control': 'private, max-age=300',  // 5분 사적 캐시
@@ -48,7 +49,6 @@ assignees: ''
     accessibility_mode: boolean;
     media_preference: 'VIDEO' | 'TEXT' | 'MIXED';
     font_size: 'XS' | 'S' | 'L' | 'XL';
-    color_mode: 'LIGHT' | 'DARK' | 'SYSTEM';
   }
   ```
 - [ ] **Cache 정책**:
@@ -101,10 +101,10 @@ assignees: ''
 - **When**: 호출
 - **Then**: p95 ≤ 100ms (React.cache hit 시 더 빠름)
 
-### Scenario 7: 응답 페이로드 — 4필드만
+### Scenario 7: 응답 페이로드 — 3필드만
 - **Given**: 응답
 - **When**: JSON 검사
-- **Then**: accessibility_mode, media_preference, font_size, color_mode 4필드만. email·role 등 미포함
+- **Then**: accessibility_mode, media_preference, font_size 3필드만. email·role 등 미포함
 
 ### Scenario 8: enum 값 정확
 - **Given**: 응답
@@ -122,13 +122,13 @@ assignees: ''
 - **Then**: X-Request-Id (CT-API-001) 포함
 
 ## :gear: Technical & Non-Functional Constraints
-- **응답 컬럼 화이트리스트**: 4필드만. email·role·createdAt 등 미포함 (불필요한 노출 방지)
+- **응답 컬럼 화이트리스트**: 3필드만. email·role·createdAt 등 미포함 (불필요한 노출 방지)
 - **세션 우선 (IDOR)**: user_id 입력 미허용
 - **Cache 정책**: private 5분. PATCH 후 SWR mutate 로 무효화
 - **응답 시간**: p95 ≤ 100ms (FR-AUTH-001 의 React.cache 활용)
 - **금지**:
   - user_id 클라이언트 입력
-  - 4필드 외 추가 노출
+  - 3필드 외 추가 노출
   - Edge cache 사용
 
 ## :checkered_flag: Definition of Done (DoD)
