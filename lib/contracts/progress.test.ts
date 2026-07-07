@@ -21,6 +21,18 @@ describe("SaveProgressRequestSchema", () => {
       SaveProgressRequestSchema.safeParse({ lesson_id: "x", position_sec: 0 }).success,
     ).toBe(false);
   });
+
+  it("위조 user_id 등 정의 외 키 strict 거부(IDOR — 결정8)", () => {
+    const r = SaveProgressRequestSchema.safeParse({
+      lesson_id: "L001",
+      position_sec: 0,
+      user_id: "attacker",
+    });
+    expect(r.success).toBe(false);
+    if (!r.success) {
+      expect(r.error.issues.some((i) => i.code === "unrecognized_keys")).toBe(true);
+    }
+  });
 });
 
 describe("SaveProgressResponseSchema", () => {
