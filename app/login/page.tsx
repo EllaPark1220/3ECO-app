@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { signInWithKakao } from '@/app/auth/actions';
+import { signInWithKakao, signUp, signIn } from '@/app/auth/actions';
 
 function callbackErrorMessage(code: string): string {
   switch (code) {
@@ -11,6 +11,18 @@ function callbackErrorMessage(code: string): string {
     case 'confirm_failed': return '인증 링크가 만료되었거나 이미 사용되었습니다.';
     case 'missing_code': return '로그인 정보를 확인하지 못했어요. 다시 시도해 주세요.';
     default: return '로그인 중 문제가 발생했어요.';
+  }
+}
+
+// 이메일 가입/로그인 서버 액션(signUp/signIn)의 ErrorResponse.error_code → 사용자 문구.
+// 열거 방지 원칙(actions.ts) 정합: 미가입/오답을 구분 노출하지 않음(INVALID_CREDENTIALS 단일).
+function formErrorMessage(code: string): string {
+  switch (code) {
+    case 'INVALID_EMAIL': return '이메일 형식을 확인해 주세요.';
+    case 'INVALID_INPUT': return '입력한 정보를 확인해 주세요.';
+    case 'INVALID_CREDENTIALS': return '이메일 또는 비밀번호가 올바르지 않습니다.';
+    case 'EMAIL_NOT_CONFIRMED': return '이메일 인증이 아직 완료되지 않았어요. 받은 메일의 링크를 눌러 주세요.';
+    default: return '처리 중 문제가 발생했어요. 잠시 후 다시 시도해 주세요.';
   }
 }
 
@@ -24,6 +36,9 @@ export default function LoginPage() {
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [agreePrivacy, setAgreePrivacy] = useState(false);
   const [oauthError, setOauthError] = useState<string | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [signupSentTo, setSignupSentTo] = useState<string | null>(null);
 
   // 콜백(/login?error=...)에서 돌아온 경우만 마운트 후 1회 URL 을 읽어 배너 노출.
   // window 는 클라이언트 전용이라 렌더 중 읽으면 SSR/하이드레이션이 깨진다 → 서버는 항상
@@ -68,10 +83,41 @@ export default function LoginPage() {
       agreePrivacy;
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isFormValid) {
-      alert(`${mode === 'login' ? '로그인' : '회원가입'} 데모입니다. 실제 구현 시 서버 호출로 처리됩니다.`);
+    if (!isFormValid || submitting) return;
+    setFormError(null);
+    setSubmitting(true);
+    try {
+      // strict 스키마 정합: 정의된 필드만 담는다(agree/passwordConfirm 제외 → PII 구조적 거부 회피).
+      const fd = new FormData();
+      fd.set('email', email);
+      fd.set('password', password);
+      if (mode === 'signup') {
+        fd.set('nickname', nickname);
+        const res = await signUp(fd);
+        if (res && 'error_code' in res) {
+          setFormError(formErrorMessage(res.error_code));
+          return;
+        }
+        // 자동 로그인 아님 — 이메일 확인 안내 화면으로 전환(폼 언마운트).
+        setSignupSentTo(email);
+      } else {
+        // 로그인 후 복귀 경로: ?next= 를 서버 액션에 그대로 넘겨 safeInternalPath 재검증.
+        const next = new URLSearchParams(window.location.search).get('next');
+        if (next) fd.set('to', next);
+        const res = await signIn(fd);
+        if (res && 'error_code' in res) {
+          setFormError(formErrorMessage(res.error_code));
+          return;
+        }
+        // 세션 쿠키가 확실히 실리도록 전체 내비게이션으로 이동.
+        window.location.assign(res.redirect_to);
+      }
+    } catch {
+      setFormError('처리 중 문제가 발생했어요. 잠시 후 다시 시도해 주세요.');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -110,6 +156,33 @@ export default function LoginPage() {
 
       <main className="flex-1 flex items-center justify-center p-[30px_20px_60px] md:p-[40px_20px_80px]" id="main">
         <div className="w-full max-w-[440px] bg-white rounded-[22px] p-[44px_40px_36px] border border-line-light shadow-[0_12px_40px_-20px_rgba(13,95,109,0.18)]">
+          {signupSentTo ? (
+            <div className="text-center py-2">
+              <div className="mb-6">
+                <h1 className="font-serif font-semibold text-[26px] text-text-main tracking-[-0.01em] mb-3">
+                  확인 메일을 보냈어요
+                </h1>
+                <p className="font-sans text-[14px] text-text-soft leading-[1.8]">
+                  <span className="text-text-main font-semibold break-all">{signupSentTo}</span>로 인증 메일을 보냈습니다.
+                  메일의 링크를 눌러 가입을 완료해 주세요. 메일이 안 보이면 스팸함도 확인해 주세요.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setSignupSentTo(null);
+                  setFormError(null);
+                  setMode('login');
+                  setPassword('');
+                  setPasswordConfirm('');
+                }}
+                className="w-full p-3.5 bg-accent-main text-white border-none rounded-[11px] font-sans font-semibold text-[15px] cursor-pointer transition-all hover:bg-accent-deep hover:-translate-y-[1px] hover:shadow-[0_8px_20px_-8px_rgba(26,142,156,0.5)]"
+              >
+                로그인 화면으로
+              </button>
+            </div>
+          ) : (
+          <>
           <div className="text-center mb-7">
             <h1 className="font-serif font-semibold text-[26px] text-text-main tracking-[-0.01em] mb-1.5">
               {copy[mode].title}
@@ -138,6 +211,7 @@ export default function LoginPage() {
                 setPasswordConfirm('');
                 setAgreeTerms(false);
                 setAgreePrivacy(false);
+                setFormError(null);
               }}
               role="tab"
               aria-selected={mode === 'login'}
@@ -147,7 +221,7 @@ export default function LoginPage() {
             <button
               type="button"
               className={`flex-1 p-2.5 rounded-[9px] font-sans text-[14px] transition-all cursor-pointer border-none ${mode === 'signup' ? 'bg-white text-text-main font-semibold shadow-[0_2px_8px_-3px_rgba(13,95,109,0.2)]' : 'bg-transparent text-text-soft font-medium hover:text-text-main'}`}
-              onClick={() => setMode('signup')}
+              onClick={() => { setMode('signup'); setFormError(null); }}
               role="tab"
               aria-selected={mode === 'signup'}
             >
@@ -170,6 +244,15 @@ export default function LoginPage() {
           <div className="text-center my-2 mb-[22px] relative h-3 before:content-[''] before:absolute before:top-1/2 before:left-0 before:w-[calc(50%-56px)] before:h-px before:bg-line-light after:content-[''] after:absolute after:top-1/2 after:right-0 after:w-[calc(50%-56px)] after:h-px after:bg-line-light">
             <span className="font-sans text-[11.5px] text-text-mute tracking-[0.02em] bg-white px-2">또는 이메일로</span>
           </div>
+
+          {formError && (
+            <div
+              role="alert"
+              className="mb-4 rounded-xl border border-error/40 bg-error/5 p-[12px_14px] font-sans text-[13px] text-error leading-[1.6]"
+            >
+              {formError}
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} noValidate>
             <div className="mb-4">
@@ -266,15 +349,17 @@ export default function LoginPage() {
 
             <button
               type="submit"
-              disabled={!isFormValid}
+              disabled={!isFormValid || submitting}
               className={`w-full p-3.5 border-none rounded-[11px] font-sans font-semibold text-[15px] tracking-[0.01em] transition-all
-                ${isFormValid 
-                  ? 'bg-accent-main text-white cursor-pointer hover:bg-accent-deep hover:-translate-y-[1px] hover:shadow-[0_8px_20px_-8px_rgba(26,142,156,0.5)]' 
+                ${isFormValid && !submitting
+                  ? 'bg-accent-main text-white cursor-pointer hover:bg-accent-deep hover:-translate-y-[1px] hover:shadow-[0_8px_20px_-8px_rgba(26,142,156,0.5)]'
                   : 'bg-line-light text-text-mute cursor-not-allowed'}`}
             >
-              {mode === 'login' ? '로그인' : '계정 만들기'}
+              {submitting ? '처리 중…' : mode === 'login' ? '로그인' : '계정 만들기'}
             </button>
           </form>
+          </>
+          )}
 
           <div className="mt-7 pt-5 border-t border-line-soft text-center">
             <p className="font-sans text-[11.5px] text-text-mute leading-[1.85]">결제 정보를 받지 않습니다 · 광고 없음</p>
