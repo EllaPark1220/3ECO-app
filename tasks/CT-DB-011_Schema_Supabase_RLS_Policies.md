@@ -14,6 +14,25 @@ assignees: ''
 - **기능명**: [CT-DB-011] Supabase 의 모든 테이블에 Row-Level Security (RLS) 정책 적용 — anon·authenticated·service_role 별 권한 명시 + 본인 데이터만 접근 + INV-07 (TeacherFeedback INSERT 는 TEACHER 만) 강제 + EventLog append-only 강제
 - **목적**: defense-in-depth 의 마지막 방어선. 애플리케이션 가드 (FR-AUTH-002) 가 1차 방어, **RLS 가 데이터 레이어 마지막 방어**. 코드 버그·SQL injection·service_role 키 유출 시에도 다른 사용자 데이터 보호. INV-06 (단방향 해시 — Supabase Auth) + INV-07 (역할 격리) + INV-11 (EventLog append-only) 의 데이터 레이어 강제.
 
+## :wrench: 구현 현황·편차 (2026-07-10 · PR `feat/ct-db-011-rls`) — 부분 완료
+
+> 이 태스크는 **9개 테이블 전체**를 상정하나, 현재 DB엔 **3개 테이블만 존재**(User·Lesson·LessonProgress, +`_prisma_migrations`). 나머지(Stamp·OxQuestion·TeacherFeedback·TeacherKit·EventLog·Module)는 **CT-DB-005~010 미구현** → RLS도 그 모델 착수 시 함께. 본 PR은 **현존 테이블 subset**만 적용.
+
+**적용된 것 (staging·prod 실측 검증 완료):**
+- `Lesson`: ENABLE + `lesson_select_public`(anon+authenticated `USING(true)`) — 공개 읽기 ✅
+- `User`: ENABLE + `user_select_self`(authenticated `(select auth.uid())::text = id`) — 본인 읽기 ✅
+- `LessonProgress`: ENABLE + `progress_select_self`(authenticated `(select auth.uid())::text = "userId"`) ✅
+- `_prisma_migrations`: ENABLE + 정책 0개(deny-all) ✅
+- 마이그레이션: `prisma/migrations/20260709235613_enable_rls_ct_db_011/` (raw SQL, 코드 영속)
+
+**설계 편차 2건 (의도적, 사용자 승인 2026-07-10):**
+1. **쓰기 정책 없음(읽기 self만).** 스펙의 `*_insert_self`·`*_update_self`(User UPDATE self 포함) **미채택**. 이유: User·LessonProgress **쓰기는 100% 서버(Prisma + `requireUser` 가드) 전담** → 공개 API(anon/authenticated) 쓰기 문을 아예 안 여는 게 더 안전(deny-all). 클라 직접 쓰기 도입 시 `WITH CHECK` self-write 정책 추가.
+2. **RLS 의 방어 대상 정정 — Prisma 는 RLS 에 안 걸린다.** 실측: Prisma 접속 role=`postgres`(테이블 owner + `rolbypassrls=true`) → **RLS 자동 우회.** 따라서 스펙 Scenario 2/6/8 의 "Prisma 쿼리가 RLS 로 0건 차단"은 **이 프로젝트 접속 구조에선 성립하지 않음**. RLS 가 실제 방어하는 면 = **PostgREST 공개 API(`/rest/v1`, anon 키) 경로**. 앱 자체 IDOR 차단은 RLS 가 아니라 **애플리케이션 레이어(FR-AUTH-002 + 세션 userId)** 가 담당 = 1차 방어. RLS = 공개 API 표면의 defense-in-depth(2차). `FORCE ROW LEVEL SECURITY` 는 owner(Prisma)까지 깨므로 **미사용**.
+
+**실측 검증(양 환경):** RLS 전 anon 키로 `/rest/v1/User` → 이메일 포함 행 노출(200) → RLS 후 `[]`(차단). `Lesson` 은 후에도 공개 읽기 유지. Prisma CRUD 는 RLS 후에도 정상(우회).
+
+**남은 범위(후속, 미완):** 6개 테이블 RLS(모델 착수 시) · INV-07(TeacherFeedback INSERT=TEACHER, `WITH CHECK`) · INV-11(EventLog append-only) · `docs/rls-debug.md` · TS-IT-013. → 이 태스크는 **DoD 미충족(부분)**, 오픈 유지.
+
 ## :link: References (Spec & Context)
 > :bulb: AI Agent & Dev Note: 작업 시작 전 아래 문서를 반드시 먼저 Read/Evaluate 할 것.
 - SRS 문서:
