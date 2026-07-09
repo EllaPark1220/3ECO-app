@@ -1,5 +1,9 @@
-// FW-AUTH-004 — 이메일 확인 콜백. 코드→세션 교환 후 확인된 계정만 public.User 등록.
+// FW-AUTH-004 — 인증 콜백. 확인된 계정만 public.User 등록.
+//  - 이메일 확인/비번재설정: token_hash + verifyOtp (Supabase SSR 권장). PKCE code_verifier
+//    쿠키 의존·메일 클라이언트 링크 프리페치로 인한 일회용 code 소비(=confirm_failed) 취약성을 회피.
+//  - OAuth(카카오): code + exchangeCodeForSession.
 import { NextResponse, type NextRequest } from "next/server";
+import type { EmailOtpType } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { syncConfirmedUser } from "@/lib/auth/sync-user";
 import { safeInternalPath } from "@/lib/auth/redirect";
@@ -9,6 +13,8 @@ export const dynamic = "force-dynamic";
 export async function GET(req: NextRequest) {
   const { searchParams, origin } = new URL(req.url);
   const code = searchParams.get("code");
+  const tokenHash = searchParams.get("token_hash");
+  const type = searchParams.get("type") as EmailOtpType | null;
   const oauthError = searchParams.get("error");
   const next = safeInternalPath(searchParams.get("next"));
 
@@ -17,13 +23,21 @@ export async function GET(req: NextRequest) {
     console.error(`[auth/callback] oauth 거부 error=${oauthError}`);
     return NextResponse.redirect(`${origin}/login?error=oauth_canceled`);
   }
-  if (!code) {
-    return NextResponse.redirect(`${origin}/login?error=missing_code`);
-  }
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.exchangeCodeForSession(code);
-  if (error) {
+
+  // 이메일 확인(token_hash) 우선, OAuth(code) 차선. 둘 다 없으면 잘못된 진입.
+  const result =
+    tokenHash && type
+      ? await supabase.auth.verifyOtp({ type, token_hash: tokenHash })
+      : code
+        ? await supabase.auth.exchangeCodeForSession(code)
+        : null;
+
+  if (!result) {
+    return NextResponse.redirect(`${origin}/login?error=missing_code`);
+  }
+  if (result.error) {
     // 만료·재사용 등 — 존재/원인 비노출 일반 코드
     return NextResponse.redirect(`${origin}/login?error=confirm_failed`);
   }

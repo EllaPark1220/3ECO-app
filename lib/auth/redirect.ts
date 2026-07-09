@@ -11,7 +11,7 @@ function hasControlChar(s: string): boolean {
 
 export function safeInternalPath(
   raw: string | null | undefined,
-  fallback = "/lessons",
+  fallback = "/", // 로그인·가입확인 후 착지(홈). `/lessons` 인덱스는 아직 없음(404) → 홈으로.
 ): string {
   if (!raw || !raw.startsWith("/")) return fallback;
   if (raw.startsWith("//") || raw.startsWith("/\\")) return fallback; // 프로토콜-상대·백슬래시

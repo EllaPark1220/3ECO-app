@@ -171,7 +171,7 @@ describe("signIn() / signOut() (FW-AUTH-003 / TS-UT-002)", () => {
 
   it("오픈 리다이렉트 to=//evil.com → 내부 기본값", async () => {
     const res = await signIn(fd({ ...login, to: "//evil.com" }));
-    expect(res).toEqual({ ok: true, redirect_to: "/lessons" });
+    expect(res).toEqual({ ok: true, redirect_to: "/" });
   });
 
   it("검증 실패(빈 입력) → INVALID_CREDENTIALS, signInWithPassword 미호출", async () => {
@@ -298,12 +298,12 @@ describe("signInWithKakao() (FW-AUTH-006)", () => {
     );
   });
 
-  it("오픈 리다이렉트 next=//evil.com → 내부 기본값(/lessons)으로 차단", async () => {
+  it("오픈 리다이렉트 next=//evil.com → 내부 기본값(/)으로 차단", async () => {
     await signInWithKakao("//evil.com");
     expect(oauthMock).toHaveBeenCalledWith(
       expect.objectContaining({
         options: expect.objectContaining({
-          redirectTo: expect.stringContaining("next=%2Flessons"),
+          redirectTo: expect.stringContaining("next=%2F"),
         }),
       }),
     );
