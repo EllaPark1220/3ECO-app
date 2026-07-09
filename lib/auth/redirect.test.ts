@@ -22,12 +22,12 @@ describe("safeInternalPath (FW-AUTH-004 오픈 리다이렉트 가드)", () => {
     " /lessons",
     "/lessons ",
   ])("외부/불량 %s → 기본값으로 차단", (p) => {
-    expect(safeInternalPath(p as string | null)).toBe("/lessons");
+    expect(safeInternalPath(p as string | null)).toBe("/");
   });
 
   it("제어문자(개행·탭) 포함 경로 차단", () => {
-    expect(safeInternalPath("/a\nb")).toBe("/lessons");
-    expect(safeInternalPath("/a\tb")).toBe("/lessons");
+    expect(safeInternalPath("/a\nb")).toBe("/");
+    expect(safeInternalPath("/a\tb")).toBe("/");
   });
 
   it("커스텀 fallback 적용", () => {

@@ -1,13 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-const { exchangeMock, getUserMock, syncMock } = vi.hoisted(() => ({
+const { exchangeMock, verifyOtpMock, getUserMock, syncMock } = vi.hoisted(() => ({
   exchangeMock: vi.fn(),
+  verifyOtpMock: vi.fn(),
   getUserMock: vi.fn(),
   syncMock: vi.fn(),
 }));
 vi.mock("@/lib/supabase/server", () => ({
   createClient: vi.fn(async () => ({
-    auth: { exchangeCodeForSession: exchangeMock, getUser: getUserMock },
+    auth: {
+      exchangeCodeForSession: exchangeMock,
+      verifyOtp: verifyOtpMock,
+      getUser: getUserMock,
+    },
   })),
 }));
 vi.mock("@/lib/auth/sync-user", () => ({ syncConfirmedUser: syncMock }));
@@ -25,6 +30,7 @@ function location(res: Response): string {
 
 beforeEach(() => {
   exchangeMock.mockReset().mockResolvedValue({ error: null });
+  verifyOtpMock.mockReset().mockResolvedValue({ error: null });
   getUserMock
     .mockReset()
     .mockResolvedValue({ data: { user: { id: "u1", email: "a@b.com" } } });
@@ -32,16 +38,36 @@ beforeEach(() => {
 });
 
 describe("GET /auth/callback (FW-AUTH-004)", () => {
-  it("정상 code → 교환 + sync + next 리다이렉트", async () => {
+  it("정상 code(OAuth) → 교환 + sync + next 리다이렉트", async () => {
     const res = await GET(req("?code=abc&next=/lessons"));
     expect(exchangeMock).toHaveBeenCalledWith("abc");
+    expect(verifyOtpMock).not.toHaveBeenCalled();
     expect(syncMock).toHaveBeenCalledOnce();
     expect(location(res)).toBe(`${ORIGIN}/lessons`);
   });
 
-  it("code 없음 → missing_code, 교환 미호출", async () => {
+  it("정상 token_hash(이메일 확인) → verifyOtp + sync + next 리다이렉트", async () => {
+    const res = await GET(req("?token_hash=xyz&type=email&next=/stamp-map"));
+    expect(verifyOtpMock).toHaveBeenCalledWith({
+      type: "email",
+      token_hash: "xyz",
+    });
+    expect(exchangeMock).not.toHaveBeenCalled();
+    expect(syncMock).toHaveBeenCalledOnce();
+    expect(location(res)).toBe(`${ORIGIN}/stamp-map`);
+  });
+
+  it("token_hash 만료·재사용 → confirm_failed, sync 미호출", async () => {
+    verifyOtpMock.mockResolvedValueOnce({ error: { message: "expired" } });
+    const res = await GET(req("?token_hash=stale&type=email"));
+    expect(syncMock).not.toHaveBeenCalled();
+    expect(location(res)).toBe(`${ORIGIN}/login?error=confirm_failed`);
+  });
+
+  it("code·token_hash 둘 다 없음 → missing_code, 교환·verifyOtp 미호출", async () => {
     const res = await GET(req(""));
     expect(exchangeMock).not.toHaveBeenCalled();
+    expect(verifyOtpMock).not.toHaveBeenCalled();
     expect(location(res)).toBe(`${ORIGIN}/login?error=missing_code`);
   });
 
@@ -60,9 +86,9 @@ describe("GET /auth/callback (FW-AUTH-004)", () => {
     spy.mockRestore();
   });
 
-  it("오픈 리다이렉트 next=//evil.com → 내부 기본값으로 차단", async () => {
+  it("오픈 리다이렉트 next=//evil.com → 내부 기본값(/)으로 차단", async () => {
     const res = await GET(req("?code=abc&next=//evil.com"));
-    expect(location(res)).toBe(`${ORIGIN}/lessons`);
+    expect(location(res)).toBe(`${ORIGIN}/`);
   });
 
   it("sync 실패 → sync_failed graceful 리다이렉트", async () => {
