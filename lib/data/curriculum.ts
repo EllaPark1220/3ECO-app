@@ -62,6 +62,31 @@ export const TOTAL_LESSONS = LESSONS.length;
 export const getFlatLesson = (lessonId: string): FlatLesson | undefined =>
   LESSONS.find((l) => l.lessonId === lessonId);
 
+/**
+ * 레슨 라우트 파라미터 → 정규 lessonId(L\d{3}) 정규화 (W11-T6 · 접근 ②).
+ * 저장소에 공존하는 두 링크 계열을 모두 흡수한다:
+ *   - `L\d{3}`  — app/page.tsx 계열. 평탄 목록에 존재하면 그대로 반환.
+ *   - `vol-ep`  — stamp-map(주 진척 표면)·dictionary·teacher-kit·not-found·breadcrumb 계열.
+ *                 volume + episodeInVolume 조합으로 평탄 목록을 역조회(하드코딩 매핑표 없음 —
+ *                 build() 가 만든 lessonId 를 그대로 재사용).
+ * 그 외/미존재 → null (호출자 page 가 notFound()).
+ */
+export function resolveLessonId(param: string): string | null {
+  if (/^L\d{3}$/.test(param)) {
+    return LESSONS.some((l) => l.lessonId === param) ? param : null;
+  }
+  const m = /^(\d+)-(\d+)$/.exec(param);
+  if (m) {
+    const volume = Number(m[1]);
+    const episodeInVolume = Number(m[2]);
+    const hit = LESSONS.find(
+      (l) => l.volume === volume && l.episodeInVolume === episodeInVolume,
+    );
+    return hit ? hit.lessonId : null;
+  }
+  return null;
+}
+
 export interface ModuleMeta {
   module_id: string;
   name: string;
