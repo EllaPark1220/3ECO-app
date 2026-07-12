@@ -11,13 +11,17 @@ import {
 } from "@/lib/contracts/lesson";
 import { getFlatLesson } from "./curriculum";
 
+// 스모크용 실존 임베드 영상 — L001 한정 오버라이드(이어보기 검증용). 나머지 편은 기존
+// placeholder 유지. 실제 영상은 CT-DB-003(3매체 컬럼)/W14 CMS 연동 시 DB 에서 읽어 교체.
+const SMOKE_VIDEO_IDS: Record<string, string> = { L001: "aqz-KE-bpKQ" };
+
 export async function getLesson(lessonId: string): Promise<LessonResponse | null> {
   const l = getFlatLesson(lessonId);
   if (!l) return null;
   const dto: LessonResponse = {
     lesson_id: l.lessonId,
     title: l.title,
-    youtube_video_id: "5R0epUboFsk", // MOCK — 실제 영상 ID 는 CMS 연동 시 교체(W14)
+    youtube_video_id: SMOKE_VIDEO_IDS[l.lessonId] ?? "5R0epUboFsk", // MOCK(그 외 편) — W14 교체
     script:
       `[${l.area}] ${l.title}\n\n` +
       `핵심 개념: ${l.concepts}\n\n` +
