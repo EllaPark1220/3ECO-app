@@ -13,7 +13,7 @@ import { getFlatLesson } from "./curriculum";
 
 // 스모크용 실존 임베드 영상 — L001 한정 오버라이드(이어보기 검증용). 나머지 편은 기존
 // placeholder 유지. 실제 영상은 CT-DB-003(3매체 컬럼)/W14 CMS 연동 시 DB 에서 읽어 교체.
-const SMOKE_VIDEO_IDS: Record<string, string> = { L001: "aqz-KE-bpKQ" };
+const SMOKE_VIDEO_IDS: Record<string, string> = { L001: "oLPoeKtsvXc" };
 
 export async function getLesson(lessonId: string): Promise<LessonResponse | null> {
   const l = getFlatLesson(lessonId);
