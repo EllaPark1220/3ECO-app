@@ -16,7 +16,12 @@ vi.mock("@/lib/auth/session", async (importOriginal) => {
   return { ...actual, getCurrentUser: getCurrentUserMock };
 });
 
-import { saveProgressCore, getResumePosition } from "./progress";
+import {
+  saveProgressCore,
+  getResumePosition,
+  getViewerProgress,
+} from "./progress";
+import { AuthError } from "@/lib/auth/session";
 
 const savedRow = {
   id: "p1",
@@ -116,5 +121,56 @@ describe("getResumePosition() (결정6 — graceful)", () => {
     getCurrentUserMock.mockResolvedValueOnce({ id: "u1" });
     findUniqueMock.mockResolvedValueOnce(null);
     await expect(getResumePosition("L001")).resolves.toBe(0);
+  });
+});
+
+describe("getViewerProgress() (공개 시청 — 절대 throw 안 함, 익명 degrade)", () => {
+  it("익명(getCurrentUser null) → {0, false}, DB 조회 안 함", async () => {
+    getCurrentUserMock.mockResolvedValueOnce(null);
+    await expect(getViewerProgress("L001")).resolves.toEqual({
+      initialPositionSec: 0,
+      sessionActive: false,
+    });
+    expect(findUniqueMock).not.toHaveBeenCalled();
+  });
+
+  it("로그인 + 진척 있음 → {position, true}", async () => {
+    getCurrentUserMock.mockResolvedValueOnce({ id: "u1" });
+    findUniqueMock.mockResolvedValueOnce({ lastPositionSec: 200 });
+    await expect(getViewerProgress("L001")).resolves.toEqual({
+      initialPositionSec: 200,
+      sessionActive: true,
+    });
+  });
+
+  it("로그인 + 진척 없음 → {0, true}", async () => {
+    getCurrentUserMock.mockResolvedValueOnce({ id: "u1" });
+    findUniqueMock.mockResolvedValueOnce(null);
+    await expect(getViewerProgress("L001")).resolves.toEqual({
+      initialPositionSec: 0,
+      sessionActive: true,
+    });
+  });
+
+  it("broken-sync(getCurrentUser AuthError throw) → 익명 degrade {0, false} (500 방지)", async () => {
+    getCurrentUserMock.mockRejectedValueOnce(new AuthError("INTERNAL_ERROR"));
+    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    await expect(getViewerProgress("L001")).resolves.toEqual({
+      initialPositionSec: 0,
+      sessionActive: false,
+    });
+    expect(spy).toHaveBeenCalled(); // anomaly 로깅
+    spy.mockRestore();
+  });
+
+  it("DB 조회 실패(findUnique throw) → 익명 degrade {0, false}", async () => {
+    getCurrentUserMock.mockResolvedValueOnce({ id: "u1" });
+    findUniqueMock.mockRejectedValueOnce(new Error("db down"));
+    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    await expect(getViewerProgress("L001")).resolves.toEqual({
+      initialPositionSec: 0,
+      sessionActive: false,
+    });
+    spy.mockRestore();
   });
 });

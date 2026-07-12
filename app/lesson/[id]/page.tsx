@@ -1,14 +1,13 @@
 // FR-LES-003 / W11-T6 — 레슨 시청 페이지(Server Component).
 // 라우트 파라미터를 정규 lessonId 로 정규화(접근 ②, resolveLessonId) → 미존재는 notFound.
-// getLesson seam 으로 youtube_video_id 확보, getResumePosition 으로 재개 위치를 서버에서 조회해
-// initialPositionSec 을 client player 에 주입(SSR 첫 페인트 반영, fetch 왕복 0).
+// getLesson seam 으로 youtube_video_id 확보, getViewerProgress 로 재개 위치·세션 여부를 서버에서
+// 조회해(throw 흡수·익명 degrade) client player 에 주입(SSR 첫 페인트 반영, fetch 왕복 0).
 // 진척 저장/재개만 이 슬라이스의 대상 — OX·완료모달·헤더/브레드크럼은 프로토타입 유지(스코프 밖).
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { resolveLessonId } from "@/lib/data/curriculum";
 import { getLesson } from "@/lib/data/lesson";
-import { getResumePosition } from "@/lib/services/progress";
-import { getCurrentUser } from "@/lib/auth/session";
+import { getViewerProgress } from "@/lib/services/progress";
 import LessonPlayerClient from "./components/LessonPlayerClient";
 import LessonOxQuiz from "./components/LessonOxQuiz";
 
@@ -24,12 +23,9 @@ export default async function LessonPage({
   const lesson = await getLesson(lessonId);
   if (!lesson) notFound();
 
-  // 재개 위치(서버 조회) + 세션 여부. getCurrentUser 는 React.cache 로 getResumePosition 과 dedupe.
-  const [initialPositionSec, user] = await Promise.all([
-    getResumePosition(lessonId),
-    getCurrentUser(),
-  ]);
-  const sessionActive = user !== null;
+  // 재개 위치 + 세션 여부(서버 조회). 시청은 공개(W11-T7)이므로 세션/진척 읽기 실패는
+  // 절대 페이지를 500 내지 않고 익명 뷰로 degrade — getViewerProgress 가 throw 를 흡수한다.
+  const { initialPositionSec, sessionActive } = await getViewerProgress(lessonId);
 
   return (
     <div className="min-h-screen font-sans" style={{ background: 'var(--bg-light)', color: 'var(--text-main)', lineHeight: 1.78, fontSize: '16px' }}>
