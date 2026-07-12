@@ -184,15 +184,15 @@ assignees: ''
   - 일시정지 중 저장 (DB 부하 + 사용자 의도 위배)
 
 ## :checkered_flag: Definition of Done (DoD)
-- [ ] 10개 GWT 시나리오 전부 통과
-- [ ] `usePositionSync.ts` 훅 구현
-- [ ] YouTube IFrame API 통합 (FR-LES-003 와 정합)
-- [ ] beforeunload + sendBeacon 통합
-- [ ] `/api/progress/sync` Route Handler 추가
-- [ ] 메모리 누수 부재 검증 (Chrome DevTools Memory profile)
-- [ ] 다중 탭 시나리오 검증
-- [ ] PR 본문에 "Story 4 의 자동 저장 진입점. FW-PROG-001 의 호출자" 명시
-- [ ] Linter 경고 0건
+- [~] 10개 GWT 시나리오 — 단위(Vitest) 커버: S1(10초 저장)·S2(일시정지 skip)·S3(재개 재저장)·S4(중복 skip)·S5(unload→sendBeacon)·S7(cleanup)·S10(익명 미저장). S6/S8/S9(401·다중탭·네트워크)는 E2E(TS-E2E-002)로 이월
+- [x] `usePositionSync.ts` 훅 구현 (`app/lesson/[id]/hooks/usePositionSync.ts`)
+- [x] YouTube IFrame API 통합 (`LessonPlayerClient.tsx` — enablejsapi=1, onReady seek)
+- [x] beforeunload + sendBeacon 통합 — `pagehide`(bfcache·모바일 안전 최신 대체) + unmount cleanup 이중 flush
+- [x] `/api/progress/sync` Route Handler (W11 #234 기존 — sendBeacon transport 재사용)
+- [ ] 메모리 누수 부재 검증 (Chrome DevTools Memory profile) — cleanup(clearInterval+listener 제거) 구현, 프로파일 측정은 이월
+- [ ] 다중 탭 시나리오 검증 — E2E 이월
+- [x] PR 본문에 "Story 4 의 자동 저장 진입점. FW-PROG-001 의 호출자" 명시
+- [x] Linter 경고 0건 (신규 파일 eslint clean)
 
 ## :construction: Dependencies & Blockers
 - **Depends on**:

@@ -97,16 +97,16 @@ assignees: ''
   - OX 완료 사용자에게 재시청 차단 또는 경고
 
 ## :checkered_flag: Definition of Done (DoD)
-- [ ] 8개 GWT 시나리오 전부 통과
-- [ ] `getLastPosition()` Server Action + `useLessonResume()` 훅 구현
-- [ ] YouTube IFrame API `seekTo` 통합 동작 검증
-- [ ] 재개 토스트 + "처음부터 보기" 버튼 UI 동작
-- [ ] OX 완료 사용자 재시청 시나리오 (Scenario 4) 검증
-- [ ] 100회 자동화 시나리오 (Scenario 8) 실패 < 2건 — REQ-FUNC-021 AC 충족
-- [ ] 응답 시간 p95 ≤ 100ms 측정
-- [ ] TS-IT-007 (100회 재개 시나리오) 통과
-- [ ] PR 본문에 "Story 4 의 핵심 — Story 1 의 학습 루프와 결합하여 단편 세션 완주율 보호" 명시
-- [ ] Linter 경고 0건
+- [~] 8개 GWT 시나리오 — 단위 커버: S1(0초 seek 생략)·S2(재진입 seek)·S3(처음부터 보기)·S5(익명 0). S6/S7/S8(다기기·부하·100회 오차)은 E2E/부하로 이월
+- [x] 재개 조회 + 클라 통합 — `getResumePosition()`(W11 #234) + RSC 서버 주입(`initialPositionSec`) + `seekToResume()`(onReady seek). 별도 `useLessonResume` 대신 RSC prop 주입 방식(W11-T6 결정)
+- [x] YouTube IFrame API `seekTo` 통합 (onReady → `seekTo(initialPositionSec, true)`, 단위 테스트)
+- [x] 재개 토스트 + "처음부터 보기" 버튼 UI 동작 (`LessonPlayerClient` — resume>0 시 차분한 안내, 5초 자동 dismiss)
+- [ ] OX 완료 사용자 재시청 시나리오 (Scenario 4) — OX/배지는 FW-OX 소관(스코프 밖)
+- [ ] 100회 자동화 시나리오 (Scenario 8) 실패 < 2건 — E2E 이월
+- [ ] 응답 시간 p95 ≤ 100ms 측정 — 부하 이월
+- [ ] TS-IT-007 (100회 재개 시나리오) 통과 — 이월
+- [x] PR 본문에 "Story 4 의 핵심 — Story 1 의 학습 루프와 결합하여 단편 세션 완주율 보호" 명시
+- [x] Linter 경고 0건 (신규 파일 eslint clean)
 
 ## :construction: Dependencies & Blockers
 - **Depends on**:
