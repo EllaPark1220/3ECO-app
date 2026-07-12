@@ -1,5 +1,7 @@
 # [Feature] FR-PROG-001: 재진입 시 last_position_sec 조회 → ≤5초 오차 복원
 
+> ✅ **DONE — W11 클로즈 (2026-07-13).** PR #238(RSC 주입 + seekTo) + #240(getViewerProgress graceful) + 이어보기 실측 통과. 남은 미체크 DoD(100회 재개·p95)는 E2E/부하로 **이월**. 상세: `docs/session-records/SESSION_HISTORY_2026-07-13.md`.
+
 ```yaml
 ---
 name: Feature Task

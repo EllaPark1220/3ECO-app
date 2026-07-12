@@ -1,5 +1,7 @@
 # [Feature] FW-PROG-002: usePositionSync() 훅 — YouTube iframe API 활용 10초 간격 위치 송신
 
+> ✅ **DONE — W11 클로즈 (2026-07-13).** PR #238 배선 + 이어보기 실측 통과. 남은 미체크 DoD(다중 탭·메모리 프로파일)는 E2E/부하로 **이월**. 상세: `docs/session-records/SESSION_HISTORY_2026-07-13.md`.
+
 ```yaml
 ---
 name: Feature Task
