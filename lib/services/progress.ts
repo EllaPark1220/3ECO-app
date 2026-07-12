@@ -77,3 +77,36 @@ export async function getResumePosition(lessonId: string): Promise<number> {
   });
   return progress?.lastPositionSec ?? 0;
 }
+
+/**
+ * 공개 시청 표면용 뷰어 컨텍스트 — **절대 throw 하지 않는다**(W11-T7: 레슨 시청은 비로그인 공개).
+ * getCurrentUser 는 auth↔public sync 깨짐 시 AuthError 를 던지는 가드용 헬퍼라, 이를 그대로
+ * 렌더 경로에 쓰면 세션/DB 이상이 공개 페이지를 500 으로 무너뜨린다. 여기서는 어떤 실패든
+ * 익명 뷰로 degrade 한다: { initialPositionSec: 0, sessionActive: false }.
+ * (쓰기 경로는 계속 strict requireUser 로 401 — 이 완화는 읽기·공개 시청 전용.)
+ */
+export async function getViewerProgress(
+  lessonId: string,
+): Promise<{ initialPositionSec: number; sessionActive: boolean }> {
+  try {
+    const user = await getCurrentUser();
+    if (!user) return { initialPositionSec: 0, sessionActive: false }; // 익명 — 정상
+    const progress = await prisma.lessonProgress.findUnique({
+      where: { userId_lessonId: { userId: user.id, lessonId } },
+      select: { lastPositionSec: true },
+    });
+    return {
+      initialPositionSec: progress?.lastPositionSec ?? 0,
+      sessionActive: true,
+    };
+  } catch (e) {
+    // 세션 해석/진척 조회 실패(broken-sync AuthError·일시적 DB 오류 등). 시청은 공개이므로
+    // 페이지를 죽이지 않고 익명 뷰로 degrade + 이상 신호만 남긴다.
+    // TODO(CT-DB-009): EventLog progress.anomaly / auth.sync_broken 발행.
+    console.error(
+      `[getViewerProgress] 세션/진척 읽기 실패 — 익명 뷰로 degrade lesson=${lessonId}`,
+      e,
+    );
+    return { initialPositionSec: 0, sessionActive: false };
+  }
+}
