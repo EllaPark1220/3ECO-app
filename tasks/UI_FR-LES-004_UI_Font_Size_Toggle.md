@@ -26,6 +26,13 @@ assignees: ''
 - WCAG 참고: WCAG 2.1 SC 1.4.4 (Resize Text — 200% 확대 시 콘텐츠 손실 0)
 - 선행: FW-AUTH-005 (영속화 Write), FR-LES-003 (시청 페이지 호스트)
 
+## :broom: 현재 구현 현황 — 정리 필요 (착수 시 선행)
+> PR #238(W11 진척 배선) 재검증 중 발견. 본 태스크 착수 시 **먼저 처리**한다.
+- `app/lesson/[id]/components/FontSizeToggle.tsx` 에 #216(prototype→app 이전) 유래 **고아 스텁**이 존재. 어느 컴포넌트에서도 import 되지 않음(참조: 본 task 문서·TS-E2E-003 뿐).
+- **스펙 위반**: 스텁은 `SMALL/MEDIUM/LARGE` **3단계** — 본 태스크가 요구하는 `XS/S/L/XL`(14/18/22/28px) **4단계** 및 line 142 금지 조항("3단계 금지")과 정면 충돌. 또한 shadcn ToggleGroup·FW-AUTH-005 영속화·rem/CSS var 패턴 미적용(단순 useState+localStorage).
+- **Lint 2건**(repo-wide lint 시 표면화): `react-hooks/set-state-in-effect`(effect 내 동기 setState), `applyFontSize` 선언 전 접근(TDZ). — PR #238 은 이 파일 미변경(스코프 밖).
+- **권고**: 스펙 위반 스텁에 lint 패치만 하지 말 것. 본 태스크 정식 구현 시 **삭제 후 재작성**(4단계 + shadcn + 영속화)이 정답. 재작성 전까지는 orphan 이라 런타임 영향 없음.
+
 ## :white_check_mark: Task Breakdown (실행 계획)
 - [ ] `app/lesson/[id]/components/FontSizeToggle.tsx` Client Component
 - [ ] **shadcn/ui `Select` 또는 `ToggleGroup` 활용** (Radix 기반 — 키보드·ARIA 자동)
