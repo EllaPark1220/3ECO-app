@@ -533,10 +533,8 @@ export default function Home() {
               <div>
                 <h4 className="font-mono text-[11px] tracking-[0.2em] text-white/45 uppercase font-semibold mb-4">채널</h4>
                 <ul className="space-y-2.5">
-                  <li><a href="#" className="font-sans text-[14px] text-white/65 hover:text-white transition-colors">유튜브</a></li>
-                  <li><a href="#" className="font-sans text-[14px] text-white/65 hover:text-white transition-colors">인스타그램</a></li>
-                  <li><a href="#nl-email" className="font-sans text-[14px] text-white/65 hover:text-white transition-colors">뉴스레터</a></li>
-                  <li><a href="#" className="font-sans text-[14px] text-white/65 hover:text-white transition-colors">문의</a></li>
+                  <li><a href="https://www.youtube.com/@GOYO-y1o" target="_blank" rel="noopener noreferrer" className="font-sans text-[14px] text-white/65 hover:text-white transition-colors">유튜브</a></li>
+                  <li><a href="https://www.instagram.com/goyo.economy/" target="_blank" rel="noopener noreferrer" className="font-sans text-[14px] text-white/65 hover:text-white transition-colors">인스타그램</a></li>
                 </ul>
               </div>
             </div>
