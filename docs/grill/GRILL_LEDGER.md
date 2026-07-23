@@ -49,3 +49,33 @@ RESOLVED: 9 / TOTAL: 9   (STOP: ALL_RESOLVED)
 - [x] W11-T8 | CORE  | 스탬프맵 미변경(완료=Stamp/OX 소관)                                 | depends:W11-T1  | status:RESOLVED | decision: W11 은 스탬프맵/Stamp/Module 미변경. 스탬프 획득은 OX(FW-OX) 소관, saveProgress 는 스탬프맵 revalidate 불필요(사용자별·RSC 재조회). '진행중 표시'는 게임화 금지 정신상 신중한 별도 UX 결정으로 후속 | applied: 이 원장(closeout 일괄)
 - [x] W11-T9 | MINOR | EventLog = TODO(CT-DB-009) 스텁                                     | depends:-       | status:RESOLVED | decision: progress.saved/anomaly 발행 자리는 TODO(CT-DB-009) 주석 스텁(기존 auth 코드와 동일 패턴). W11 은 발행 안 함 | applied: 이 원장, closeout 시 FW-PROG-001 노트
 ```
+
+---
+
+# FR-헤더세션 — 공용 SiteHeader 추출 + 세션 배선 (grill 세션 3)
+
+> 참조(A): app/{page,teacher-kit,dictionary,stamp-map,lesson/[id]}/page.tsx · lib/auth/session.ts · lib/services/progress.ts · app/api/auth/me/route.ts · PR #238/#240
+> 방향(B): 공용 헤더 컴포넌트 추출 + 세션(로그인 여부) 반영 배선
+> 완료(C): CORE 토픽 전부 RESOLVED — **명세만 산출, 코드 미작성**. 사용자 확인 후 goal 로 이관
+> OUTPUT(D): tasks/ 신규 FR 스펙 초안 + 이 원장 (하네스·구현은 goal 단계에서)
+> 제약: **layout.tsx 헤더 승격 금지**(admin/login/not-found/playboard 가 별도 nav 사용 → 충돌) · 스코프 최소
+
+```
+RESOLVED: 4 / TOTAL: 4   (STOP: ALL_RESOLVED)
+- [x] H1 | CORE | 세션 배선 메커니즘                                                            | depends:-     | status:RESOLVED
+- [x] H2 | CORE | orphan no-throw 가드 지점                                                     | depends:H1    | status:RESOLVED
+- [x] H3 | CORE | SiteHeader 인터페이스                                                         | depends:H1    | status:RESOLVED
+- [x] H4 | CORE | PR-A/PR-B 분할 + 스타일 drift 정규화                                          | depends:H1,H3 | status:RESOLVED
+```
+
+## 결정 로그 (세션 3)
+
+- [x] H1 | CORE | 세션 배선 메커니즘 | status:RESOLVED | decision: **옵션 4 — `app/(site)/` 라우트 그룹 + 서버 layout**에서 `getViewerSession()` 호출 → `SiteHeader`(client, `usePathname`으로 variant·active) 에 prop 주입. 1그룹·pathname 파생 variant(랜딩 dark+fixed / 그 외 light+sticky). **전제 정정 수용**: `sessionActive`(lessonId 결합·닉네임 없음) 재사용 불가 → 신규 **lesson 비결합 no-throw** `getViewerSession(): ViewerSession = {authenticated:true,nickname} | {authenticated:false}` 공통 필수, orphan(AuthError)·DB오류 폴백 `{authenticated:false}`+anomaly console.error(TODO CT-DB-009), 절대 throw 안 함. 옵션3(하이브리드) 기각. 사실확인: 5페이지 이동 시 import·테스트 무파손(저위험)·lesson 부속 layout/loading/error 없음·공유 layout은 클라 네비 간 재실행 안 됨(세션 재조회 비용 낮음). | applied: GRILL_LEDGER(세션3); 스펙 초안은 closeout 시 tasks/ 신규 FR
+- [x] H2 | CORE | orphan no-throw 가드 지점 | status:RESOLVED | decision: **함수 no-throw + 방어적 렌더 2단**, 그룹 error.tsx 미신설. ⑴ `getViewerSession()` try/catch 단일 서버 가드점(orphan/DB→{authenticated:false}), ⑵ 그룹 layout의 유일한 동적 호출이 이 no-throw 함수뿐 → layout throw 경로 없음, ⑶ `SiteHeader`(client)는 prop 순수 렌더로 `authenticated!==true`(undefined 포함) 전부 익명 처리 → "로그인" 링크. `app/(site)/error.tsx`는 throw 경로가 없어 미신설(스코프 최소), 스펙에 "향후 경화 옵션"으로만 메모. | applied: GRILL_LEDGER(세션3)
+- [x] H3 | CORE | SiteHeader 인터페이스 | status:RESOLVED | decision: **`SiteHeader({ session: ViewerSession })` client 컴포넌트**. variant(`/`→dark+fixed / 그 외 light+sticky)·active item은 `usePathname` **런타임 파생**(공유 layout이라 prop 불가), active 강조는 NAV_ITEMS(HOME·INDEX·STAMP MAP) 매칭만 — 랜딩 HOME만 신규 강조, /teacher-kit·/lesson 은 미포함이라 강조 없음(H4 기록). NAV_ITEMS 단일 배열로 링크·active DRY. 우측 슬롯: `session.authenticated ? {nickname 비링크 라벨 + "로그아웃"} : <Link href="/login">로그인</Link>`. **로그아웃 = 기존 `signOut()` Server Action → `router.refresh()`**(그룹 layout 재실행 → 익명 재렌더). 로그인/로그아웃 후 세션 즉시 반영도 동일 `router.refresh()` 조건. 신규 라우트 0. | applied: GRILL_LEDGER(세션3)
+- [x] H4 | CORE | PR-A/PR-B 분할 + 스타일 drift 정규화 | status:RESOLVED | decision: **2-PR 분할**. 추출은 헤더 1개가 5페이지를 렌더 → 페이지별 drift 보존 불가·정규값 선택 강제 → PR-A 정의 = "**기능 0변경 + 시각적 수렴**"(바이트 동일 아님). **PR-A**: `app/(site)/` 그룹 이동(git mv, import·테스트 무파손) + `SiteHeader` 추출 + 그룹 `layout.tsx` 신설 + 5개 인라인 nav 제거 + drift 정규화(light 정규값 `bg-[#F8FCFC]/90`·`md:gap-6`·`text-sm`; dark=랜딩 현행 variant 보존) + active 강조는 NAV_ITEMS 매칭만(랜딩 HOME 신규 강조·teacher-kit·lesson 강조 없음), skip-link는 light만. 헤더는 정적 `로그인` 유지(세션 0). **PR-B**: `getViewerSession()` 신설 + 그룹 layout에서 호출→SiteHeader `session` prop 주입 + 닉네임 라벨/로그아웃(`signOut()`→`router.refresh()`) + 로그인·로그아웃 후 `router.refresh()`. 검증 seam: A=5페이지 시각 동등, B=세션 반영. | applied: GRILL_LEDGER(세션3); tasks/UI_FR-HEADER-001(스펙 초안)
+
+---
+
+**세션 3 STOP: ALL_RESOLVED** — 반영: 이 원장 + tasks/UI_FR-HEADER-001_UI_SiteHeader_Session_Wiring.md(스펙 초안). 구현·이슈·하네스 반영은 goal 단계(사용자 확인 후).
+

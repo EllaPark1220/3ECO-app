@@ -34,19 +34,6 @@ export default function Home() {
 
   return (
     <main className="flex flex-col min-h-screen bg-accent-darkest text-white">
-      {/* NAV */}
-      <nav className="fixed top-0 left-0 right-0 z-[100] px-5 py-4 md:px-10 md:py-5 flex justify-between items-center backdrop-blur-md bg-[rgba(10,58,66,0.28)] border-b border-white/10 saturate-150">
-        <div className="font-serif font-semibold text-[17px] tracking-tight drop-shadow-md">
-          고요의 경제나루
-        </div>
-        <div className="flex gap-4 md:gap-7 items-center">
-          <Link href="/" className="text-[13px] md:text-sm text-white/90 font-medium hover:text-white hover:-translate-y-[1px] transition-all drop-shadow-md">HOME</Link>
-          <Link href="/dictionary" className="text-[13px] md:text-sm text-white/90 font-medium hover:text-white hover:-translate-y-[1px] transition-all drop-shadow-md">INDEX</Link>
-          <Link href="/stamp-map" className="text-[13px] md:text-sm text-white/90 font-medium hover:text-white hover:-translate-y-[1px] transition-all drop-shadow-md">STAMP MAP</Link>
-          <Link href="/login" className="text-[13px] md:text-sm text-white/90 font-medium hover:text-white hover:-translate-y-[1px] transition-all drop-shadow-md">로그인</Link>
-        </div>
-      </nav>
-
       {/* STAGE 1 */}
       <section className="relative min-h-screen overflow-hidden bg-[#0A3A42] flex items-center justify-center">
         <div className="absolute inset-0 overflow-hidden z-0">
