@@ -5,23 +5,6 @@ import Link from 'next/link';
 export default function TeacherKitPage() {
   return (
     <div className="min-h-screen font-sans" style={{ background: 'var(--bg-light)', color: 'var(--text-main)', lineHeight: 1.78, fontSize: '16px' }}>
-      <a href="#main" className="absolute -top-10 left-0 bg-accent-deep text-white px-4 py-2 text-sm z-[200] focus:top-0 outline-none">
-        본문으로 건너뛰기
-      </a>
-
-      {/* Nav */}
-      <nav className="sticky top-0 z-[100] px-5 py-4 md:px-10 flex justify-between items-center bg-[#F8FCFC]/90 backdrop-blur-md saturate-150 border-b border-line-soft">
-        <Link href="/" className="font-serif font-semibold text-base text-text-main tracking-tight">
-          고요의 경제나루
-        </Link>
-        <div className="flex gap-4 md:gap-6 items-center">
-          <Link href="/" className="text-[13px] md:text-sm text-text-soft font-medium hover:text-accent-deep transition-colors">HOME</Link>
-          <Link href="/dictionary" className="text-[13px] md:text-sm text-text-soft font-medium hover:text-accent-deep transition-colors">INDEX</Link>
-          <Link href="/stamp-map" className="text-[13px] md:text-sm text-text-soft font-medium hover:text-accent-deep transition-colors">STAMP MAP</Link>
-          <Link href="/login" className="text-[13px] md:text-sm text-text-soft font-medium hover:text-accent-deep transition-colors">로그인</Link>
-        </div>
-      </nav>
-
       <main className="max-w-[1100px] w-full mx-auto px-[22px] py-[36px] md:px-10 md:py-[50px] pb-20" id="main">
 
         <div className="font-mono text-[11px] tracking-[0.1em] text-accent-deep mb-[26px] font-semibold uppercase">
