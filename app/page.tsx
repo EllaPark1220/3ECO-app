@@ -1,23 +1,10 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import Link from 'next/link';
 
 export default function Home() {
   const revealRefs = useRef<(HTMLElement | null)[]>([]);
-  const [email, setEmail] = useState('');
-  const [subscribeStatus, setSubscribeStatus] = useState<{ message: string; ok: boolean } | null>(null);
-
-  const handleSubscribe = (e: React.FormEvent) => {
-    e.preventDefault();
-    const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
-    if (!valid) {
-      setSubscribeStatus({ message: '이메일 주소를 한 번 더 확인해 주세요.', ok: false });
-      return;
-    }
-    setSubscribeStatus({ message: '신청이 접수되었습니다. 새 소식이 준비되면 차분히 전해 드리겠습니다.', ok: true });
-    setEmail('');
-  };
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -465,50 +452,6 @@ export default function Home() {
                   계정 만들기
                 </Link>
               </div>
-            </div>
-          </div>
-
-          {/* 소식 받기 (Newsletter) */}
-          <div ref={addToRefs} className="max-w-[640px] mx-auto mt-20 md:mt-28 opacity-0 translate-y-8 transition-all duration-1000 ease-out delay-100">
-            <div className="bg-white/[0.06] border border-white/15 rounded-[24px] p-8 md:p-10 backdrop-blur-md">
-              <div className="font-mono text-[11px] tracking-[0.3em] text-accent-soft uppercase font-semibold mb-3 text-center">소식 받기</div>
-              <h3 className="font-serif font-semibold text-[22px] md:text-[26px] text-white tracking-tight text-center mb-3">
-                새 레슨이 나오면, 차분히 알려 드립니다
-              </h3>
-              <p className="font-sans text-[14.5px] text-white/75 leading-relaxed text-center max-w-[460px] mx-auto mb-7">
-                광고도, 재촉도 없습니다. 새 글과 영상이 준비될 때만 한 통씩 보냅니다. 해지는 언제든 한 번에.
-              </p>
-              <form onSubmit={handleSubscribe} noValidate className="flex flex-col sm:flex-row gap-3 max-w-[480px] mx-auto">
-                <label htmlFor="nl-email" className="sr-only">이메일 주소</label>
-                <input
-                  id="nl-email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="name@example.com"
-                  autoComplete="email"
-                  className="flex-1 min-h-[52px] bg-white/10 border border-white/20 rounded-xl px-4 text-white placeholder-white/40 outline-none transition-all focus:border-accent-soft focus:bg-white/15"
-                />
-                <button
-                  type="submit"
-                  className="flex items-center justify-center min-h-[52px] px-7 bg-accent-main text-white font-semibold rounded-xl whitespace-nowrap transition-all hover:bg-accent-deep hover:-translate-y-0.5 shadow-[0_10px_28px_-10px_rgba(0,0,0,0.5)] hover:shadow-[0_18px_40px_-14px_rgba(26,142,156,0.7)] tracking-wide"
-                >
-                  소식 받아보기
-                </button>
-              </form>
-              {subscribeStatus && (
-                <p
-                  className="font-sans text-[13px] text-center mt-4"
-                  role="status"
-                  aria-live="polite"
-                  style={{ color: subscribeStatus.ok ? 'var(--accent-soft)' : '#E5B88C' }}
-                >
-                  {subscribeStatus.message}
-                </p>
-              )}
-              <p className="font-sans text-[12px] text-white/45 text-center mt-3">
-                이메일 주소만 받습니다. 선체크·숨은 해지 같은 장치는 두지 않습니다.
-              </p>
             </div>
           </div>
 
