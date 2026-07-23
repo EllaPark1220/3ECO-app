@@ -1,0 +1,658 @@
+{
+  "name": "02_책본문",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -272,
+        -16
+      ],
+      "id": "0b47dcd3-0f15-4878-9498-6b9f1f944437",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_SPREADSHEET_ID",
+          "mode": "list",
+          "cachedResultName": "3ECO_마스터시트",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2132566108,
+          "mode": "list",
+          "cachedResultName": "커리큘럼",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit#gid=2132566108"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "episode_id",
+              "lookupValue": "E001"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -128,
+        -16
+      ],
+      "id": "95b079b6-40c7-40e1-836e-79e7bbc11b06",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleApi": {
+          "id": "CREDENTIAL_ID",
+          "name": "Google - 3eco"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_SPREADSHEET_ID",
+          "mode": "list",
+          "cachedResultName": "3ECO_마스터시트",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1536518948,
+          "mode": "list",
+          "cachedResultName": "제작현황",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit#gid=1536518948"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "episode_id",
+              "lookupValue": "E001"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        32,
+        -16
+      ],
+      "id": "af9c8a82-1fa4-4d69-a307-5d55ea5d0c9d",
+      "name": "Get row(s) in sheet1",
+      "credentials": {
+        "googleApi": {
+          "id": "CREDENTIAL_ID",
+          "name": "Google - 3eco"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "folderId": "YOUR_FOLDER_ID",
+        "title": "={{ $('Get row(s) in sheet').item.json['episode_id'] }}_책본문"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        1472,
+        -16
+      ],
+      "id": "8c9a16aa-f5e2-464d-be15-4002cec75322",
+      "name": "Create a document",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "CREDENTIAL_ID",
+          "name": "Google OAuth - 3eco"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "={{ $json.id }}",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "insert",
+              "text": "={{ $('본문합치기').item.json.content }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        1632,
+        -16
+      ],
+      "id": "1b42ea51-357b-45f7-bb63-d3381d4060b9",
+      "name": "Update a document",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "CREDENTIAL_ID",
+          "name": "Google OAuth - 3eco"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_SPREADSHEET_ID",
+          "mode": "list",
+          "cachedResultName": "3ECO_마스터시트",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1536518948,
+          "mode": "list",
+          "cachedResultName": "제작현황",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit#gid=1536518948"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "episode_id": "E001",
+            "책본문": "={{ $('Create a document').item.json.id }}"
+          },
+          "matchingColumns": [
+            "episode_id"
+          ],
+          "schema": [
+            {
+              "id": "episode_id",
+              "displayName": "episode_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "권",
+              "displayName": "권",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "제목",
+              "displayName": "제목",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "워크플로우_버전",
+              "displayName": "워크플로우_버전",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "자료패키지",
+              "displayName": "자료패키지",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "자료선별",
+              "displayName": "자료선별",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "책본문",
+              "displayName": "책본문",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "가드레일",
+              "displayName": "가드레일",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "게이트1",
+              "displayName": "게이트1",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "상태_영상",
+              "displayName": "상태_영상",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "상태_카드뉴스",
+              "displayName": "상태_카드뉴스",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "상태_OX교안",
+              "displayName": "상태_OX교안",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "상태_스크립트",
+              "displayName": "상태_스크립트",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "게이트2",
+              "displayName": "게이트2",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "발행_YT",
+              "displayName": "발행_YT",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "발행_IG",
+              "displayName": "발행_IG",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "발행_WEB",
+              "displayName": "발행_WEB",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "발행일",
+              "displayName": "발행일",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "비고",
+              "displayName": "비고",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1792,
+        -16
+      ],
+      "id": "4d34b3fb-881f-470d-bc8a-bc2f90df580d",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleApi": {
+          "id": "CREDENTIAL_ID",
+          "name": "Google - 3eco"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=쉽고 친절한 경제교육 시리즈 '경제판단력 교과서'의 한 편을 4단으로 나눠 씁니다. 지금은 1단 '도입'만 씁니다. 일상 장면으로 시작하지만 목적은 묘사가 아니라 독자의 공감입니다.\n\n[편 정보]\n편: {{ $('Get row(s) in sheet').item.json['권'] }} {{ $('Get row(s) in sheet').item.json['권내_편번호'] }}편\n제목: {{ $('Get row(s) in sheet').item.json['제목'] }}\n핵심 개념어: {{ $('Get row(s) in sheet').item.json['핵심_개념어'] }}\nHook 패턴: {{ $('Get row(s) in sheet').item.json['Hook_패턴'] }}\n사례 시드: {{ $('Get row(s) in sheet').item.json['사례_시드'] }}\n\n[이 단의 임무] 도입 — 한 장면에 머무르기 (3문단, 문단당 220~260자·5~6문장)\n이 단의 분량은 공백 포함 600자 이상입니다. 부족하면 묘사를 더해 채우고, 요약하지 않습니다.\n\n① 장면의 시작 (1문단) — 시간과 장소, 그 자리에 오게 된 경위, 눈앞에 보이는 것들\n② 갈림길 (1문단) — 무엇과 무엇 사이에서 망설이는지, 하나를 고르면 무엇이 사라지는지\n③ 결정 직전 (1문단) — 아직 고르지 않은 상태의 감각과 마음\n\nHook 패턴별 방식:\n· 사례형: 세 문단을 한 장면 안에서 서술합니다.\n· 질문형: ①로 장면을 열고, ②에서 독자에게 직접 묻고, ③으로 여운을 남깁니다.\n· 뉴스형: ①에 현상·수치를 단서처럼 제시하고, ②③은 그것이 일상의 장면으로 나타나는 모습을 씁니다.\n· 직설형: ①에 결론을 한 문장으로 선언하고, ②③으로 그 선언을 장면으로 보입니다.\n\n- 장면은 독자가 \"나도 저랬다\"고 떠올리게 하는 도구입니다. 인물의 감각·감정 묘사(손끝, 향기, 긴장 등)를 늘어놓지 않습니다.\n- 문장마다 상황이 한 걸음씩 나아갑니다. 같은 순간에 머물며 묘사만 쌓지 않습니다.\n- 한 문단은 하나의 장면에 충분히 머무릅니다. 빠르게 진행하거나 다음 사건으로 서둘러 넘어가지 않습니다.\n- 용어를 정의하지 않습니다. 개념 설명은 뒤 단의 몫입니다.\n- 항목 번호나 소제목을 출력하지 않습니다. 문단만 이어 씁니다.\n\n[문체]\n- 합니다체로 통일합니다. 평어체·해요체를 쓰지 않습니다.\n- 한 문장은 40자 안팎, 60자를 넘기지 않습니다.\n- '여러분'은 도입·전환부에만, '우리'는 사고를 함께할 때만. 1인칭 자제.\n- 한자어 대신 쉬운 표현. 학술 용어는 풀어서 한 번 더 설명.\n- 번역체 금지: '매우', '대단히', '그것은 ~이다', '~에 의해', '결국', '결국에는', '~을 가지고', '~를 가지고', '~에 대하여'.\n\n[회피 — 위반 시 실패]\n- 결혼·자녀·부부·아내·남편 단위 사례 금지.\n- 정치·정당·정권·좌파·우파·진보·보수, 종교, 지역 비교, 젠더 이슈 금지.\n- 군 복무·군대·징병, 장기 매매, 마약, 최저임금 금지.\n- 학자명은 쓰지 않습니다(1권은 입문 톤).\n- 단정 금지: '반드시', '절대', '무조건', '보장', '확실히', '충격'.\n- 불확실한 수치는 지어내지 말고 \"확인 필요\"로 표시.\n\n출력은 본문 텍스트만. 제목·머리말·설명·분량 표시를 붙이지 마세요."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "maxTokens": 8000
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        176,
+        -16
+      ],
+      "id": "64b77ed3-06bc-406c-98b7-2c769a1a6ba2",
+      "name": "S1_도입",
+      "credentials": {
+        "openAiApi": {
+          "id": "CREDENTIAL_ID",
+          "name": "OpenAI - 3eco"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=쉽고 친절한 경제교육 시리즈입니다. 같은 편의 2단 '직관·사례'를 씁니다.\n\n[편 정보]\n제목: {{ $('Get row(s) in sheet').item.json['제목'] }}\n핵심 개념어: {{ $('Get row(s) in sheet').item.json['핵심_개념어'] }}\n학습목표 ①: {{ $('Get row(s) in sheet').item.json['학습목표_1'] }}\n학습목표 ②: {{ $('Get row(s) in sheet').item.json['학습목표_2'] }}\n사례 시드: {{ $('Get row(s) in sheet').item.json['사례_시드'] }}\n\n[자료 패키지]\n{{ $('Get row(s) in sheet1').item.json['자료패키지'] }}\n\n[선별된 자료]\n{{ $('Get row(s) in sheet1').item.json['자료선별'] }}\n\n[앞서 쓴 도입]\n{{ $('S1_도입').item.json.output[0].content[0].text }}\n\n[이 단의 임무] 직관·사례 — 서로 다른 상황에서 같은 구조를 반복해 보이기 (10문단, 문단당 220~260자·5~6문장)\n이 단의 분량은 공백 포함 2,200자 이상입니다. 부족하면 장면 묘사와 비교를 더해 채우고, 요약하지 않습니다.\n\n① 연결 (1문단) — 도입의 장면을 이어받아 이 단으로 넘어옵니다\n② 장면 A (2문단) — 사례 시드에서 고른 첫 상황.\n   첫 문단은 장면 묘사(언제·어디서·무엇을 앞에 두고 있는지),\n   둘째 문단은 무엇이 한정되어 있고 그래서 무엇을 포기하는지\n③ 장면 B (2문단) — 다른 영역의 상황을 같은 방식으로\n④ 장면 C (2문단) — 또 다른 영역의 상황을 같은 방식으로\n⑤ 장면 D (2문단) — 또 다른 영역의 상황을 같은 방식으로\n⑥ 공통점 (1문단) — 네 장면을 관통하는 같은 구조. 단, 용어는 꺼내지 않습니다\n\n- 네 장면은 겹치지 않는 영역에서 고릅니다(예: 시간 배분 / 돈 배분 / 관계·기회 / 공간·물건). 사례 시드를 우선 활용합니다.\n- 장면은 독자가 \"나도 저랬다\"고 떠올리게 하는 도구입니다. 인물의 감각·감정 묘사(손끝, 향기, 긴장 등)를 늘어놓지 않습니다.\n- 문장마다 상황이 한 걸음씩 나아갑니다. 같은 순간에 머물며 묘사만 쌓지 않습니다.\n- 한 문단은 하나의 장면에 충분히 머무릅니다. 서둘러 다음 장면으로 넘어가지 않습니다.\n- 선별된 자료가 뒷받침하는 장면에서는 수치·사실을 근거로 인용하고 기관명과 연도를 함께 적습니다. 장식으로 넣지 않습니다.\n- 사례 1순위는 청소년기~청년기 보편 경험, 2순위는 직장·일상 경험입니다.\n- 아직 용어를 정의하지 않습니다.\n- 항목 번호나 소제목을 출력하지 않습니다. 문단만 이어 씁니다.\n\n[문체]\n- 합니다체로 통일합니다. 평어체·해요체를 쓰지 않습니다.\n- 한 문장은 40자 안팎, 60자를 넘기지 않습니다.\n- '여러분'은 도입·전환부에만, '우리'는 사고를 함께할 때만. 1인칭 자제.\n- 한자어 대신 쉬운 표현. 학술 용어는 풀어서 한 번 더 설명.\n- 번역체 금지: '매우', '대단히', '그것은 ~이다', '~에 의해', '결국', '결국에는', '~을 가지고', '~를 가지고', '~에 대하여'.\n\n[회피 — 위반 시 실패]\n- 결혼·자녀·부부·아내·남편 단위 사례 금지.\n- 정치·정당·정권·좌파·우파·진보·보수, 종교, 지역 비교, 젠더 이슈 금지.\n- 군 복무·군대·징병, 장기 매매, 마약, 최저임금 금지.\n- 학자명은 쓰지 않습니다(1권은 입문 톤).\n- 단정 금지: '반드시', '절대', '무조건', '보장', '확실히', '충격'.\n- 불확실한 수치는 지어내지 말고 \"확인 필요\"로 표시.\n\n출력은 본문 텍스트만. 제목·머리말·설명·분량 표시를 붙이지 마세요."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "maxTokens": 8000
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        448,
+        -16
+      ],
+      "id": "bac592c4-2314-4fe1-a232-534a489e5047",
+      "name": "S2_사례",
+      "credentials": {
+        "openAiApi": {
+          "id": "CREDENTIAL_ID",
+          "name": "OpenAI - 3eco"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=쉽고 친절한 경제교육 시리즈입니다. 개념을 다루는 단이지만 설명은 장면과 사례에 붙여서 풀어냅니다. 같은 편의 3단 '용어·개념'을 씁니다.\n\n[편 정보]\n제목: {{ $('Get row(s) in sheet').item.json['제목'] }}\n핵심 개념어: {{ $('Get row(s) in sheet').item.json['핵심_개념어'] }}\n학습목표 ①: {{ $('Get row(s) in sheet').item.json['학습목표_1'] }}\n학습목표 ②: {{ $('Get row(s) in sheet').item.json['학습목표_2'] }}\n연계 개념: {{ $('Get row(s) in sheet').item.json['연계_개념'] }}\n\n[선별된 자료]\n{{ $('Get row(s) in sheet1').item.json['자료선별'] }}\n\n[앞서 쓴 직관·사례]\n{{ $('S2_사례').item.json.output[0].content[0].text }}\n\n[이 단의 임무] 용어·개념 — 느낀 것에 이름 붙이기 (7문단, 문단당 220~260자·5~6문장)\n이 단의 분량은 공백 포함 1,700자 이상입니다. 부족하면 사례 적용과 설명을 더해 채우고, 요약하지 않습니다.\n\n① 이름 붙이기 (1문단) — 앞 단에서 반복된 구조를 무엇이라 부르는지, 여기서 처음 꺼내고 뜻을 풀어 설명합니다\n② 오해 바로잡기 (1문단) — 흔히 잘못 알고 있는 지점 하나를 짚고 바로잡습니다\n③ 학습목표 ① 적용 (2문단) — 첫 문단은 앞 사례 하나를 다시 불러 개념을 적용,\n   둘째 문단은 그 적용이 왜 그렇게 되는지 한 걸음 더 설명\n④ 학습목표 ② 적용 (2문단) — 다른 사례로 같은 방식으로\n⑤ 자료와 다음 예고 (1문단) — 선별된 자료의 수치·사실로 개념을 확인(기관명·연도 명시)하고, 연계 개념을 언급하며 뒤에서 다룬다고 밝힙니다\n\n- 각 문장은 구체적 사례, 구체적 비교, 구체적 설명 중 하나를 담습니다. 추상적 반복으로 채우지 않습니다.\n- 학술 핵심어는 첫 등장에만 '한글(영문)', 이후 한글. 구체 수치는 아라비아 숫자.\n- 학부 경제학이 아니라 실전 일상 판단력이 핵심입니다. 수식이나 모형으로 가지 않습니다.\n- 항목 번호나 소제목을 출력하지 않습니다. 문단만 이어 씁니다.\n\n[문체]\n- 합니다체로 통일합니다. 평어체·해요체를 쓰지 않습니다.\n- 한 문장은 40자 안팎, 60자를 넘기지 않습니다.\n- '여러분'은 도입·전환부에만, '우리'는 사고를 함께할 때만. 1인칭 자제.\n- 한자어 대신 쉬운 표현. 학술 용어는 풀어서 한 번 더 설명.\n- 번역체 금지: '매우', '대단히', '그것은 ~이다', '~에 의해', '결국', '결국에는', '~을 가지고', '~를 가지고', '~에 대하여'.\n\n[회피 — 위반 시 실패]\n- 결혼·자녀·부부·아내·남편 단위 사례 금지.\n- 정치·정당·정권·좌파·우파·진보·보수, 종교, 지역 비교, 젠더 이슈 금지.\n- 군 복무·군대·징병, 장기 매매, 마약, 최저임금 금지.\n- 학자명은 쓰지 않습니다(1권은 입문 톤).\n- 단정 금지: '반드시', '절대', '무조건', '보장', '확실히', '충격'.\n- 불확실한 수치는 지어내지 말고 \"확인 필요\"로 표시.\n\n출력은 본문 텍스트만. 제목·머리말·설명·분량 표시를 붙이지 마세요."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "maxTokens": 8000
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        736,
+        -16
+      ],
+      "id": "5f5cc4c0-f51f-4954-8600-61225fddb72a",
+      "name": "S3_개념",
+      "credentials": {
+        "openAiApi": {
+          "id": "CREDENTIAL_ID",
+          "name": "OpenAI - 3eco"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=같은 편의 4단 '마무리'를 씁니다.\n\n[편 정보]\n제목: {{ $('Get row(s) in sheet').item.json['제목'] }}\n핵심 개념어: {{ $('Get row(s) in sheet').item.json['핵심_개념어'] }}\n\n[앞서 쓴 용어·개념]\n{{ $('S3_개념').item.json.output[0].content[0].text }}\n\n[이 단의 임무] 마무리 (3문단, 문단당 220~260자·5~6문장)\n이 단의 분량은 공백 포함 700자 이상입니다. 부족하면 구체적인 적용 묘사를 더해 채우고, 요약하지 않습니다.\n\n① 걸어온 길과 한 줄 (1문단) — 장면에서 개념까지 어떤 길을 왔는지 짚고, 이 편이 남기는 문장 하나를 제시합니다\n② 내일 해볼 것 (1문단) — 독자가 당장 시도할 수 있는 행동 하나를 언제·어디서·무엇을·어떻게 수준으로 구체적으로 제시합니다\n③ 이어지는 이야기 (1문단) — 이 개념이 다음 편에서 어디로 이어지는지 예고합니다\n\n- 각 문장은 구체적 정리, 구체적 행동, 구체적 예고 중 하나를 담습니다.\n- 새로운 개념을 꺼내지 않습니다.\n- 항목 번호나 소제목을 출력하지 않습니다. 문단만 이어 씁니다.\n\n[문체]\n- 합니다체로 통일합니다. 평어체·해요체를 쓰지 않습니다.\n- 한 문장은 40자 안팎, 60자를 넘기지 않습니다.\n- '여러분'은 도입·전환부에만, '우리'는 사고를 함께할 때만. 1인칭 자제.\n- 한자어 대신 쉬운 표현. 학술 용어는 풀어서 한 번 더 설명.\n- 번역체 금지: '매우', '대단히', '그것은 ~이다', '~에 의해', '결국', '결국에는', '~을 가지고', '~를 가지고', '~에 대하여'.\n\n[회피 — 위반 시 실패]\n- 결혼·자녀·부부·아내·남편 단위 사례 금지.\n- 정치·정당·정권·좌파·우파·진보·보수, 종교, 지역 비교, 젠더 이슈 금지.\n- 군 복무·군대·징병, 장기 매매, 마약, 최저임금 금지.\n- 학자명은 쓰지 않습니다(1권은 입문 톤).\n- 단정 금지: '반드시', '절대', '무조건', '보장', '확실히', '충격'.\n- 불확실한 수치는 지어내지 말고 \"확인 필요\"로 표시.\n\n출력은 본문 텍스트만. 제목·머리말·설명·분량 표시를 붙이지 마세요."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "maxTokens": 8000
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        1008,
+        -16
+      ],
+      "id": "d3ab8010-eae2-4e12-9a0c-302267fc5348",
+      "name": "S4_마무리",
+      "credentials": {
+        "openAiApi": {
+          "id": "CREDENTIAL_ID",
+          "name": "OpenAI - 3eco"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const s1 = $('S1_도입').first().json.output[0].content[0].text;\nconst s2 = $('S2_사례').first().json.output[0].content[0].text;\nconst s3 = $('S3_개념').first().json.output[0].content[0].text;\nconst s4 = $('S4_마무리').first().json.output[0].content[0].text;\n\nconst full = [s1, s2, s3, s4].map(t => t.trim()).join('\\n\\n');\n\nreturn [{\n  json: {\n    content: full,\n    charCount: full.replace(/\\s/g, '').length,\n    parts: {\n      s1: s1.replace(/\\s/g, '').length,\n      s2: s2.replace(/\\s/g, '').length,\n      s3: s3.replace(/\\s/g, '').length,\n      s4: s4.replace(/\\s/g, '').length\n    }\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1312,
+        -16
+      ],
+      "id": "29ad1880-f090-48ce-8043-dd606f586594",
+      "name": "본문합치기"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet1": {
+      "main": [
+        [
+          {
+            "node": "S1_도입",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a document": {
+      "main": [
+        [
+          {
+            "node": "Update a document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a document": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "S1_도입": {
+      "main": [
+        [
+          {
+            "node": "S2_사례",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "S2_사례": {
+      "main": [
+        [
+          {
+            "node": "S3_개념",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "S3_개념": {
+      "main": [
+        [
+          {
+            "node": "S4_마무리",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "S4_마무리": {
+      "main": [
+        [
+          {
+            "node": "본문합치기",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "본문합치기": {
+      "main": [
+        [
+          {
+            "node": "Create a document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": ""
+  },
+  "nodeGroups": [],
+  "tags": []
+}

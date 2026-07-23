@@ -1,0 +1,695 @@
+{
+  "name": "03_가드레일",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -864,
+        -336
+      ],
+      "id": "a9ece572-e49c-4f25-982f-791238bf2b84",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_SPREADSHEET_ID",
+          "mode": "list",
+          "cachedResultName": "3ECO_마스터시트",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1536518948,
+          "mode": "list",
+          "cachedResultName": "제작현황",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit#gid=1536518948"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "episode_id",
+              "lookupValue": "E001"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -656,
+        -336
+      ],
+      "id": "766ee3ff-5e3a-4b7f-abac-f74edc365380",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleApi": {
+          "id": "CREDENTIAL_ID",
+          "name": "Google - 3eco"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "={{ $('Get row(s) in sheet').item.json['책본문'] }}"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        -240,
+        -336
+      ],
+      "id": "7eae39b5-08a8-40b9-be31-9c790baafd66",
+      "name": "Get a document",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "CREDENTIAL_ID",
+          "name": "Google OAuth - 3eco"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const text = $input.first().json.content || '';\nconst violations = [];\n\n// G1 — 회피 영역 키워드 (부분 문자열 오탐 방지: 앞에 한글이 오면 제외)\nconst avoidKeywords = ['군 복무','군대','징병','페미','젠더','좌파','우파','진보','보수','정권',\n  '영호남','부부','자녀','아내','남편','결혼','장기 매매','마약','최저임금'];\nfor (const kw of avoidKeywords) {\n  const count = (text.match(new RegExp('(?<![가-힣])' + kw, 'g')) || []).length;\n  if (count > 0) violations.push({ rule: 'G1_회피영역', term: kw, count });\n}\n// G2 — 번역체 8종 (자동 차단)\nconst translationese = ['매우','대단히','그것은','에 의해','결국에는','결국','을 가지고','를 가지고','에 대하여'];\nfor (const kw of translationese) {\n  const count = (text.match(new RegExp(kw, 'g')) || []).length;\n  if (count > 0) violations.push({ rule: 'G2_번역체', term: kw, count });\n}\n\n// G3 — 금지 표현: 단정·자극\nconst banned = ['충격','절대','무조건','확실히'];\nfor (const kw of banned) {\n  const count = (text.match(new RegExp(kw, 'g')) || []).length;\n  if (count > 0) violations.push({ rule: 'G3_금지표현', term: kw, count });\n}\n// '반드시'·'보장'은 단정 어미와 붙을 때만 위반\nconst assertive = (text.match(/(반드시|보장)[^.]{0,15}(됩니다|입니다)\\./g) || []).length;\nif (assertive > 0) violations.push({ rule: 'G3_금지표현', term: '단정 표현', count: assertive });\n\n// G4 — 학자명: 위반 아님. 마스터 운영 규칙의 세 조건\n// (반전 일화 / 그 인물 없이 설명이 어색 / 흥미로운 실험·사건) 판단이 필요하므로\n// 자동 차단하지 않고 게이트1에서 사람이 판단하도록 플래그만 올린다.\nconst scholars = ['애덤 스미스','케인즈','마르크스','리카도','프리드먼','슘페터','하이에크'];\nconst scholarFlags = [];\nfor (const kw of scholars) {\n  const count = (text.match(new RegExp(kw, 'g')) || []).length;\n  if (count > 0) scholarFlags.push({ term: kw, count });\n}\n\n// G5 — 분량 4,300 ±200 (공백 제외)\nconst charCount = text.replace(/\\s/g, '').length;\nif (charCount < 4100 || charCount > 4500) {\n  violations.push({ rule: 'G5_분량', term: `${charCount}자`, count: 1 });\n}\n\n// G6 — 문장 길이: 60자 초과 0건 목표\nconst sentences = text.split(/[.!?]\\s/).filter(s => s.trim().length > 0);\nconst longOnes = sentences.filter(s => s.trim().length > 60);\nconst avgLen = sentences.length\n  ? Math.round(sentences.reduce((a, s) => a + s.trim().length, 0) / sentences.length)\n  : 0;\nif (longOnes.length > 0) {\n  violations.push({ rule: 'G6_문장길이', term: `60자 초과 ${longOnes.length}건`, count: longOnes.length });\n}\n\n// G7 — 문체: 합니다체 통일 ('이야기' 오탐 제외)\nconst casualEndings = (text.match(/(해요\\.|어요\\.|이야\\.|한다\\.|이다\\.)/g) || []).length;\nif (casualEndings > 0) {\n  violations.push({ rule: 'G7_문체', term: '비합니다체 어미', count: casualEndings });\n}\n\nreturn [{\n  json: {\n    passed: violations.length === 0,\n    violationCount: violations.length,\n    charCount,\n    sentenceCount: sentences.length,\n    avgSentenceLength: avgLen,\n    violations,\n    scholarFlags,                        // 게이트1에서 사람이 판단\n    needsReview: scholarFlags.length > 0\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -32,
+        -336
+      ],
+      "id": "626c59be-4d19-462f-9d35-7cd6b6ca8c31",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "59c52a2d-3485-4eeb-ab85-9541a9bd08d3",
+              "leftValue": "={{ $json.passed }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        832,
+        -336
+      ],
+      "id": "5e87a561-8d27-4964-ad03-37f288c8a8f7",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=아래 본문에서 [위반 항목]만 수정하세요. 그 외의 문장, 구조, 내용은 절대 바꾸지 마세요.\n\n[위반 항목]\n{{ JSON.stringify({tier1: $json.tier1.violations, tier2: $json.tier2.flags, tier3: $json.tier3.detail.issues}) }}\n\n수정 방법:\n- G2_번역체: 해당 표현을 자연스러운 우리말로 바꿉니다. '결국' → '그래서', '끝내', 또는 삭제.\n- G6_문장길이: 60자를 넘는 문장을 두 문장으로 나눕니다. 뜻은 유지합니다.\n- G5_분량: 분량이 부족한 경우, 기존 사례 문단 중 하나에 문장 2~3개를 자연스럽게 덧붙입니다. 새 개념은 추가하지 않습니다.\n\n[본문]\n{{ $('Get a document').item.json.content }}\n\n수정된 본문 전체만 출력하세요. 설명을 붙이지 마세요."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        1040,
+        -240
+      ],
+      "id": "ad1f7869-983b-4a8d-80fe-7648c998587c",
+      "name": "본문수정",
+      "credentials": {
+        "openAiApi": {
+          "id": "CREDENTIAL_ID",
+          "name": "OpenAI - 3eco"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "folderId": "YOUR_FOLDER_ID",
+        "title": "={{ $('Get row(s) in sheet').item.json['episode_id'] }}_책본문_수정"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        1392,
+        -240
+      ],
+      "id": "ba5b0719-e9c4-4a82-8f0e-bf74f3725da1",
+      "name": "Create a document",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "CREDENTIAL_ID",
+          "name": "Google OAuth - 3eco"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_SPREADSHEET_ID",
+          "mode": "list",
+          "cachedResultName": "3ECO_마스터시트",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1536518948,
+          "mode": "list",
+          "cachedResultName": "제작현황",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit#gid=1536518948"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "episode_id": "E001",
+            "가드레일": "통과"
+          },
+          "matchingColumns": [
+            "episode_id"
+          ],
+          "schema": [
+            {
+              "id": "episode_id",
+              "displayName": "episode_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "권",
+              "displayName": "권",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "제목",
+              "displayName": "제목",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "워크플로우_버전",
+              "displayName": "워크플로우_버전",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "자료패키지",
+              "displayName": "자료패키지",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "자료선별",
+              "displayName": "자료선별",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "책본문",
+              "displayName": "책본문",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "가드레일",
+              "displayName": "가드레일",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "게이트1",
+              "displayName": "게이트1",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "상태_영상",
+              "displayName": "상태_영상",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "상태_카드뉴스",
+              "displayName": "상태_카드뉴스",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "상태_OX교안",
+              "displayName": "상태_OX교안",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "상태_스크립트",
+              "displayName": "상태_스크립트",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "게이트2",
+              "displayName": "게이트2",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "발행_YT",
+              "displayName": "발행_YT",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "발행_IG",
+              "displayName": "발행_IG",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "발행_WEB",
+              "displayName": "발행_WEB",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "발행일",
+              "displayName": "발행일",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "비고",
+              "displayName": "비고",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1040,
+        -432
+      ],
+      "id": "648a076e-3cb2-402a-b468-58b8646aeeca",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleApi": {
+          "id": "CREDENTIAL_ID",
+          "name": "Google - 3eco"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "={{ $json.id }}",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "insert",
+              "text": "={{ $('본문수정').item.json.output[0].content[0].text }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        1600,
+        -240
+      ],
+      "id": "9c06c4a4-fd92-4f34-9228-4a0e297abb8c",
+      "name": "Update a document",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "CREDENTIAL_ID",
+          "name": "Google OAuth - 3eco"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"llama-3.3-70b-versatile\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": {{ JSON.stringify(\"다음 경제교육 본문에서 아래 세 유형의 문장을 찾으세요.\\n1. 이념적 단정: 특정 집단이나 계층에 대한 가치 판단을 단정하는 문장 (예: '부자는 결국 ~이다')\\n2. 미래 단정: 불확실한 미래를 확정적으로 말하는 문장 (예: '~하면 성공합니다', '~은 오를 것입니다')\\n3. 과잉 확신: 근거 없이 강하게 확신하는 문장\\n\\n반드시 JSON만 출력하세요. 설명이나 마크다운 코드블록 없이 아래 형식으로만:\\n{\\\"flags\\\": [{\\\"type\\\": \\\"유형\\\", \\\"sentence\\\": \\\"해당 문장\\\", \\\"reason\\\": \\\"이유\\\"}]}\\n문제가 없으면 {\\\"flags\\\": []}\\n\\n본문:\\n\" + $('Get a document').item.json.content) }}\n    }\n  ],\n  \"temperature\": 0\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        176,
+        -336
+      ],
+      "id": "e035e971-da43-4db8-8233-3d8d7ac7c41b",
+      "name": "2단_Groq스크리닝",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "CREDENTIAL_ID",
+          "name": "Groq Header - 3eco"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=당신은 경제교육 콘텐츠의 최종 검수자입니다. 아래 본문이 이 편의 기획을 충족하는지 판정하세요.\n\n[이 편의 기획]\n제목: {{ $('Get row(s) in sheet').item.json['제목'] }}\n핵심 개념어: {{ $('커리큘럼읽기').item.json['핵심_개념어'] }}\n학습목표 ①: {{ $('커리큘럼읽기').item.json['학습목표_1'] }}\n학습목표 ②: {{ $('커리큘럼읽기').item.json['학습목표_2'] }}\n연계 개념: {{ $('커리큘럼읽기').item.json['연계_개념'] }}\n\n[판정 항목]\n1. topic_match: 본문이 처음부터 끝까지 핵심 개념어를 다루는가. 다른 경제 개념(프레이밍, 넛지 등)을 주개념으로 도입하지 않았는가\n2. goal1_achieved: 학습목표 ①이 본문에서 실제로 달성되는가 (언급이 아니라, 독자가 그것을 할 수 있게 되는가)\n3. goal2_achieved: 학습목표 ②가 실제로 달성되는가\n4. structure_ok: 직관 → 사례 → 용어 순서를 지켰는가 (용어 정의가 사례보다 먼저 나오면 위반)\n5. hallucination: 본문에 없는 내용을 \"앞서 언급한\"이라고 인용하거나, 출처 불명의 구체 수치를 단정한 곳이 있는가\n\n반드시 JSON만 출력하세요. 마크다운 코드블록 없이:\n{\"topic_match\": true/false, \"goal1_achieved\": true/false, \"goal2_achieved\": true/false, \"structure_ok\": true/false, \"hallucination_found\": true/false, \"issues\": [\"발견된 문제 설명\"]}\n\n[본문]\n{{ $('Get a document').item.json.content }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        352,
+        -336
+      ],
+      "id": "a1695587-fdbb-4321-81d0-78d544817042",
+      "name": "3단_GPT검증",
+      "credentials": {
+        "openAiApi": {
+          "id": "CREDENTIAL_ID",
+          "name": "OpenAI - 3eco"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1단 결과\nconst s1 = $('Code in JavaScript').first().json;\n\n// 2단 결과 파싱 (Groq)\nlet s2flags = [];\ntry {\n  const raw = $('2단_Groq스크리닝').first().json.choices[0].message.content;\n  const clean = raw.replace(/```json|```/g, '').trim();\n  s2flags = JSON.parse(clean).flags || [];\n} catch (e) {\n  s2flags = [{ type: 'PARSE_ERROR', sentence: '', reason: '2단 응답 파싱 실패 — 수동 확인 필요' }];\n}\n\n// 3단 결과 파싱 (GPT)\nlet s3 = null;\ntry {\n  const raw = $('3단_GPT검증').first().json.output[0].content[0].text;\n  const clean = raw.replace(/```json|```/g, '').trim();\n  s3 = JSON.parse(clean);\n} catch (e) {\n  s3 = { topic_match: false, issues: ['3단 응답 파싱 실패 — 수동 확인 필요'] };\n}\n\nconst s3failed = !s3.topic_match || !s3.goal1_achieved || !s3.goal2_achieved\n  || !s3.structure_ok || s3.hallucination_found;\n\nconst allPassed = s1.passed && s2flags.length === 0 && !s3failed;\n\nreturn [{\n  json: {\n    passed: allPassed,\n    tier1: { passed: s1.passed, violations: s1.violations, charCount: s1.charCount },\n    tier2: { passed: s2flags.length === 0, flags: s2flags },\n    tier3: { passed: !s3failed, detail: s3 },\n    scholarFlags: s1.scholarFlags,\n    needsReview: s1.needsReview\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        656,
+        -336
+      ],
+      "id": "9d7b591e-a991-42d9-9458-33c6bd06f9bc",
+      "name": "판정통합"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_SPREADSHEET_ID",
+          "mode": "list",
+          "cachedResultName": "3ECO_마스터시트",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2132566108,
+          "mode": "list",
+          "cachedResultName": "커리큘럼",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit#gid=2132566108"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "episode_id",
+              "lookupValue": "E001"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -448,
+        -336
+      ],
+      "id": "a5174778-ef6d-4c42-8a61-4b579f9985f8",
+      "name": "커리큘럼읽기",
+      "credentials": {
+        "googleApi": {
+          "id": "CREDENTIAL_ID",
+          "name": "Google - 3eco"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "커리큘럼읽기",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a document": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "2단_Groq스크리닝",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "본문수정",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "본문수정": {
+      "main": [
+        [
+          {
+            "node": "Create a document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a document": {
+      "main": [
+        [
+          {
+            "node": "Update a document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "2단_Groq스크리닝": {
+      "main": [
+        [
+          {
+            "node": "3단_GPT검증",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "3단_GPT검증": {
+      "main": [
+        [
+          {
+            "node": "판정통합",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "판정통합": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "커리큘럼읽기": {
+      "main": [
+        [
+          {
+            "node": "Get a document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": ""
+  },
+  "nodeGroups": [],
+  "tags": []
+}
