@@ -7,9 +7,9 @@
 ![무광고·무결제](https://img.shields.io/badge/ads%20%26%20payment-none-brightgreen)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black)
 
-**둘러보기(UI 데모):** https://goyo-economy.vercel.app · **코드:** [github.com/EllaPark1220/3ECO-app](https://github.com/EllaPark1220/3ECO-app)
+**서비스:** https://www.goyoeco.com · **코드:** [github.com/EllaPark1220/3ECO-app](https://github.com/EllaPark1220/3ECO-app)
 
-> 데모는 프론트엔드(UI) 중심입니다. 백엔드·데이터 영속화는 진행 중이며 상세는 [현재 한계와 로드맵](#현재-한계와-로드맵)을 참고하세요.
+> 인증(이메일·카카오 OAuth)·세션·학습 진척 저장·RLS는 백엔드에 영속화되어 동작합니다. 일부(OX 채점·스탬프 적립·콘텐츠 CMS)는 진행/예정이며, 상세는 [현재 한계와 로드맵](#현재-한계와-로드맵)을 참고하세요.
 
 폭죽도, 등수도, 결제창도 없습니다. 강의를 하나 마칠 때마다 심해 지도에 진주 하나가 조용히 켜지는 잔잔한 학습 경험을 지향합니다. 총 133편(L001~L133)의 강의를 5권(27·25·25·31·25편)으로 나누어 담습니다.
 
@@ -21,12 +21,21 @@
 
 - **과금·구독·페이월·광고·PPL·데이터 판매 영구 배제.** 결제/과금 필드가 스키마에 존재하지 않습니다.
 - **최소 수집.** 수집하는 개인정보는 **이메일·닉네임뿐**입니다. 성명·연락처·소득은 받지 않습니다.
-- **추적하지 않는 계측.** 웹 분석은 Vercel Analytics + Plausible만 사용하며, GA4 및 추적기성 외부 스크립트를 금지합니다. 제품 지표(KPI)는 외부 분석 도구가 아니라 내부 `event_log`(SQL)에서 산출합니다.
+- **추적하지 않는 계측.** 웹 분석은 Vercel Analytics + Plausible만 사용하며, GA4 및 추적기성 외부 스크립트를 금지합니다. 제품 지표(KPI)는 외부 분석 도구가 아니라 내부 `event_log`(SQL)에서 산출하도록 **설계**되어 있습니다(관측성 구현은 예정 — 로드맵 W16).
 - **게임화 없음.** 배지·랭킹·레벨업·획득 연출이 없습니다. 스탬프 맵은 보상 장치가 아니라 "여기까지 왔다"를 비추는 인지 장치입니다.
 - **영상은 유튜브 임베드 단독.** 자체 CDN·이중화를 두지 않습니다.
 - **접근성 우선.** 글자 크기 14 / 18 / 22 / 28px 4단계, WCAG AA. 28px + 브라우저 200% 확대에서 가로 스크롤이 0이 되도록 합니다.
 
 라이선스는 **CC BY-NC-SA 4.0**입니다(전문은 루트의 [`LICENSE`](./LICENSE) 참고).
+
+---
+
+## 프로젝트 구성 — 두 트랙
+
+이 저장소는 두 갈래로 이루어져 있으며, 하나의 README로 함께 안내합니다.
+
+- **① 웹 서비스** — Next.js 학습 웹앱(인증·학습 진척·스탬프 맵·용어 사전·교사 키트 등). 아래 문서는 별도 표기가 없으면 이 트랙을 설명합니다.
+- **② 콘텐츠 자동화 파이프라인** — 강의 콘텐츠(자료 수집 → 본문 초안 → 가드레일 검증 → 게이트 콜백)를 만드는 n8n 워크플로. 저장소 [`automation/`](./automation) 아래에 워크플로 JSON과 로드맵이 있습니다(비밀값·실제 ID는 플레이스홀더로 치환).
 
 ---
 
@@ -36,8 +45,8 @@
 
 | 화면 | 경로 | 설명 |
 |------|------|------|
-| 랜딩 | `/` (`app/page.tsx`) | 프로젝트 소개·철학·뉴스레터 구독 |
-| 강의 시청 | `/lesson/[id]` | 유튜브 임베드 + 텍스트 모드 토글, OX 퀴즈(5문항), 학습 흔적 모달 |
+| 랜딩 | `/` (`app/(site)/page.tsx`) | 프로젝트 소개·철학 |
+| 강의 시청 | `/lesson/[id]` | 유튜브 임베드 + 텍스트 모드 토글, 학습 흔적 모달. 재생 위치는 DB에 저장·재개(로그인 시). OX 퀴즈는 UI 프로토타입(채점 미배선) |
 | 진주 스탬프 맵 | `/stamp-map` | 완주 강의를 심해 지도에 진주로 표시 |
 | 용어 사전 | `/dictionary` | 경제 용어 사전 |
 | 로그인·회원가입 | `/login` | 이메일/비밀번호 + 카카오 OAuth 진입 |
@@ -53,12 +62,12 @@
 
 | 영역 | 선택 | 이유 |
 |------|------|------|
-| 프레임워크 | Next.js 16 (App Router) · React 19 | <!-- 확인 필요: App Router 채택 사유가 코드/docs에 명시되어 있지 않음 --> |
+| 프레임워크 | Next.js 16 (App Router) · React 19 | 서버 컴포넌트·Server Action으로 인증·데이터 접근을 서버에 둠 |
 | 언어 | TypeScript 5 | 타입으로 레지스트리 파생(SoT) 무결성을 컴파일 타임에 강제 |
 | 스타일 | Tailwind CSS 4 | 디자인 토큰(VDS) 런타임 SoT는 `app/globals.css` |
 | DB/ORM | Prisma 6 (PostgreSQL) | Prisma는 provider를 정적 리터럴로만 허용(env 불가)하여, 로컬·배포 모두 PostgreSQL 단일 provider로 확정(로컬은 Supabase local) |
 | 인증·백엔드 | Supabase (Auth · RLS) | 카카오 OAuth provider 및 Row Level Security 활용 |
-| 레이트리밋 | Upstash Redis / Ratelimit | 서버리스 친화 KV 기반 요청 제한 |
+| 레이트리밋 | Upstash Redis / Ratelimit | 서버리스 친화 KV 기반 요청 제한 (코드 구현됨, 현재 미활성 — 프로비저닝 대기) |
 | 검증 | Zod 4 | API DTO·입력 스키마 검증 |
 | UI | @base-ui/react · shadcn · lucide-react · class-variance-authority | 접근성 확보된 헤드리스 컴포넌트 기반 |
 | 테스트 | Vitest + Testing Library | 무결성 불변식·단위/통합 테스트 |
@@ -134,22 +143,28 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 ## 프로젝트 구조
 
 ```
-app/            Next.js App Router 라우트
-  page.tsx        랜딩
-  lesson/[id]/    강의 시청
-  stamp-map/      진주 스탬프 맵
-  dictionary/     용어 사전
-  login/          로그인·회원가입
-  teacher-kit/    교사 키트
-  admin/          관리자 대시보드
-  playboard/      기획·구현 상황판(내부 전용)
-playboard/      PlayBoard SoT
-  registry/       사실의 단일 출처(6개 레지스트리)
-  derive/         레지스트리에서 파생되는 뷰·게이트
-prisma/         schema.prisma (DB 스키마)
-tasks/          세부 작업 명세 (GitHub 이슈와 1:1 동기화)
-docs/           PRD·의사결정·설계 동결 문서
-scripts/        capture.ts 등 운영 스크립트
+app/                Next.js App Router
+  (site)/             공용 SiteHeader + 학습자 화면 그룹 (라우트 그룹, URL 불변)
+    page.tsx            랜딩
+    lesson/[id]/        강의 시청
+    stamp-map/          진주 스탬프 맵
+    dictionary/         용어 사전
+    teacher-kit/        교사 키트
+  login/              로그인·회원가입
+  admin/dashboard/    관리자 대시보드
+  auth/               인증 Server Action · OAuth 콜백
+  progress/           학습 진척 저장 Server Action
+  api/                Route Handler (진척 sync · auth 등)
+  playboard/          기획·구현 상황판(내부 전용)
+automation/         콘텐츠 자동화 n8n 워크플로 (트랙 ②)
+playboard/          PlayBoard SoT
+  registry/           사실의 단일 출처(6개 레지스트리)
+  derive/             레지스트리에서 파생되는 뷰·게이트
+prisma/             schema.prisma + migrations (RLS 포함)
+lib/                auth · services · contracts 등 서버 로직
+tasks/              세부 작업 명세 (GitHub 이슈와 1:1 동기화)
+docs/               PRD · 의사결정 · grill 원장 · 설계 동결 문서
+scripts/            capture.ts 등 운영 스크립트
 ```
 
 ### PlayBoard — 단일 진실 공급원(SoT)
@@ -179,31 +194,43 @@ scripts/        capture.ts 등 운영 스크립트
 
 ---
 
+## 개발 방식
+
+이 프로젝트는 사람과 코딩 에이전트가 함께 다음 절차로 개발합니다.
+
+1. **명세 확정(grill)** — 착수 전 미해소 결정을 한 토픽씩 해소하고 설계 문서·하네스에 반영합니다. 진척은 [`docs/grill/GRILL_LEDGER.md`](./docs/grill/GRILL_LEDGER.md)에 재개 가능한 원장으로 남깁니다.
+2. **에이전트 자율 실행(goal)** — 확정된 명세를 에이전트가 브랜치에서 구현합니다.
+3. **PR → 독립 재검증** — 모든 변경은 PR로 올라오고, 구현과 분리된 재검증(테스트·diff·무결성 불변식)을 거칩니다.
+4. **사람이 머지** — 에이전트에는 머지 권한을 주지 않습니다. `main`은 브랜치 보호로 직접 push가 차단되어 모든 변경이 PR을 경유하며, 최종 검증·머지는 사람이 수행합니다.
+
+---
+
 ## 현재 한계와 로드맵
 
-이 저장소는 **P0(디자인·프로토타입) 단계가 완료**되었고, **P1(백엔드·영속화)에 착수해 인증 백엔드 뼈대가 완성**된 상태입니다. 모든 학습자·운영자 화면(랜딩·강의·스탬프 맵·사전·로그인·교사 키트·관리자 대시보드)이 UI로 구현되어 있습니다.
+**P0(디자인·프로토타입) 완료**, **P1(백엔드·영속화)** 진행 중입니다. 모든 학습자·운영자 화면이 UI로 구현되어 있고, 아래는 서버 로직·테스트와 함께 **DB에 영속되어 동작**합니다.
 
-**구현 완료 — 인증 백엔드(P1·W10 진행분).** `prisma/schema.prisma`에 `User` 모델(+`Role`/`MediaPreference`/`FontSize` enum)이 정의되어 마이그레이션이 적용되었고, 다음이 서버 로직·테스트와 함께 동작합니다.
+**구현 완료**
+- **인증 백엔드** — 이메일·닉네임 회원가입(PII 최소·결제 필드 구조적 거부·이메일 열거 방지) → 이메일 확인 콜백(확인된 계정만 `public.User` 멱등 등록·오픈 리다이렉트 차단) → 로그인/로그아웃, **카카오 OAuth**(`signInWithOAuth` + `/auth/callback` + 로그인 화면 배선), 세션 조회(`getCurrentUser`, 서버 JWT 재검증), **RBAC 가드**(learner/teacher/admin · 401/403), **환경설정 GET/PATCH**. 로그인 화면은 실제 Server Action에 배선되어 있습니다.
+- **RLS(Row Level Security)** — `User`·`Lesson`·`LessonProgress`에 RLS 활성 + select 정책(콘텐츠 공개 읽기·본인 행 한정 읽기, 쓰기는 서버 Prisma 전담). `prisma/migrations/…_enable_rls_ct_db_011`.
+- **학습 진척 저장** — 재생 위치(`lastPositionSec`)를 Server Action + Route Handler(sendBeacon)로 upsert 저장·재개. 시청은 비로그인 공개, 진척 저장/재개만 로그인.
 
-- **회원가입**(이메일·닉네임만, PII 최소·결제 필드 구조적 거부, 이메일 열거 방지) → **이메일 확인 콜백**(확인된 계정만 `public.User` 멱등 등록, 오픈 리다이렉트 차단) → **로그인/로그아웃**(Supabase 세션 쿠키, 열거 방지 균일 응답).
-- **세션 조회**(`getCurrentUser`, 서버에서 JWT 재검증·요청당 1회) + **RBAC 가드**(learner/teacher/admin, 401/403 분리)로 인증·권한 레이어를 갖췄습니다.
+**진행/예정**
+- **OX 채점** — 채점 로직은 seam 스텁 상태(정답 채점·`oxCompleted` 기록 미구현). 시청 화면의 OX 퀴즈는 현재 UI 프로토타입입니다.
+- **스탬프 적립** — 스탬프 맵은 현재 목업 데이터로 표시하며, OX 통과 기반 적립(`Stamp` 모델)은 미구현입니다.
+- **레이트리밋** — 코드(`lib/api/rate-limit.ts`)는 있으나 인증 경로에 아직 배선되지 않았습니다(프로비저닝 대기).
+- **교안 PDF 백엔드 · 콘텐츠 CMS(강의 3-미디어) · 관측성(`event_log`·내부 KPI) · 접근성 CI** — 예정.
 
-아직 **UI 배선(프로토타입 로그인 화면 ↔ 실제 Server Action)** 과 **나머지 영속화(학습 진척·OX 채점·스탬프 적립·교안 PDF·콘텐츠)** 는 진행 예정입니다. 즉 강의 시청·OX·스탬프 화면은 현재까진 클라이언트 프로토타입 수준이며 DB에 영속되지 않습니다.
+작업은 GitHub 마일스톤과 PlayBoard EPIC(`playboard/registry/work-items.ts`)으로 추적하며, 세부 명세는 `tasks/*.md`에 있습니다 — [P1 · 백엔드·영속화](https://github.com/EllaPark1220/3ECO-app/milestone/1) · [P2 · 품질·운영](https://github.com/EllaPark1220/3ECO-app/milestone/2).
 
-> 이 README는 현재 초안 수준으로, 구현 진척에 맞춰 계속 갱신됩니다.
-
-앞으로의 작업은 PlayBoard EPIC(`playboard/registry/work-items.ts`)에 대응하며, GitHub에서는 **Phase 단위 마일스톤**으로 추적합니다. 세부 명세는 `tasks/*.md`에, 진행은 각 마일스톤의 이슈에 있습니다.
-
-**[P1 · 백엔드·영속화](https://github.com/EllaPark1220/3ECO-app/milestone/1)** (다음 단계 · 이슈 58건)
-- **인증 백엔드 (W10)** — Supabase SSR + 최소 PII 회원가입·확인·로그인·세션·RBAC 가드 **구현 완료**. 남은 것: 카카오 OAuth([#191 FW-AUTH-006](https://github.com/EllaPark1220/3ECO-app/issues/191)), 환경설정 PATCH/GET(FW/FR-AUTH-005), rate limit·감사 로그·RLS(각 IF-KV-001/CT-DB-009/CT-DB-011 선행).
-- **학습 진척 영속화 (W11)** — 진척 저장(throttle·upsert), OX 멱등 채점, 스탬프 유니크 제약. → [#71 FW-PROG-001](https://github.com/EllaPark1220/3ECO-app/issues/71), [#15 CT-DB-004](https://github.com/EllaPark1220/3ECO-app/issues/15)
-- **관리자 인증·역할 게이트 (W12)** — 3역할 RBAC, learner 403 가드. → [#165 TS-UT-013](https://github.com/EllaPark1220/3ECO-app/issues/165)
-- **PDF 다운로드 백엔드 (W13)** — 한글 폰트 렌더러, 2단 캐시, 교사 피드백 저장. → [#69 FW-PDF-001](https://github.com/EllaPark1220/3ECO-app/issues/69), [#80 IF-CACHE-001](https://github.com/EllaPark1220/3ECO-app/issues/80)
-- **콘텐츠 CMS 연동 (W14)** — 강의 3-미디어 스키마, 시드·마이그레이션. → [#14 CT-DB-003](https://github.com/EllaPark1220/3ECO-app/issues/14), [#21 CT-DB-010](https://github.com/EllaPark1220/3ECO-app/issues/21)
-
-**[P2 · 품질·운영](https://github.com/EllaPark1220/3ECO-app/milestone/2)** (이슈 84건)
-- **접근성 감사·보강 (W15)** — Axe·Lighthouse CI 게이트, E2E 접근성 검증. → [#83 IF-CI-002](https://github.com/EllaPark1220/3ECO-app/issues/83)
-- **관측성·계측 도입 (W16)** — `event_log` append-only, 내부 KPI 산출, 개인정보 보호 분석. → [#79 IF-AN-001](https://github.com/EllaPark1220/3ECO-app/issues/79)
+| 웨이브 | 범위 | 상태 |
+|------|------|------|
+| W10 인증 백엔드 | 회원가입·확인·로그인·세션·RBAC·카카오 OAuth·환경설정·RLS | **완료** (레이트리밋 활성화·감사 로그 제외) |
+| W11 학습 진척 | 진척 저장 / OX 채점 · 스탬프 적립 | **진척 저장 완료** · OX·스탬프 예정 |
+| W12 역할 게이트 | 3역할 RBAC · learner 403 가드 | **완료** |
+| W13 PDF 백엔드 | 한글 폰트 렌더러 · 캐시 · 교사 피드백 저장 | 예정 |
+| W14 콘텐츠 CMS | 강의 3-미디어 스키마 · 시드 | 예정 |
+| W15 접근성 CI | Axe · Lighthouse CI 게이트 | 예정 |
+| W16 관측성 | `event_log` append-only · 내부 KPI | 예정 |
 
 ---
 
